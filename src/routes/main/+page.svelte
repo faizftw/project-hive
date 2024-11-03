@@ -138,7 +138,7 @@
 	</div>
 	<Separator />
 	<!-- buat card project -->
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
 		{#each $projectsStore as project (project.id)}
 			<ProjectCard {project} />
 		{/each}

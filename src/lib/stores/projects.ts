@@ -14,6 +14,9 @@ function createProjectStore() {
             );
             set(validProjects);
         },
+        deleteProject: (projectId: string) => {
+            update(projects => projects.filter(p => p.id !== projectId));
+        },
         addProject: (project: Project) => {
             if (!project?.id || typeof project.id !== 'string' || !project?.name) {
                 console.error('Invalid project data:', project);

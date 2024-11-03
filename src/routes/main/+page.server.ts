@@ -91,5 +91,47 @@ export const actions = {
 			console.error('Server error creating project:', error);
 			return { type: 'error', error: 'Gagal membuat project' };
 		}
+	},
+
+	deleteProject: async ({ request, locals }) => {
+		if (!locals.user) {
+			return { type: 'error', error: 'Unauthorized' };
+		}
+
+		try {
+			const formData = await request.formData();
+			const projectId = formData.get('id')?.toString();
+
+			if (!projectId) {
+				return { type: 'error', error: 'Project ID tidak valid' };
+			}
+
+			// Pastikan project dimiliki oleh user yang sedang login
+			const project = await prisma.project.findUnique({
+				where: { 
+					id: projectId,
+					createdById: locals.user.id 
+				}
+			});
+
+			if (!project) {
+				return { type: 'error', error: 'Project tidak ditemukan' };
+			}
+
+			// Hapus project
+			await prisma.project.delete({
+				where: { id: projectId }
+			});
+
+			return {
+				type: 'success',
+				status: 200,
+				message: 'Project berhasil dihapus'
+			};
+
+		} catch (error) {
+			console.error('Server error deleting project:', error);
+			return { type: 'error', error: 'Gagal menghapus project' };
+		}
 	}
 } satisfies Actions;
