@@ -1,0 +1,146 @@
+<script lang="ts">
+	import Folder from 'lucide-svelte/icons/folder-open';
+	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
+	import * as Card from '$lib/components/ui/card';
+	import { FolderCheck } from 'lucide-svelte';
+	import { FolderClock } from 'lucide-svelte';
+	import CardDescription from '$lib/components/ui/card/card-description.svelte';
+	import DataTable from '../task/(components)/data-table.svelte';
+	import dummyTasks from '../task/(data)/tasks.json';
+	import type { Task } from '$lib/types';
+	import * as Tabs from '$lib/components/ui/tabs';
+	import { Separator } from '$lib/components/ui/separator';
+	import ProjectCard from './(components)/project-card.svelte';
+	import type { Project } from '$lib/types';
+	import { goto, invalidate, invalidateAll } from '$app/navigation';
+	import { projectsStore } from '$lib/stores/projects';
+
+	export let data: {
+		projects: Project[];
+		tag: string;
+	};
+
+	// Initialize store with data from server
+	$: {
+		if (data.projects) {
+			console.log('Initial projects data:', data.projects); // Debug log
+			const validProjects = data.projects.filter(p => p && p.id);
+			projectsStore.set(validProjects);
+		}
+	}
+
+	// Reactive statements untuk metrics
+	$: totalProjects = $projectsStore.length;
+	$: completedProjects = $projectsStore.filter(p => p.status === 'completed').length;
+	$: inProgressProjects = $projectsStore.filter(p => p.status === 'active').length;
+	$: overdueProjects = $projectsStore.filter(p => {
+		if (p.dueDate && p.status !== 'completed') {
+			return new Date(p.dueDate) < new Date();
+		}
+		return false;
+	}).length;
+
+	async function handleProjectAdded(event: CustomEvent<{data: Project}>) {
+		try {
+			const projectData = event.detail.data;
+			console.log('Project added event data:', projectData);
+			
+			if (projectData?.id) {
+				projectsStore.update(projects => {
+					const filteredProjects = projects.filter(p => p.id !== projectData.id);
+					return [projectData, ...filteredProjects];
+				});
+			}
+		} catch (err) {
+			console.error('Error handling project added:', err);
+		}
+	}
+
+	const taskData: Task[] = dummyTasks;
+</script>
+
+<div class="flex-1 space-y-4 p-8 pt-6">
+	<div class="flex items-center justify-between space-y-2">
+		<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+		<div class="flex items-center space-x-2">
+			<Avatar />
+			<DarkMode />
+			<AddProject on:projectAdded={handleProjectAdded} />
+			<Search />
+		</div>
+	</div>
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">Projects</Card.Title>
+				<Folder class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{totalProjects}</div>
+				<p class="text-muted-foreground text-xs">Total Projects</p>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">Completed</Card.Title>
+				<FolderCheck class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{completedProjects}</div>
+				<p class="text-muted-foreground text-xs">Completed Projects</p>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">In Progress</Card.Title>
+				<FolderClock class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{inProgressProjects}</div>
+				<p class="text-muted-foreground text-xs">Active Projects</p>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">Overdue</Card.Title>
+				<FolderClock class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{overdueProjects}</div>
+				<p class="text-muted-foreground text-xs">Overdue Projects</p>
+			</Card.Content>
+		</Card.Root>
+	</div>
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+		<Card.Root class="col-span-7">
+			<Card.Header>
+				<Card.Title>Task Overview</Card.Title>
+			</Card.Header>
+			<Card.Content>
+				<Tabs.Root value="Upcoming" class="w-full">
+					<Tabs.List>
+						<Tabs.Trigger value="Upcoming">Upcoming Deadline</Tabs.Trigger>
+						<Tabs.Trigger value="Recent">Recent Task</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content value="Upcoming">
+						<div class="w-full">
+							<DataTable data={taskData} />
+						</div>
+					</Tabs.Content>
+					<Tabs.Content value="Recent">
+						<div class="w-full">
+							<DataTable data={taskData} />
+						</div>
+					</Tabs.Content>
+				</Tabs.Root>
+			</Card.Content>
+		</Card.Root>
+	</div>
+	<Separator />
+	<!-- buat card project -->
+	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+		{#each $projectsStore as project (project.id)}
+			<ProjectCard {project} />
+		{/each}
+	</div>
+</div>
