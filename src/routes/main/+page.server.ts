@@ -133,5 +133,78 @@ export const actions = {
 			console.error('Server error deleting project:', error);
 			return { type: 'error', error: 'Gagal menghapus project' };
 		}
+	},
+
+	updateProject: async ({ request, locals }) => {
+		if (!locals.user) {
+			return { type: 'error', error: 'Unauthorized' };
+		}
+
+		try {
+			const formData = await request.formData();
+			const projectId = formData.get('id')?.toString();
+			const name = formData.get('name')?.toString();
+			const description = formData.get('description')?.toString();
+			const status = formData.get('status')?.toString();
+			const dueDate = formData.get('dueDate')?.toString();
+
+			if (!projectId || !name) {
+				return { type: 'error', error: 'Data project tidak lengkap' };
+			}
+
+			// Validasi kepemilikan project
+			const existingProject = await prisma.project.findUnique({
+				where: { 
+					id: projectId,
+					createdById: locals.user.id 
+				}
+			});
+
+			if (!existingProject) {
+				return { type: 'error', error: 'Project tidak ditemukan' };
+			}
+
+			// Update project
+			const updatedProject = await prisma.project.update({
+				where: { id: projectId },
+				data: {
+					name,
+					description: description || null,
+					status: status as 'active' | 'completed',
+					dueDate: dueDate ? new Date(dueDate) : null
+				},
+				include: {
+					createdBy: {
+						select: {
+							id: true,
+							name: true,
+							email: true
+						}
+					}
+				}
+			});
+
+			return {
+				type: 'success',
+				data: {
+					id: updatedProject.id,
+					name: updatedProject.name,
+					description: updatedProject.description,
+					status: updatedProject.status,
+					dueDate: updatedProject.dueDate?.toISOString() || null,
+					createdAt: updatedProject.createdAt.toISOString(),
+					createdById: updatedProject.createdById,
+					createdBy: {
+						id: updatedProject.createdBy.id,
+						name: updatedProject.createdBy.name,
+						email: updatedProject.createdBy.email
+					}
+				}
+			};
+
+		} catch (error) {
+			console.error('Server error updating project:', error);
+			return { type: 'error', error: 'Gagal mengupdate project' };
+		}
 	}
 } satisfies Actions;

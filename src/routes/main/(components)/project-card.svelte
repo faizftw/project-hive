@@ -6,12 +6,20 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
 	import { projectsStore } from '$lib/stores/projects';
+	import EditProject from './edit-project.svelte';
+
 
 	export let project: Project;
 
 	let isDeleteDialogOpen = false;
+	let isEditDialogOpen = false;
+
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
+	}
+
+	const setIsEditDialogOpen = (value: boolean) => {
+		isEditDialogOpen = value;
 	}
 
 	// Validasi data project
@@ -69,6 +77,24 @@
 			alert('Gagal menghapus project. Silakan coba lagi.');
 		}
 	}
+
+	function handleProjectUpdated(event: CustomEvent<{project: Project}>) {
+		const updatedProject = event.detail.project;
+		
+		// Validasi lengkap untuk semua field yang diperlukan
+		if (!updatedProject?.id || 
+			!updatedProject?.name || 
+			!updatedProject?.createdBy?.id ||
+			!updatedProject?.createdBy?.name ||
+			!updatedProject?.createdBy?.email) {
+			console.error('Invalid updated project data received:', updatedProject);
+			return;
+		}
+		
+		// Update local project dan store
+		project = updatedProject;
+		projectsStore.updateProject(updatedProject);
+	}
 </script>
 
 {#if project && project.id}
@@ -83,7 +109,9 @@
 				</DropdownMenu.Trigger>
 				<DropdownMenu.Content>
 				  <DropdownMenu.Group>
-					<DropdownMenu.Item>Edit</DropdownMenu.Item>
+					<DropdownMenu.Item on:click={() => isEditDialogOpen = true}>
+						Edit
+					</DropdownMenu.Item>
 					<DropdownMenu.Item on:click={() => setIsDeleteDialogOpen(true)}>
 						Delete
 					</DropdownMenu.Item>
@@ -120,3 +148,9 @@
 		</AlertDialog.Footer>
 	  </AlertDialog.Content>
 </AlertDialog.Root>
+
+<EditProject 
+  bind:project
+  bind:open={isEditDialogOpen}
+  on:projectUpdated={handleProjectUpdated}
+/>

@@ -22,12 +22,25 @@ function createProjectStore() {
                 console.error('Invalid project data:', project);
                 return;
             }
-            update(projects => {
-                const filteredProjects = projects.filter(p => p.id !== project.id);
-                return [project, ...filteredProjects];
-            });
+            update(projects => [project, ...projects]);
         },
-        update
+        updateProject: (updatedProject: Project) => {
+            if (!updatedProject?.id || !updatedProject?.name) {
+                console.error('Invalid project data:', updatedProject);
+                return;
+            }
+            
+            update(projects => {
+                const index = projects.findIndex(p => p.id === updatedProject.id);
+                if (index === -1) {
+                    console.warn('Project not found in store:', updatedProject.id);
+                    return projects;
+                }
+                const newProjects = [...projects];
+                newProjects[index] = updatedProject;
+                return newProjects;
+            });
+        }
     };
 }
 

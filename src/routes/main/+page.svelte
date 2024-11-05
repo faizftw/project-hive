@@ -39,6 +39,8 @@
 		}
 		return false;
 	}).length;
+	$: cancelledProjects = $projectsStore.filter(p => p.status === 'cancelled').length;
+	$: onHoldProjects = $projectsStore.filter(p => p.status === 'on-hold').length;
 
 	async function handleProjectAdded(event: CustomEvent<{data: Project}>) {
 		try {
@@ -46,10 +48,7 @@
 			console.log('Project added event data:', projectData);
 			
 			if (projectData?.id) {
-				projectsStore.update(projects => {
-					const filteredProjects = projects.filter(p => p.id !== projectData.id);
-					return [projectData, ...filteredProjects];
-				});
+				projectsStore.addProject(projectData);
 			}
 		} catch (err) {
 			console.error('Error handling project added:', err);
@@ -69,7 +68,7 @@
 			<Search />
 		</div>
 	</div>
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<Card.Title class="text-sm font-medium">Projects</Card.Title>
@@ -108,6 +107,26 @@
 			<Card.Content>
 				<div class="text-2xl font-bold">{overdueProjects}</div>
 				<p class="text-muted-foreground text-xs">Overdue Projects</p>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">Cancelled</Card.Title>
+				<FolderClock class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{cancelledProjects}</div>
+				<p class="text-muted-foreground text-xs">Cancelled Projects</p>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+				<Card.Title class="text-sm font-medium">On Hold</Card.Title>
+				<FolderClock class="text-muted-foreground h-4 w-4" />
+			</Card.Header>
+			<Card.Content>
+				<div class="text-2xl font-bold">{onHoldProjects}</div>
+				<p class="text-muted-foreground text-xs">On Hold Projects</p>
 			</Card.Content>
 		</Card.Root>
 	</div>

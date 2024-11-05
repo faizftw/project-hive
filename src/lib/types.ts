@@ -2,7 +2,7 @@ export interface Project {
 	id: string;
 	name: string;
 	description: string | null;
-	status: 'active' | 'completed';
+	status: 'active' | 'completed' | 'cancelled' | 'on-hold';
 	dueDate: string | null;
 	createdAt: string;
 	createdById: string;
