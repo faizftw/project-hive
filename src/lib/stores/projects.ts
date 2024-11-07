@@ -22,7 +22,11 @@ function createProjectStore() {
                 console.error('Invalid project data:', project);
                 return;
             }
-            update(projects => [project, ...projects]);
+            
+            update(projects => {
+                const filteredProjects = projects.filter(p => p.id !== project.id);
+                return [project, ...filteredProjects];
+            });
         },
         updateProject: (updatedProject: Project) => {
             if (!updatedProject?.id || !updatedProject?.name) {

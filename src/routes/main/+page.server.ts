@@ -93,6 +93,7 @@ export const actions = {
 		}
 	},
 
+
 	deleteProject: async ({ request, locals }) => {
 		if (!locals.user) {
 			return { type: 'error', error: 'Unauthorized' };

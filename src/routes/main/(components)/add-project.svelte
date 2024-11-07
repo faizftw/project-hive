@@ -78,39 +78,43 @@
 			const result = await response.json();
 			console.log('Raw server response:', result);
 
-			// Parse data string menjadi array
-			const parsedData = JSON.parse(result.data);
-			console.log('Parsed data:', parsedData);
+			if (result.type === 'success') {
+				// Parse data string menjadi array
+				const parsedData = JSON.parse(result.data);
+				console.log('Parsed data:', parsedData);
 
-			// Extract project data dengan index yang benar
-			const newProject: Project = {
-				id: parsedData[4],          // ID project
-				name: parsedData[5],        // Nama project
-				description: parsedData[6],  // Deskripsi
-				status: parsedData[7],      // Status
-				dueDate: parsedData[8],     // Due date
-				createdAt: parsedData[9],   // Created at
-				createdById: parsedData[10], // Created by ID
-				createdBy: {
-					id: parsedData[10],     // Same as createdById
-					name: parsedData[12],    // Creator name
-					email: parsedData[13]    // Creator email
+				// Extract project data dengan index yang benar
+				const newProject: Project = {
+					id: parsedData[4],
+					name: parsedData[5],
+					description: parsedData[6],
+					status: parsedData[7],
+					dueDate: parsedData[8],
+					createdAt: parsedData[9],
+					createdById: parsedData[10],
+					createdBy: {
+						id: parsedData[10],
+						name: parsedData[12],
+						email: parsedData[13]
+					}
+				};
+
+				console.log('Formatted project:', newProject);
+
+				if (!newProject.id || !newProject.name) {
+					throw new Error('Invalid project data received');
 				}
-			};
 
-			console.log('Formatted project:', newProject);
-
-			if (!newProject.id || !newProject.name) {
-				throw new Error('Invalid project data received');
+				projectsStore.addProject(newProject);
+				dispatch('projectAdded', { data: newProject });
+				
+				form.reset();
+				dateValue = null;
+				timeValue = '';
+				open = false;
+			} else {
+				throw new Error(result.error || 'Gagal membuat project');
 			}
-
-			projectsStore.addProject(newProject);
-
-			form.reset();
-			dateValue = null;
-			timeValue = '';
-			open = false;
-			dispatch('projectAdded', { data: newProject });
 		})
 		.catch((err) => {
 			console.error('Error creating project:', err);
@@ -124,7 +128,9 @@
 
 <Dialog bind:open>
 	<DialogTrigger>
-		<Button>
+		<Button
+			aria-label="Add Project"
+		>
 			<Add class="mr-2 h-4 w-4" />
 			Add Project
 		</Button>
