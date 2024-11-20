@@ -44,13 +44,16 @@
 		/>
 		<div class="relative z-20 flex items-center text-lg font-medium">
 			<!-- <Command class="mr-2 h-6 w-6" /> -->
-			Acme Inc
+			Project Hive
 		</div>
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
 				<p class="text-lg">
-					&ldquo;This library has saved me countless hours of work and helped me deliver stunning
-					designs to my clients faster than ever before. Highly recommended!&rdquo;
+					Project Hive is a powerful project management platform focused on helping individuals
+					plan, track, and complete projects with ease. Featuring intuitive task organization,
+					customizable workflows, and real-time progress tracking, Project Hive provides a
+					streamlined approach to project management, keeping users on top of deadlines and
+					priorities to achieve their goals efficiently.
 				</p>
 				<footer class="text-sm">Sofia Davis</footer>
 			</blockquote>

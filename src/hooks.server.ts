@@ -5,7 +5,7 @@ import { redirect } from '@sveltejs/kit';
 export const handle: Handle = async ({ event, resolve }) => {
 	const session = event.cookies.get('session');
 	const publicPaths = ['/auth/login', '/auth/signup'];
-	const apiPaths = ['/api/auth/login', '/api/auth/logout'];
+	const apiPaths = ['/api/auth/login', '/api/auth/logout', '/api/auth/signup'];
 	const currentPath = event.url.pathname;
 
 	event.locals.user = null;

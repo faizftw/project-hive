@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card';
 	import type { Project } from '$lib/types';
 	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
@@ -7,7 +8,6 @@
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
 	import { projectsStore } from '$lib/stores/projects';
 	import EditProject from './edit-project.svelte';
-
 
 	export let project: Project;
 
@@ -95,6 +95,10 @@
 		project = updatedProject;
 		projectsStore.updateProject(updatedProject);
 	}
+
+	function handleCardClick() {
+		goto(`/task?projectId=${project.id}`);
+	}
 </script>
 
 {#if project && project.id}
@@ -102,24 +106,24 @@
 		<Card.Header>
 			<div class="ms-auto">
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger>
-					<button>
-						<DotsHorizontal class="h-4 w-4 ms-auto" />
-					</button>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content>
-				  <DropdownMenu.Group>
-					<DropdownMenu.Item on:click={() => isEditDialogOpen = true}>
-						Edit
-					</DropdownMenu.Item>
-					<DropdownMenu.Item on:click={() => setIsDeleteDialogOpen(true)}>
-						Delete
-					</DropdownMenu.Item>
-				  </DropdownMenu.Group>
+					<DropdownMenu.Trigger class="focus:outline-none">
+						<Button variant="ghost" >
+							<DotsHorizontal class="h-4 w-4 ms-auto" />
+						</Button>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content>
+					  <DropdownMenu.Group>
+						<DropdownMenu.Item on:click={() => isEditDialogOpen = true}>
+							Edit
+						</DropdownMenu.Item>
+						<DropdownMenu.Item on:click={() => setIsDeleteDialogOpen(true)}>
+							Delete
+						</DropdownMenu.Item>
+					  </DropdownMenu.Group>
 					</DropdownMenu.Content>
 				</DropdownMenu.Root>
 			</div>
-			<Card.Title>{project.name || 'Untitled Project'}</Card.Title>
+			<Card.Title class="m-auto">{project.name || 'Untitled Project'}</Card.Title>
 		</Card.Header>
 		<Card.Content>
 			<Card.Description>{project.description || 'No description'}</Card.Description>
@@ -129,6 +133,11 @@
 				<p class="text-muted-foreground text-sm">Status: {project.status || 'Unknown'}</p>
 				<p class="text-muted-foreground text-sm">Created: {project.createdAt ? formatDate(project.createdAt) : 'Not set'}</p>
 				<p class="text-muted-foreground text-sm">Due: {project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
+			</div>
+		</Card.Footer>
+		<Card.Footer>
+			<div class="m-auto">
+				<Button on:click={handleCardClick}>Open Task</Button>
 			</div>
 		</Card.Footer>
 	</Card.Root>

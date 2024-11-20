@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { labels } from '../(data)/data.js';
 	import { Badge } from '$lib/components/ui/badge';
-
 	export let value: string;
 	export let labelValue: string;
 	const label = labels.find((label) => label.value === labelValue);

@@ -2,6 +2,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { prisma } from '$lib/prisma';
 import { json } from '@sveltejs/kit';
+import { serialize } from 'cookie';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -9,31 +10,70 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Validasi input
 		if (!email || !password || !name) {
-			return json({ error: 'All fields are required' }, { status: 400 });
+			return json({ error: 'Email, password, and name are required' }, { status: 400 });
 		}
 
-		// Cek apakah email sudah digunakan
+		// Validasi format email
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) {
+			return json({ error: 'Format email tidak valid' }, { status: 400 });
+		}
+
+		// Cek apakah pengguna sudah ada
 		const existingUser = await prisma.user.findUnique({
 			where: { email }
 		});
 
 		if (existingUser) {
-			return json({ error: 'Email already registered' }, { status: 400 });
+			return json({ error: 'Pengguna dengan email ini sudah ada' }, { status: 409 });
 		}
 
 		// Hash password
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		// Simpan user ke database
+		// Buat pengguna baru
 		const user = await prisma.user.create({
 			data: {
 				email,
-				password: hashedPassword,
-				name
+				name,
+				password: hashedPassword
+			},
+			select: {
+				id: true,
+				email: true,
+				name: true
 			}
 		});
 
-		return json({ message: 'User created successfully', userId: user.id }, { status: 201 });
+		// Buat cookie sesi
+		const sessionId = user.id; // Anda dapat menggunakan penyimpanan sesi yang lebih aman
+
+		const headers = new Headers();
+		headers.append(
+			'Set-Cookie',
+			serialize('session', sessionId, {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: process.env.NODE_ENV === 'production',
+				maxAge: 60 * 60 * 24 * 7 // 1 minggu
+			})
+		);
+
+		return new Response(
+			JSON.stringify({
+				message: 'Signup berhasil',
+				user: {
+					id: user.id,
+					email: user.email,
+					name: user.name
+				}
+			}),
+			{
+				status: 201,
+				headers
+			}
+		);
 	} catch (error) {
 		console.error('Signup error:', error);
 		return json({ error: 'An error occurred during signup' }, { status: 500 });

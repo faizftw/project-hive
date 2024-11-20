@@ -4,7 +4,7 @@
 	import type { Writable } from 'svelte/store';
 	import { priorities, statuses } from '../(data)/data.js';
 	import type { Task } from '../(data)/schemas.js';
-	import { DataTableFacetedFilter, DataTableViewOptions } from './index.js';
+	import { DataTableFacetedFilter, DataTableViewOptions, AddTask } from './index.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Input } from '$lib/components/ui/input';
 
@@ -81,6 +81,6 @@
 			</Button>
 		{/if}
 	</div>
-
+	<AddTask />
 	<DataTableViewOptions {tableModel} />
 </div>

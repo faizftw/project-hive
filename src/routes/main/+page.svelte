@@ -4,15 +4,13 @@
 	import * as Card from '$lib/components/ui/card';
 	import { FolderCheck } from 'lucide-svelte';
 	import { FolderClock } from 'lucide-svelte';
-	import CardDescription from '$lib/components/ui/card/card-description.svelte';
-	import DataTable from '../task/(components)/data-table.svelte';
+	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
 	import dummyTasks from '../task/(data)/tasks.json';
 	import type { Task } from '$lib/types';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Separator } from '$lib/components/ui/separator';
 	import ProjectCard from './(components)/project-card.svelte';
 	import type { Project } from '$lib/types';
-	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import { projectsStore } from '$lib/stores/projects';
 
 	export let data: {
@@ -143,12 +141,12 @@
 					</Tabs.List>
 					<Tabs.Content value="Upcoming">
 						<div class="w-full">
-							<DataTable data={taskData} />
+							<DataTableOverview data={taskData} />
 						</div>
 					</Tabs.Content>
 					<Tabs.Content value="Recent">
 						<div class="w-full">
-							<DataTable data={taskData} />
+							<DataTableOverview data={taskData} />
 						</div>
 					</Tabs.Content>
 				</Tabs.Root>
