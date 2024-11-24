@@ -18,7 +18,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { createEventDispatcher } from 'svelte';
 	import type { DateValue } from '@internationalized/date';
-	import { DateFormatter, getLocalTimeZone } from '@internationalized/date';
+	import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
 	import { Calendar } from '$lib/components/ui/calendar';
 	import * as Popover from '$lib/components/ui/popover';
@@ -33,6 +33,9 @@
 	let dateValue: DateValue | null = null;
 	let timeValue = '';
 	let formattedDateTime: string | null = null;
+
+	// Tetapkan tanggal minimum sebagai hari ini
+	let minDate = today();
 
 	$: if (dateValue && timeValue) {
 		try {
@@ -59,8 +62,32 @@
 		timeValue = input.value;
 	}
 
-	function handleSubmit(event: SubmitEvent) {
+	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
+		isSubmitting = true;
+
+		// Gabungkan dateValue dan timeValue menjadi objek Date
+		let selectedDateTime: Date | null = null;
+		if (dateValue && timeValue) {
+			try {
+				const date = dateValue.toDate(getLocalTimeZone());
+				const [hours, minutes] = timeValue.split(':');
+				date.setHours(parseInt(hours));
+				date.setMinutes(parseInt(minutes));
+				selectedDateTime = date;
+			} catch (err) {
+				console.error('Error formatting date time:', err);
+				selectedDateTime = null;
+			}
+		}
+
+		// Validasi apakah deadline tidak di masa lalu
+		if (selectedDateTime && selectedDateTime < new Date()) {
+			alert('Deadline tidak boleh berada di masa lalu.');
+			isSubmitting = false;
+			return;
+		}
+
 		const form = event.target as HTMLFormElement;
 		const formData = new FormData(form);
 		
@@ -68,8 +95,6 @@
 			formData.append('dueDate', formattedDateTime);
 		}
 
-		isSubmitting = true;
-		
 		fetch('?/createProject', {
 			method: 'POST',
 			body: formData
@@ -181,7 +206,7 @@
 								</Button>
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-0">
-								<Calendar mode="single" selected={dateValue} bind:value={dateValue} initialFocus />
+								<Calendar mode="single" selected={dateValue} bind:value={dateValue} initialFocus minDate={minDate} />
 							</Popover.Content>
 						</Popover.Root>
 						<Popover.Root>

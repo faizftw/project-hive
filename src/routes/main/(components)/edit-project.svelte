@@ -75,6 +75,28 @@
     event.preventDefault();
     isSubmitting = true;
 
+    // Gabungkan dateValue dan timeValue menjadi objek Date
+    let selectedDateTime: Date | null = null;
+    if (dateValue && timeValue) {
+      try {
+        const date = dateValue.toDate(getLocalTimeZone());
+        const [hours, minutes] = timeValue.split(':');
+        date.setHours(parseInt(hours));
+        date.setMinutes(parseInt(minutes));
+        selectedDateTime = date;
+      } catch (err) {
+        console.error('Error formatting date time:', err);
+        selectedDateTime = null;
+      }
+    }
+
+    // Validasi apakah deadline tidak di masa lalu
+    if (selectedDateTime && selectedDateTime < new Date()) {
+      alert('Deadline tidak boleh berada di masa lalu.');
+      isSubmitting = false;
+      return;
+    }
+
     try {
       const form = new FormData();
       form.append('id', project.id);
@@ -127,6 +149,9 @@
       isSubmitting = false;
     }
   }
+
+  // Tetapkan tanggal minimum sebagai hari ini
+  let minDate = today();
 </script>
 
 <Dialog.Root bind:open>
@@ -189,7 +214,7 @@
                 </Button>
               </Popover.Trigger>
               <Popover.Content class="w-auto p-0">
-                <Calendar mode="single" bind:value={dateValue} selected={dateValue} />
+                <Calendar mode="single" bind:value={dateValue} selected={dateValue} minDate={minDate} />
               </Popover.Content>
             </Popover.Root>
             

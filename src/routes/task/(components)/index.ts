@@ -9,3 +9,5 @@ export { default as DataTablePagination } from './data-table-pagination.svelte';
 export { default as DataTableViewOptions } from './data-table-view-options.svelte';
 export { default as DataTableFacetedFilter } from './data-table-faceted-filter.svelte';
 export { default as AddTask } from './add-task.svelte';
+export { default as DataTableOverview } from './data-table-overview.svelte';
+export { default as OverviewToolbar } from './overview-toolbar.svelte';

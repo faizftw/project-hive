@@ -12,6 +12,7 @@
 	import ProjectCard from './(components)/project-card.svelte';
 	import type { Project } from '$lib/types';
 	import { projectsStore } from '$lib/stores/projects';
+	import { writable, derived } from 'svelte/store';
 
 	export let data: {
 		projects: Project[];
@@ -26,6 +27,19 @@
 			projectsStore.set(validProjects);
 		}
 	}
+
+	const searchQuery = writable('');
+
+	// Store yang terfilter berdasarkan kata kunci pencarian
+	const filteredProjects = derived(
+		[projectsStore, searchQuery],
+		([$projectsStore, $searchQuery]) => {
+			if (!$searchQuery) return $projectsStore;
+			return $projectsStore.filter(project =>
+				project.name.toLowerCase().includes($searchQuery.toLowerCase())
+			);
+		}
+	);
 
 	// Reactive statements untuk metrics
 	$: totalProjects = $projectsStore.length;
@@ -54,6 +68,10 @@
 	}
 
 	const taskData: Task[] = dummyTasks;
+
+	function handleSearch(event: CustomEvent<string>) {
+		searchQuery.set(event.detail);
+	}
 </script>
 
 <div class="flex-1 space-y-4 p-8 pt-6">
@@ -63,7 +81,7 @@
 			<Avatar />
 			<DarkMode />
 			<AddProject on:projectAdded={handleProjectAdded} />
-			<Search />
+			<Search on:search={handleSearch} />
 		</div>
 	</div>
 	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
@@ -156,7 +174,7 @@
 	<Separator />
 	<!-- buat card project -->
 	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-		{#each $projectsStore as project (project.id)}
+		{#each $filteredProjects as project (project.id)}
 			<ProjectCard {project} />
 		{/each}
 	</div>

@@ -18,8 +18,7 @@
 		DataTableRowActions,
 		DataTableStatusCell,
 		DataTableTitleCell,
-		DataTableToolbar,
-		AddTask
+		OverviewToolbar
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
 
@@ -164,7 +163,7 @@
 </script>
 
 <div class="space-y-4">
-	<DataTableToolbar {tableModel} {data} />
+	<OverviewToolbar {tableModel} {data} />
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
