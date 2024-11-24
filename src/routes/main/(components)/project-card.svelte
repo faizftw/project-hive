@@ -8,6 +8,7 @@
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
 	import { projectsStore } from '$lib/stores/projects';
 	import EditProject from './edit-project.svelte';
+	import { Progress } from "$lib/components/ui/progress";
 
 	export let project: Project;
 
@@ -135,8 +136,14 @@
 				<p class="text-muted-foreground text-sm">Due: {project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
 			</div>
 		</Card.Footer>
-		<Card.Footer>
-			<div class="m-auto">
+	<Card.Footer>
+		<div class="w-full">
+			<p class="text-muted-foreground text-sm">2/3 tasks completed</p>
+			<Progress value={33} />
+		</div>	
+	</Card.Footer>
+	<Card.Footer>
+		<div class="m-auto">
 				<Button on:click={handleCardClick}>Open Task</Button>
 			</div>
 		</Card.Footer>

@@ -1,9 +1,7 @@
 <script lang="ts">
-	import Folder from 'lucide-svelte/icons/folder-open';
 	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
 	import * as Card from '$lib/components/ui/card';
-	import { FolderCheck } from 'lucide-svelte';
-	import { FolderClock } from 'lucide-svelte';
+	import { FolderCheck, FolderClock, CalendarClock, FolderX, CirclePause, FolderOpen } from 'lucide-svelte';
 	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
 	import dummyTasks from '../task/(data)/tasks.json';
 	import type { Task } from '$lib/types';
@@ -88,7 +86,7 @@
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<Card.Title class="text-sm font-medium">Projects</Card.Title>
-				<Folder class="text-muted-foreground h-4 w-4" />
+				<FolderOpen class="text-muted-foreground h-4 w-4" />
 			</Card.Header>
 			<Card.Content>
 				<div class="text-2xl font-bold">{totalProjects}</div>
@@ -118,7 +116,7 @@
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<Card.Title class="text-sm font-medium">Overdue</Card.Title>
-				<FolderClock class="text-muted-foreground h-4 w-4" />
+				<CalendarClock class="text-muted-foreground h-4 w-4" />
 			</Card.Header>
 			<Card.Content>
 				<div class="text-2xl font-bold">{overdueProjects}</div>
@@ -128,7 +126,7 @@
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<Card.Title class="text-sm font-medium">Cancelled</Card.Title>
-				<FolderClock class="text-muted-foreground h-4 w-4" />
+				<FolderX class="text-muted-foreground h-4 w-4" />
 			</Card.Header>
 			<Card.Content>
 				<div class="text-2xl font-bold">{cancelledProjects}</div>
@@ -138,7 +136,7 @@
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 				<Card.Title class="text-sm font-medium">On Hold</Card.Title>
-				<FolderClock class="text-muted-foreground h-4 w-4" />
+				<CirclePause class="text-muted-foreground h-4 w-4" />
 			</Card.Header>
 			<Card.Content>
 				<div class="text-2xl font-bold">{onHoldProjects}</div>

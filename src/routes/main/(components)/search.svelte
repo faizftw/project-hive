@@ -2,7 +2,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { createEventDispatcher } from 'svelte';
 
-	const dispatch = createEventDispatcher<string>();
+	const dispatch = createEventDispatcher<{ search: string }>();
 
 	let query = '';
 
