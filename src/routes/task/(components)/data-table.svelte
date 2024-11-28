@@ -19,21 +19,28 @@
 		DataTableStatusCell,
 		DataTableTitleCell,
 		DataTableToolbar,
-		AddTask
+		DataTableDescCell
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
+	import { tasksStore } from '$lib/stores/tasks';
+	import { onMount } from 'svelte';
 
 	export let data: Task[];
+	export let projectId: string;
+
+	let tasks = [];
+
+	
 
 	const table = createTable(readable(data), {
 		select: addSelectedRows(),
 		sort: addSortBy({
-			toggleOrder: ['asc', 'desc']
+				toggleOrder: ['asc', 'desc']
 		}),
 		page: addPagination(),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => {
-				return value.toLowerCase().includes(filterValue.toLowerCase());
+				return String(value).toLowerCase().includes(String(filterValue).toLowerCase());
 			}
 		}),
 		colFilter: addColumnFilters(),
@@ -41,8 +48,9 @@
 	});
 
 	const columns = table.createColumns([
-		table.display({
+		table.column({
 			id: 'select',
+			accessor: 'id',
 			header: (_, { pluginStates }) => {
 				const { allPageRowsSelected } = pluginStates.select;
 				return createRender(DataTableCheckbox, {
@@ -67,10 +75,14 @@
 		}),
 		table.column({
 			accessor: 'id',
-			header: () => {
-				return 'Task';
-			},
+			header: () => 'Task',
 			id: 'task',
+			cell: ({ value }) => {
+				const truncate = (str: string, length: number) => {
+					return str.length > length ? str.substring(0, length) + '...' : str;
+				};
+				return truncate(value, 8); 
+			},
 			plugins: {
 				sort: {
 					disable: true
@@ -83,12 +95,24 @@
 			id: 'title',
 			cell: ({ value, row }) => {
 				if (row.isData()) {
+					const labelValue = typeof row.original.label === 'string' 
+						? { value: row.original.label, label: row.original.label } 
+						: row.original.label;
+					
 					return createRender(DataTableTitleCell, {
-						value,
-						labelValue: row.original.label
+						labelValue: labelValue || null,
+						value
 					});
 				}
 				return value;
+			}
+		}),
+		table.column({
+			accessor: 'description',
+			header: 'Description',
+			id: 'description',
+			cell: ({ value }) => {
+				return createRender(DataTableDescCell, { description: value });
 			}
 		}),
 		table.column({
@@ -105,9 +129,7 @@
 					fn: ({ filterValue, value }) => {
 						if (filterValue.length === 0) return true;
 						if (!Array.isArray(filterValue) || typeof value !== 'string') return true;
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
+						return filterValue.some((filter) => value.includes(filter));
 					},
 					initialFilterValue: [],
 					render: ({ filterValue }) => {
@@ -130,10 +152,7 @@
 					fn: ({ filterValue, value }) => {
 						if (filterValue.length === 0) return true;
 						if (!Array.isArray(filterValue) || typeof value !== 'string') return true;
-
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
+						return filterValue.some((filter) => value.includes(filter));
 					},
 					initialFilterValue: [],
 					render: ({ filterValue }) => {
@@ -144,9 +163,7 @@
 		}),
 		table.display({
 			id: 'actions',
-			header: () => {
-				return '';
-			},
+			header: () => '',
 			cell: ({ row }) => {
 				if (row.isData() && row.original) {
 					return createRender(DataTableRowActions, {
@@ -157,14 +174,22 @@
 			}
 		})
 	]);
+	
+	const unsubscribe = tasksStore.subscribe(value => {
+		tasks = value;
+	});
 
+	onMount(() => {
+		return () => unsubscribe();
+	});
+	
 	const tableModel = table.createViewModel(columns);
 
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
 </script>
 
 <div class="space-y-4">
-	<DataTableToolbar {tableModel} {data} />
+	<DataTableToolbar {tableModel} {data} {projectId}/>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
@@ -175,7 +200,7 @@
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
 										{#if cell.id !== 'select' && cell.id !== 'actions'}
-											<DataTableColumnHeader {props} {tableModel} cellId={cell.id}>
+											<DataTableColumnHeader props={props} {tableModel} cellId={cell.id}>
 												<Render of={cell.render()} />
 											</DataTableColumnHeader>
 										{:else}
@@ -196,13 +221,7 @@
 								{#each row.cells as cell (cell.id)}
 									<Subscribe attrs={cell.attrs()} let:attrs>
 										<Table.Cell {...attrs}>
-											{#if cell.id === 'task'}
-												<div class="w-[80px]">
-													<Render of={cell.render()} />
-												</div>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
+											<Render of={cell.render()} />
 										</Table.Cell>
 									</Subscribe>
 								{/each}
@@ -211,7 +230,9 @@
 					{/each}
 				{:else}
 					<Table.Row>
-						<Table.Cell colspan={columns.length} class="h-24 text-center">Tidak ada hasil.</Table.Cell>
+						<Table.Cell colspan={columns.length} class="h-24 text-center">
+							Tidak ada hasil.
+						</Table.Cell>
 					</Table.Row>
 				{/if}
 			</Table.Body>

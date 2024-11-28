@@ -3,18 +3,21 @@
 	import * as Card from '$lib/components/ui/card';
 	import { FolderCheck, FolderClock, CalendarClock, FolderX, CirclePause, FolderOpen } from 'lucide-svelte';
 	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
-	import dummyTasks from '../task/(data)/tasks.json';
-	import type { Task } from '$lib/types';
+	import type { Task } from '../task/(data)/schemas.js';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { Separator } from '$lib/components/ui/separator';
 	import ProjectCard from './(components)/project-card.svelte';
-	import type { Project } from '$lib/types';
+	import type { Project, PageData } from '$lib/types';
 	import { projectsStore } from '$lib/stores/projects';
 	import { writable, derived } from 'svelte/store';
+	import { fade } from 'svelte/transition';
+	import { tasksStore } from '$lib/stores/tasks';
 
 	export let data: {
 		projects: Project[];
+		tasks: Task[];
 		tag: string;
+		PageData: PageData;
 	};
 
 	// Initialize store with data from server
@@ -23,6 +26,9 @@
 			console.log('Initial projects data:', data.projects); // Debug log
 			const validProjects = data.projects.filter(p => p && p.id);
 			projectsStore.set(validProjects);
+		}
+		if (data.tasks) {
+			tasksStore.set(data.tasks);
 		}
 	}
 
@@ -65,7 +71,7 @@
 		}
 	}
 
-	const taskData: Task[] = dummyTasks;
+	const taskData: Task[] = [];
 
 	function handleSearch(event: CustomEvent<string>) {
 		searchQuery.set(event.detail);
@@ -173,7 +179,9 @@
 	<!-- buat card project -->
 	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
 		{#each $filteredProjects as project (project.id)}
-			<ProjectCard {project} />
+			<div transition:fade>
+				<ProjectCard {project} />
+			</div>
 		{/each}
 	</div>
 </div>

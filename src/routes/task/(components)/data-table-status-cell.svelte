@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { statuses } from '../(data)/data.js';
-
 	export let value: string;
-	const status = statuses.find((status) => status.value === value);
+	const status = statuses.find((status) => status.label === value);
 	const Icon = status?.icon;
 </script>
 

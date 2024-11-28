@@ -1,11 +1,6 @@
-import ArrowDown from 'svelte-radix/ArrowDown.svelte';
-import ArrowRight from 'svelte-radix/ArrowRight.svelte';
-import ArrowUp from 'svelte-radix/ArrowUp.svelte';
-import CheckCircled from 'svelte-radix/CheckCircled.svelte';
-import Circle from 'svelte-radix/Circle.svelte';
-import CrossCircled from 'svelte-radix/CrossCircled.svelte';
-import QuestionMarkCircled from 'svelte-radix/QuestionMarkCircled.svelte';
-import Stopwatch from 'svelte-radix/Stopwatch.svelte';
+import {ArrowDown, ArrowRight, ArrowUp, CheckCircled, Circle, CrossCircled, QuestionMarkCircled, Stopwatch, Pause } from 'svelte-radix';
+
+
 
 export const labels = [
 	{
@@ -19,32 +14,41 @@ export const labels = [
 	{
 		value: 'documentation',
 		label: 'Documentation'
+	},
+	{
+		value: 'general',
+		label: 'General'
 	}
 ];
 
 export const statuses = [
 	{
-		value: 'backlog',
+		value: 'Backlog',
 		label: 'Backlog',
 		icon: QuestionMarkCircled
 	},
 	{
-		value: 'todo',
+		value: 'Pending',
+		label: 'Pending',
+		icon: QuestionMarkCircled
+	},
+	{
+		value: 'Todo',
 		label: 'Todo',
 		icon: Circle
 	},
 	{
-		value: 'in progress',
+		value: 'In progress',
 		label: 'In Progress',
 		icon: Stopwatch
 	},
 	{
-		value: 'done',
-		label: 'Done',
+		value: 'Completed',
+		label: 'Completed',
 		icon: CheckCircled
 	},
 	{
-		value: 'canceled',
+		value: 'Canceled',
 		label: 'Canceled',
 		icon: CrossCircled
 	}
@@ -53,17 +57,17 @@ export const statuses = [
 export const priorities = [
 	{
 		label: 'Low',
-		value: 'low',
+		value: 'Low',
 		icon: ArrowDown
 	},
 	{
 		label: 'Medium',
-		value: 'medium',
+		value: 'Medium',
 		icon: ArrowRight
 	},
 	{
 		label: 'High',
-		value: 'high',
+		value: 'High',
 		icon: ArrowUp
 	}
 ];

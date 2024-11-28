@@ -12,5 +12,5 @@
 			<p class="text-muted-foreground">Berikut adalah daftar tugas untuk project ini!</p>
 		</div>
 	</div>
-	<DataTable data={data.tasks} />
+	<DataTable data={data.tasks} projectId={data.project.id} createdById={data.project.createdById} />
 </div>

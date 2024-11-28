@@ -10,6 +10,7 @@
 
 	export let tableModel: TableViewModel<Task>;
 	export let data: Task[];
+	export let projectId: string;
 
 	const counts = data.reduce<{
 		status: { [index: string]: number };
@@ -81,6 +82,6 @@
 			</Button>
 		{/if}
 	</div>
-	<AddTask />
+	<AddTask projectId={projectId}/>
 	<DataTableViewOptions {tableModel} />
 </div>

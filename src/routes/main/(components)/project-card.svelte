@@ -9,6 +9,8 @@
 	import { projectsStore } from '$lib/stores/projects';
 	import EditProject from './edit-project.svelte';
 	import { Progress } from "$lib/components/ui/progress";
+	import { tasksStore } from '$lib/stores/tasks';
+	import { derived } from 'svelte/store';
 
 	export let project: Project;
 
@@ -29,6 +31,25 @@
 			console.error('Invalid project data:', project);
 		}
 	}
+
+	// Menghitung progress
+	const projectTasks = derived(tasksStore, $tasks => 
+		$tasks.filter(task => task.projectId === project.id)
+	);
+
+	const completedTasks = derived(projectTasks, $projectTasks => 
+		$projectTasks.filter(task => task.status === 'Completed').length
+	);
+
+	const totalTasks = derived(projectTasks, $projectTasks => $projectTasks.length);
+
+	const progressPercentage = derived(
+		[completedTasks, totalTasks],
+		([$completedTasks, $totalTasks]) => {
+			if ($totalTasks === 0) return 0;
+			return Math.round(($completedTasks / $totalTasks) * 100);
+		}
+	);
 
 	function formatDate(date: string | null) {
 		if (!date) return 'Not set';
@@ -136,14 +157,14 @@
 				<p class="text-muted-foreground text-sm">Due: {project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
 			</div>
 		</Card.Footer>
-	<Card.Footer>
-		<div class="w-full">
-			<p class="text-muted-foreground text-sm">2/3 tasks completed</p>
-			<Progress value={33} />
-		</div>	
-	</Card.Footer>
-	<Card.Footer>
-		<div class="m-auto">
+		<Card.Footer>
+			<div class="w-full">
+				<p class="text-muted-foreground text-sm">{ $completedTasks }/{ $totalTasks } tasks completed</p>
+				<Progress value={ $progressPercentage } />
+			</div>	
+		</Card.Footer>
+		<Card.Footer>
+			<div class="m-auto">
 				<Button on:click={handleCardClick}>Open Task</Button>
 			</div>
 		</Card.Footer>

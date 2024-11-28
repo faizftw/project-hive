@@ -30,6 +30,9 @@ export const load = (async ({ url, locals }) => {
 		where: {
 			projectId: projectId,
 		},
+		include: {
+			label: true,
+		},
 		orderBy: {
 			createdAt: 'desc',
 		},

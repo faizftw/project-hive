@@ -1,6 +1,12 @@
 <script lang="ts">
-	import { readable, get } from 'svelte/store';
-	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
+	import { get } from 'svelte/store';
+	import { readable } from 'svelte/store';
+	import {
+		createTable,
+		Render,
+		Subscribe,
+		createRender,
+	} from 'svelte-headless-table';
 	import {
 		addColumnFilters,
 		addHiddenColumns,
@@ -21,6 +27,7 @@
 		OverviewToolbar
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
+	import type { Label } from '$lib/types';
 
 	export let data: Task[];
 
@@ -158,8 +165,16 @@
 	]);
 
 	const tableModel = table.createViewModel(columns);
-
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+
+	// Fungsi untuk memproses label
+	const processLabel = (labelValue: string | Label | null | undefined) => {
+		if (!labelValue) return null;
+		if (typeof labelValue === 'string') {
+			return { value: labelValue, label: labelValue };
+		}
+		return labelValue;
+	};
 </script>
 
 <div class="space-y-4">
@@ -174,7 +189,7 @@
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
 										{#if cell.id !== 'select' && cell.id !== 'actions'}
-											<DataTableColumnHeader {props} {tableModel} cellId={cell.id}>
+											<DataTableColumnHeader props={props} {tableModel} cellId={cell.id}>
 												<Render of={cell.render()} />
 											</DataTableColumnHeader>
 										{:else}
@@ -195,13 +210,7 @@
 								{#each row.cells as cell (cell.id)}
 									<Subscribe attrs={cell.attrs()} let:attrs>
 										<Table.Cell {...attrs}>
-											{#if cell.id === 'task'}
-												<div class="w-[80px]">
-													<Render of={cell.render()} />
-												</div>
-											{:else}
-												<Render of={cell.render()} />
-											{/if}
+											<Render of={cell.render()} />
 										</Table.Cell>
 									</Subscribe>
 								{/each}
@@ -210,7 +219,9 @@
 					{/each}
 				{:else}
 					<Table.Row>
-						<Table.Cell colspan={columns.length} class="h-24 text-center">Tidak ada hasil.</Table.Cell>
+						<Table.Cell colspan={columns.length} class="h-24 text-center">
+							Tidak ada hasil.
+						</Table.Cell>
 					</Table.Row>
 				{/if}
 			</Table.Body>

@@ -3,8 +3,6 @@
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import ClockIcon from 'lucide-svelte/icons/clock';
 	import { Button } from '$lib/components/ui/button';
-	import { enhance } from '$app/forms';
-	import type { ActionResult, SubmitFunction } from '@sveltejs/kit';
 	import type { Project } from '$lib/types';
 	import {
 		Dialog,

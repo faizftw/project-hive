@@ -13,15 +13,27 @@ export interface Project {
 	};
 }
 
+export interface Label {
+	id?: string;
+	value: string;
+	label: string;
+}
+
 export interface Task {
 	id: string;
 	title: string;
-	status: string;
-	label: string;
-	priority: string;
+	description: string | null;
+	priority: 'Low' | 'Medium' | 'High';
+	status: 'Backlog' | 'Pending' | 'Todo' | 'In Progress' | 'Completed' | 'Canceled';
+	label?: Label | string | null;
+	deadline: string | null;
+	createdAt: string;
+	projectId: string;
+	createdById: string;
 }
 
 export interface PageData {
 	projects: Project[];
+	tasks: Task[];
 }
 

@@ -2,7 +2,7 @@ import { prisma } from '$lib/prisma';
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
 
-export const load = (async ({ locals }) => {
+export const load = (async ({ url, locals }) => {
 	if (!locals.user) {
 		throw redirect(302, '/auth/login');
 	}
@@ -26,8 +26,24 @@ export const load = (async ({ locals }) => {
 		}
 	});
 
+	// Ambil semua tugas untuk proyek-proyek tersebut
+	const tasks = await prisma.task.findMany({
+		where: {
+			projectId: {
+				in: projects.map(project => project.id)
+			}
+		},
+		include: {
+			label: true,
+		},
+		orderBy: {
+			createdAt: 'desc',
+		},
+	});
+
 	return {
 		projects,
+		tasks,
 		tag: 'all'
 	};
 }) satisfies PageServerLoad;
