@@ -4,18 +4,31 @@ import type { Task } from '$lib/types';
 function createTaskStore() {
 	const { subscribe, set, update } = writable<Task[]>([]);
 
+	const sortTasks = (tasks: Task[]) => {
+		return [...tasks].sort((a, b) => 
+			new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+		);
+	};
+
 	return {
 		subscribe,
-		set: (tasks: Task[]) => set(tasks),
+		set: (tasks: Task[]) => {
+			set(sortTasks(tasks));
+		},
 		addTask: (task: Task) => {
-			if (!task?.id || typeof task.id !== 'string' || !task?.title) {
-				console.error('Data task tidak valid:', task);
-				return;
-			}
-			if (task.label === undefined) {
-				task.label = null;
-			}
-			update(tasks => [task, ...tasks]);
+			update(tasks => {
+				console.log('Menambahkan task:', task);
+				const newTask = {
+					...task,
+					label: task.label ? (
+						typeof task.label === 'string' 
+							? task.label 
+							: { ...task.label }
+					) : null,
+					createdAt: new Date().toISOString(),
+				};
+				return sortTasks([...tasks, newTask]);
+			});
 		},
 		deleteTask: (taskId: string) => {
 			update(tasks => tasks.filter(t => t.id !== taskId));

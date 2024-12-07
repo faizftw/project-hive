@@ -25,7 +25,7 @@ export interface Task {
 	description: string | null;
 	priority: 'Low' | 'Medium' | 'High';
 	status: 'Backlog' | 'Pending' | 'Todo' | 'In Progress' | 'Completed' | 'Canceled';
-	label?: Label | string | null;
+	label: Label | null;
 	deadline: string | null;
 	createdAt: string;
 	projectId: string;

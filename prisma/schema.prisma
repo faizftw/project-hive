@@ -41,7 +41,7 @@ model Task {
   status      String
   labelId     String?
   label       Label?   @relation("TaskLabels", fields: [labelId], references: [id])
-  deadline    DateTime?
+  deadline    DateTime? 
   createdAt   DateTime @default(now())
   project     Project  @relation(fields: [projectId], references: [id])
   projectId   String

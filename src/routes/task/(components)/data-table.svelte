@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readable, get } from 'svelte/store';
+	import { readable, get, derived } from 'svelte/store';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
 		addColumnFilters,
@@ -23,19 +23,21 @@
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
 	import { tasksStore } from '$lib/stores/tasks';
-	import { onMount } from 'svelte';
-
-	export let data: Task[];
-	export let projectId: string;
-
-	let tasks = [];
-
 	
 
-	const table = createTable(readable(data), {
+	export let projectId: string;
+
+	// Buat derived store untuk memfilter task berdasarkan projectId
+	const filteredTasks = derived(tasksStore, $tasks => 
+		$tasks.filter(task => task.projectId === projectId)
+	);
+
+
+	// Gunakan filteredTasks untuk tabel
+	const table = createTable(filteredTasks, {
 		select: addSelectedRows(),
 		sort: addSortBy({
-				toggleOrder: ['asc', 'desc']
+			toggleOrder: ['asc', 'desc']
 		}),
 		page: addPagination(),
 		filter: addTableFilter({
@@ -49,39 +51,14 @@
 
 	const columns = table.createColumns([
 		table.column({
-			id: 'select',
-			accessor: 'id',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected,
-					'aria-label': 'Select all'
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-				return createRender(DataTableCheckbox, {
-					checked: isSelected,
-					'aria-label': 'Select row',
-					class: 'translate-y-[2px]'
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
-				}
-			}
-		}),
-		table.column({
-			accessor: 'id',
+			accessor:'id',
 			header: () => 'Task',
 			id: 'task',
 			cell: ({ value }) => {
 				const truncate = (str: string, length: number) => {
 					return str.length > length ? str.substring(0, length) + '...' : str;
 				};
-				return truncate(value, 8); 
+				return 'Task - ' + truncate(value, 5); 
 			},
 			plugins: {
 				sort: {
@@ -95,17 +72,15 @@
 			id: 'title',
 			cell: ({ value, row }) => {
 				if (row.isData()) {
-					const labelValue = typeof row.original.label === 'string' 
-						? { value: row.original.label, label: row.original.label } 
-						: row.original.label;
 					
 					return createRender(DataTableTitleCell, {
-						labelValue: labelValue || null,
+						labelValue: row.original.label,
 						value
 					});
 				}
 				return value;
-			}
+
+			},
 		}),
 		table.column({
 			accessor: 'description',
@@ -175,21 +150,13 @@
 		})
 	]);
 	
-	const unsubscribe = tasksStore.subscribe(value => {
-		tasks = value;
-	});
-
-	onMount(() => {
-		return () => unsubscribe();
-	});
-	
 	const tableModel = table.createViewModel(columns);
 
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
 </script>
 
 <div class="space-y-4">
-	<DataTableToolbar {tableModel} {data} {projectId}/>
+	<DataTableToolbar {tableModel} {projectId} data={$filteredTasks} />
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
@@ -231,7 +198,7 @@
 				{:else}
 					<Table.Row>
 						<Table.Cell colspan={columns.length} class="h-24 text-center">
-							Tidak ada hasil.
+							No Task found
 						</Table.Cell>
 					</Table.Row>
 				{/if}

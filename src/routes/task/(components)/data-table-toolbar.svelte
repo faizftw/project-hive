@@ -9,8 +9,11 @@
 	import { Input } from '$lib/components/ui/input';
 
 	export let tableModel: TableViewModel<Task>;
-	export let data: Task[];
+	export let data: Task[] = []; // Nilai default array kosong
 	export let projectId: string;
+
+	// Tambahkan logging untuk debugging
+	console.log('Data diterima di DataTableToolbar:', data);
 
 	const counts = data.reduce<{
 		status: { [index: string]: number };

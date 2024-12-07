@@ -12,14 +12,14 @@ export const taskSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	description: z.string().nullable(),
-		status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled']),
+	status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled']),
 	label: z.union([
 		labelSchema,           // Label sebagai objek
 		z.string(),            // Label sebagai string
 		z.null()               // Label bisa null
 	]).optional(),             // Menjadikan label opsional
 	priority: z.enum(['Low', 'Medium', 'High']),
-	deadline: z.string().nullable().or(z.date().nullable()),
+	deadline: z.string().nullable().or(z.date().nullable()), // Sesuaikan dengan Prisma
 	createdAt: z.string().or(z.date()),
 	projectId: z.string(),
 	createdById: z.string()
@@ -36,7 +36,7 @@ export const taskCreateSchema = z.object({
 		z.null()               // Label bisa null
 	]).optional(),             // Menjadikan label opsional
 	priority: z.enum(['Low', 'Medium', 'High']),
-	deadline: z.string().nullable().or(z.date().nullable()),
+	deadline: z.string().nullable().or(z.date().nullable()), // Sesuaikan dengan Prisma
 	projectId: z.string(),
 });
 

@@ -10,7 +10,7 @@
 
   <div class="flex space-x-2">
 	{#if label}
-	  <Badge variant="outline">{label.label}</Badge>
+	  <Badge key={label.value} variant="outline">{label.label}</Badge>
 	{/if}
 	<span class="max-w-[500px] truncate font-medium">
 	  {value}

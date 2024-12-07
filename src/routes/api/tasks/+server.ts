@@ -127,3 +127,36 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		return json({ error: error.message }, { status: 500 });
 	}
 };
+
+export const DELETE: RequestHandler = async ({ request, locals }) => {
+	try {
+		if (!locals.user) {
+			return json({ error: 'Pengguna tidak terautentikasi.' }, { status: 401 });
+		}
+
+		const data = await request.json();
+		const { id } = data;
+
+		// Cek apakah task ada dan dimiliki oleh user
+		const task = await prisma.task.findUnique({
+			where: {
+				id,
+				createdById: locals.user.id
+			}
+		});
+
+		if (!task) {
+			return json({ error: 'Task tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
+		}
+
+		// Hapus task
+		await prisma.task.delete({
+			where: { id }
+		});
+
+		return json({ message: 'Task berhasil dihapus' }, { status: 200 });
+
+	} catch (error: any) {
+		return json({ error: error.message }, { status: 500 });
+	}
+};
