@@ -7,13 +7,19 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { toast } from 'svelte-sonner';
+	import EditTask from './edit-task.svelte';
 
 	export let row: Task;
 	const task = taskSchema.parse(row);
 	let isDeleteDialogOpen = false;
+	let isEditDialogOpen = false;
 
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
+	}
+
+	const setIsEditDialogOpen = (value: boolean) => {
+		isEditDialogOpen = value;
 	}
 
 	const deleteTask = async (id: string) => {
@@ -40,6 +46,32 @@
 			toast.error(error.message);
 		}
 	}
+
+	const handleEditTask = async (event: CustomEvent<Task>) => {
+		try {
+			const updatedTask = event.detail;
+			const response = await fetch(`/api/tasks/${task.id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(updatedTask)
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				tasksStore.updateTask(result.task);
+				setIsEditDialogOpen(false);
+				toast.success('Task berhasil diperbarui');
+			} else {
+				const data = await response.json();
+				throw new Error(data.error || 'Gagal memperbarui task');
+			}
+		} catch (error: any) {
+			console.error('Error updating task:', error);
+			toast.error(error.message);
+		}
+	}
 </script>
 
 <DropdownMenu.Root>
@@ -54,7 +86,7 @@
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="w-[160px]" align="end">
-		<DropdownMenu.Item>Edit</DropdownMenu.Item>
+		<DropdownMenu.Item on:click={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>
 		<DropdownMenu.Item>Make a copy</DropdownMenu.Item>
 		<DropdownMenu.Item>Favorite</DropdownMenu.Item>
 		<DropdownMenu.Separator />
@@ -77,6 +109,13 @@
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
+
+<EditTask 
+	bind:open={isEditDialogOpen} 
+	task={task}
+	projectId={task.projectId}
+	on:taskUpdated={handleEditTask}
+/>
 
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 	<AlertDialog.Content>

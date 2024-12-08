@@ -15,7 +15,7 @@
 	import { cn } from '$lib/utils';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import ClockIcon from 'lucide-svelte/icons/clock';
-
+	import { refreshTableData } from '$lib/utils/table-utils';
 	export let projectId: string;
 
 	const dispatch = createEventDispatcher();
@@ -99,6 +99,7 @@
 
 			if (response.ok) {
 				tasksStore.addTask(result.task);
+				await refreshTableData(projectId);
 				dispatch('taskAdded', result.task);
 				toast.success('Task berhasil ditambahkan!');
 				resetForm();

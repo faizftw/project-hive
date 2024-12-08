@@ -4,37 +4,48 @@ import type { Task } from '$lib/types';
 function createTaskStore() {
 	const { subscribe, set, update } = writable<Task[]>([]);
 
-	const sortTasks = (tasks: Task[]) => {
-		return [...tasks].sort((a, b) => 
-			new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-		);
-	};
-
 	return {
 		subscribe,
 		set: (tasks: Task[]) => {
-			set(sortTasks(tasks));
+			const validTasks = tasks.filter(t => 
+				t && 
+				typeof t.id === 'string' && 
+				typeof t.title === 'string'
+			);
+			set(validTasks);
 		},
 		addTask: (task: Task) => {
+			if (!task?.id || !task?.title) {
+				console.error('Invalid task data:', task);
+				return;
+			}
+			update(tasks => [...tasks, task]);
+		},
+		updateTask: (updatedTask: Task) => {
+			if (!updatedTask?.id || !updatedTask?.title) {
+				console.error('Invalid task data:', updatedTask);
+				return;
+			}
+			
 			update(tasks => {
-				console.log('Menambahkan task:', task);
-				const newTask = {
-					...task,
-					label: task.label ? (
-						typeof task.label === 'string' 
-							? task.label 
-							: { ...task.label }
-					) : null,
-					createdAt: new Date().toISOString(),
+				const index = tasks.findIndex(t => t.id === updatedTask.id);
+				if (index === -1) {
+					console.warn('Task not found in store:', updatedTask.id);
+					return tasks;
+				}
+				const newTasks = [...tasks];
+				newTasks[index] = {
+					...newTasks[index],
+					...updatedTask,
+					label: updatedTask.label || null,
+					priority: updatedTask.priority || 'Low',
+					status: updatedTask.status || 'Pending'
 				};
-				return sortTasks([...tasks, newTask]);
+				return newTasks;
 			});
 		},
 		deleteTask: (taskId: string) => {
 			update(tasks => tasks.filter(t => t.id !== taskId));
-		},
-		updateTask: (updatedTask: Task) => {
-			update(tasks => tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
 		}
 	};
 }

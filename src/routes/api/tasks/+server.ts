@@ -160,3 +160,57 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 		return json({ error: error.message }, { status: 500 });
 	}
 };
+
+export const PUT: RequestHandler = async ({ request, locals, params }) => {
+	try {
+		if (!locals.user) {
+			return json({ error: 'Pengguna tidak terautentikasi.' }, { status: 401 });
+		}
+
+		const data = await request.json();
+		const { id } = data;
+
+		// Cek apakah task ada dan dimiliki oleh user
+		const existingTask = await prisma.task.findUnique({
+			where: {
+				id,
+				createdById: locals.user.id
+			}
+		});
+
+		if (!existingTask) {
+			return json({ error: 'Task tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
+		}
+
+		let labelConnect = undefined;
+		if (data.label) {
+			if (typeof data.label === 'string') {
+				labelConnect = { connect: { value: data.label } };
+			} else {
+				labelConnect = { connect: { value: data.label.value } };
+			}
+		}
+
+		const updatedTask = await prisma.task.update({
+			where: { id },
+			data: {
+				title: data.title,
+				description: data.description,
+				priority: data.priority,
+				status: data.status,
+				deadline: data.deadline ? new Date(data.deadline) : null,
+				label: labelConnect,
+			},
+			include: {
+				label: true,
+				project: true,
+				createdBy: true,
+			},
+		});
+
+		return json({ task: updatedTask });
+	} catch (error: any) {
+		console.error('Error updating task:', error);
+		return json({ error: error.message }, { status: 500 });
+	}
+};

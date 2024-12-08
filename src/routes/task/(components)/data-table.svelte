@@ -23,9 +23,35 @@
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
 	import { tasksStore } from '$lib/stores/tasks';
-	
+	import { onDestroy } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	export let projectId: string;
+
+	let isLoading = false;
+
+	async function refreshTableData() {
+		isLoading = true;
+		try {
+			const response = await fetch(`/api/tasks?projectId=${projectId}`);
+			const tasks = await response.json();
+			tasksStore.set(tasks);
+		} catch (error) {
+			console.error('Error refreshing data:', error);
+			toast.error('Gagal memperbarui data');
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	// Subscribe ke event taskAdded dan taskUpdated
+	const unsubscribe = tasksStore.subscribe(() => {
+		refreshTableData();
+	});
+
+	onDestroy(() => {
+		unsubscribe();
+	});
 
 	// Buat derived store untuk memfilter task berdasarkan projectId
 	const filteredTasks = derived(tasksStore, $tasks => 
@@ -155,55 +181,68 @@
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
 </script>
 
-<div class="space-y-4">
-	<DataTableToolbar {tableModel} {projectId} data={$filteredTasks} />
-	<div class="rounded-md border">
-		<Table.Root {...$tableAttrs}>
-			<Table.Header>
-				{#each $headerRows as headerRow}
-					<Subscribe rowAttrs={headerRow.attrs()}>
-						<Table.Row>
-							{#each headerRow.cells as cell (cell.id)}
-								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-									<Table.Head {...attrs}>
-										{#if cell.id !== 'select' && cell.id !== 'actions'}
-											<DataTableColumnHeader props={props} {tableModel} cellId={cell.id}>
+{#if isLoading}
+	<div class="w-full space-y-3">
+		{#each Array(5) as _}
+			<div class="flex items-center space-x-4 rounded-md border p-4">
+				<div class="h-6 w-[30%] animate-pulse rounded-md bg-muted"></div>
+				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
+				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
+				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
+			</div>
+		{/each}
+	</div>
+{:else}
+	<div class="space-y-4">
+		<DataTableToolbar {tableModel} {projectId} data={$filteredTasks} />
+		<div class="rounded-md border">
+			<Table.Root {...$tableAttrs}>
+				<Table.Header>
+					{#each $headerRows as headerRow}
+						<Subscribe rowAttrs={headerRow.attrs()}>
+							<Table.Row>
+								{#each headerRow.cells as cell (cell.id)}
+									<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
+										<Table.Head {...attrs}>
+											{#if cell.id !== 'select' && cell.id !== 'actions'}
+												<DataTableColumnHeader props={props} {tableModel} cellId={cell.id}>
+													<Render of={cell.render()} />
+												</DataTableColumnHeader>
+											{:else}
 												<Render of={cell.render()} />
-											</DataTableColumnHeader>
-										{:else}
-											<Render of={cell.render()} />
-										{/if}
-									</Table.Head>
-								</Subscribe>
-							{/each}
-						</Table.Row>
-					</Subscribe>
-				{/each}
-			</Table.Header>
-			<Table.Body {...$tableBodyAttrs}>
-				{#if $pageRows.length}
-					{#each $pageRows as row (row.id)}
-						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<Table.Row {...rowAttrs}>
-								{#each row.cells as cell (cell.id)}
-									<Subscribe attrs={cell.attrs()} let:attrs>
-										<Table.Cell {...attrs}>
-											<Render of={cell.render()} />
-										</Table.Cell>
+											{/if}
+										</Table.Head>
 									</Subscribe>
 								{/each}
 							</Table.Row>
 						</Subscribe>
 					{/each}
-				{:else}
-					<Table.Row>
-						<Table.Cell colspan={columns.length} class="h-24 text-center">
-							No Task found
-						</Table.Cell>
-					</Table.Row>
-				{/if}
-			</Table.Body>
-		</Table.Root>
+				</Table.Header>
+				<Table.Body {...$tableBodyAttrs}>
+					{#if $pageRows.length}
+						{#each $pageRows as row (row.id)}
+							<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+								<Table.Row {...rowAttrs}>
+									{#each row.cells as cell (cell.id)}
+										<Subscribe attrs={cell.attrs()} let:attrs>
+											<Table.Cell {...attrs}>
+												<Render of={cell.render()} />
+											</Table.Cell>
+										</Subscribe>
+									{/each}
+								</Table.Row>
+							</Subscribe>
+						{/each}
+					{:else}
+						<Table.Row>
+							<Table.Cell colspan={columns.length} class="h-24 text-center">
+								No Task found
+							</Table.Cell>
+						</Table.Row>
+					{/if}
+				</Table.Body>
+			</Table.Root>
+		</div>
+		<DataTablePagination {tableModel} />
 	</div>
-	<DataTablePagination {tableModel} />
-</div>
+{/if}
