@@ -13,3 +13,4 @@ export { default as DataTableOverview } from './data-table-overview.svelte';
 export { default as OverviewToolbar } from './overview-toolbar.svelte';
 export { default as DataTableDescCell } from './data-table-desc-cell.svelte';
 export { default as EditTask } from './edit-task.svelte';
+export { default as DataTableDeadline } from './data-table-deadline.svelte';

@@ -2,7 +2,8 @@
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card';
 	import type { Project } from '$lib/types';
-	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
+	import { DotsHorizontal } from 'svelte-radix';
+	import { ClockAlert, SquarePen, CircleCheck } from 'lucide-svelte';
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 	import { Button } from '$lib/components/ui/button';
 	import * as AlertDialog from "$lib/components/ui/alert-dialog";
@@ -11,6 +12,7 @@
 	import { Progress } from "$lib/components/ui/progress";
 	import { tasksStore } from '$lib/stores/tasks';
 	import { derived } from 'svelte/store';
+	import { Badge } from "$lib/components/ui/badge";
 
 	export let project: Project;
 
@@ -62,7 +64,7 @@
 				return 'Not set';
 			}
 
-			return new Intl.DateTimeFormat('id-ID', {
+			return new Intl.DateTimeFormat('en-US', {
 				year: 'numeric',
 				month: 'long',
 				day: 'numeric',
@@ -121,6 +123,16 @@
 	function handleCardClick() {
 		goto(`/task?projectId=${project.id}`);
 	}
+
+	function getBadgeVariant(status: string) {
+		switch (status) {
+			case 'completed': return 'success';
+			case 'active': return 'warning';
+			case 'on-hold': return 'info';
+			case 'cancelled': return 'error';
+			default: return 'default';
+		}
+	}
 </script>
 
 {#if project && project.id}
@@ -152,15 +164,21 @@
 		</Card.Content>
 		<Card.Footer>
 			<div>
-				<p class="text-muted-foreground text-sm">Status: {project.status || 'Unknown'}</p>
-				<p class="text-muted-foreground text-sm">Created: {project.createdAt ? formatDate(project.createdAt) : 'Not set'}</p>
-				<p class="text-muted-foreground text-sm">Due: {project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
+				<div class="flex flex-row gap-2 my-1 items-center">
+					<SquarePen class="h-4 w-4" color="#bbff00"/> <p class="text-muted-foreground text-sm">{project.createdAt ? formatDate(project.createdAt) : 'Not set'}</p>
+				</div>
+				<div class="flex flex-row gap-2 my-1">
+					<ClockAlert class="h-4 w-4" color="#ff1900"/> <p class="text-muted-foreground text-sm">{project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
+				</div>
 			</div>
 		</Card.Footer>
 		<Card.Footer>
 			<div class="w-full">
-				<p class="text-muted-foreground text-sm">{ $completedTasks }/{ $totalTasks } tasks completed</p>
+				<p class="text-muted-foreground text-sm flex flex-row gap-1 items-center my-2">
+					{ $completedTasks }/{ $totalTasks } <CircleCheck class="h-4 w-4" color="#44ff00" /> 
+				</p>
 				<Progress value={ $progressPercentage } />
+				<Badge variant={getBadgeVariant(project.status || 'Unknown')} class="capitalize mt-3 ">{project.status || 'Unknown'}</Badge>
 			</div>	
 		</Card.Footer>
 		<Card.Footer>

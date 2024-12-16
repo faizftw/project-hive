@@ -9,9 +9,7 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
-	import type { Task } from '../(data)/schemas.js';
 	import {
-		DataTableCheckbox,
 		DataTableColumnHeader,
 		DataTablePagination,
 		DataTablePriorityCell,
@@ -19,7 +17,8 @@
 		DataTableStatusCell,
 		DataTableTitleCell,
 		DataTableToolbar,
-		DataTableDescCell
+		DataTableDescCell,
+		DataTableDeadline
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
 	import { tasksStore } from '$lib/stores/tasks';
@@ -160,6 +159,14 @@
 						return get(filterValue);
 					}
 				}
+			}
+		}),
+		table.column({
+			accessor: 'deadline',
+			header: 'Due',
+			id: 'deadline',
+			cell: ({ value }) => {
+				return createRender(DataTableDeadline, { deadline: value });
 			}
 		}),
 		table.display({
