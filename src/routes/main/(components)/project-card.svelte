@@ -64,10 +64,10 @@
 				return 'Not set';
 			}
 
-			return new Intl.DateTimeFormat('en-US', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
+			return new Intl.DateTimeFormat('Us-En', {
+				day: '2-digit',
+				month: 'short',
+				year: '2-digit',
 				hour: '2-digit',
 				minute: '2-digit'
 			}).format(dateObj);
@@ -165,10 +165,12 @@
 		<Card.Footer>
 			<div>
 				<div class="flex flex-row gap-2 my-1 items-center">
-					<SquarePen class="h-4 w-4" color="#bbff00"/> <p class="text-muted-foreground text-sm">{project.createdAt ? formatDate(project.createdAt) : 'Not set'}</p>
+					<SquarePen class="h-4 w-4" color="#bbff00"/> 
+					<p class="text-muted-foreground text-sm">{project.createdAt ? formatDate(project.createdAt) : '-'}</p>
 				</div>
 				<div class="flex flex-row gap-2 my-1">
-					<ClockAlert class="h-4 w-4" color="#ff1900"/> <p class="text-muted-foreground text-sm">{project.dueDate ? formatDate(project.dueDate) : 'Not set'}</p>
+					<ClockAlert class="h-4 w-4" color="#ff1900"/> 
+					<p class="text-muted-foreground text-sm">{project.dueDate ? formatDate(project.dueDate) : '-'}</p>
 				</div>
 			</div>
 		</Card.Footer>

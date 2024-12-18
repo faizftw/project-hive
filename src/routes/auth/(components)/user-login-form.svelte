@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { cn } from '$lib/utils.js';
 	import { goto } from '$app/navigation';
-	import CrossCircled from 'svelte-radix/CrossCircled.svelte';
+	import { CrossCircled, EyeOpen, EyeNone } from 'svelte-radix';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 
 	let className: string | undefined | null = undefined;
@@ -16,6 +16,7 @@
 	let errorMessage = '';
 	let showAlert = false;
 	let isLoading = false;
+	let showPassword = false;
 
 	async function onSubmit() {
 		showAlert = false;
@@ -80,17 +81,30 @@
 			</div>
 			<div class="grid gap-1">
 				<Label for="password">Password</Label>
-				<Input
-					id="password"
-					placeholder="password"
-					type="password"
-					bind:value={password}
-					autocapitalize="none"
-					autocomplete="current-password"
-					autocorrect="off"
-					disabled={isLoading}
-					required
-				/>
+				<div class="relative">
+					<Input
+						id="password"
+						placeholder="password"
+						type={showPassword ? "text" : "password"}
+						bind:value={password}
+						autocapitalize="none"
+						autocomplete="current-password"
+						autocorrect="off"
+						disabled={isLoading}
+						required
+					/>
+					<button 
+						type="button"
+						class="absolute right-3 top-1/2 -translate-y-1/2"
+						on:click={() => showPassword = !showPassword}
+					>
+						{#if showPassword}
+							<EyeNone class="h-4 w-4 text-muted-foreground" />
+						{:else}
+							<EyeOpen class="h-4 w-4 text-muted-foreground" />
+						{/if}
+					</button>
+				</div>
 			</div>
 			<Button type="submit" disabled={isLoading}>
 				{#if isLoading}

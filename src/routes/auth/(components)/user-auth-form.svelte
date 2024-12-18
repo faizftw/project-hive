@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { cn } from '$lib/utils.js';
 	import { goto } from '$app/navigation';
-	import CrossCircled from 'svelte-radix/CrossCircled.svelte';
+	import { CrossCircled} from 'svelte-radix';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 
 	let className: string | undefined | null = undefined;
@@ -17,7 +17,6 @@
 	let confirmPassword = '';
 	let errorMessage = '';
 	let showAlert = false;
-
 	let isLoading = false;
 
 	async function onSubmit() {
