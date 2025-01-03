@@ -33,7 +33,7 @@
 	let formattedDateTime: string | null = null;
 
 	// Tetapkan tanggal minimum sebagai hari ini
-	let minDate = today();
+	let minDate = today(getLocalTimeZone());
 
 	$: if (dateValue && timeValue) {
 		try {

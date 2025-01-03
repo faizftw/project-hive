@@ -1,12 +1,6 @@
 <script lang="ts">
-	import { get } from 'svelte/store';
-	import { readable } from 'svelte/store';
-	import {
-		createTable,
-		Render,
-		Subscribe,
-		createRender,
-	} from 'svelte-headless-table';
+	import { readable, get, derived } from 'svelte/store';
+	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
 		addColumnFilters,
 		addHiddenColumns,
@@ -15,23 +9,64 @@
 		addSortBy,
 		addTableFilter
 	} from 'svelte-headless-table/plugins';
-	import type { Task } from '../(data)/schemas.js';
 	import {
-		DataTableCheckbox,
 		DataTableColumnHeader,
 		DataTablePagination,
 		DataTablePriorityCell,
 		DataTableRowActions,
 		DataTableStatusCell,
 		DataTableTitleCell,
-		OverviewToolbar
+		OverviewToolbar,
+		DataTableDescCell,
+		DataTableDeadline,
+		DataTableProjectCell
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table';
-	import type { Label } from '$lib/types';
+	import { tasksStore } from '$lib/stores/tasks';
+	import { onDestroy, onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
-	export let data: Task[];
+	export let projectId: string;
 
-	const table = createTable(readable(data), {
+	let isLoading = false;
+
+	async function refreshTableData() {
+		isLoading = true;
+		try {
+			const response = await fetch(`/api/tasks?projectId=${projectId}`);
+			const tasks = await response.json();
+			tasksStore.set(tasks);
+		} catch (error) {
+			console.error('Error refreshing data:', error);
+			toast.error('Gagal memperbarui data');
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	// Pindahkan subscribe ke dalam onMount
+	onMount(() => {
+		// Panggil refreshTableData pertama kali
+		if (projectId) {
+			refreshTableData();
+		}
+
+		// Subscribe ke perubahan store
+		const unsubscribe = tasksStore.subscribe(() => {
+			if (projectId) {
+				refreshTableData();
+			}
+		});
+
+		// Cleanup subscription saat komponen dihapus
+		return () => {
+			unsubscribe();
+		};
+	});
+
+	const allTasks = derived(tasksStore, $tasks => $tasks);
+
+	const table = createTable(allTasks, {
 		select: addSelectedRows(),
 		sort: addSortBy({
 			toggleOrder: ['asc', 'desc']
@@ -47,40 +82,14 @@
 	});
 
 	const columns = table.createColumns([
-		table.display({
-			id: 'select',
-			header: (_, { pluginStates }) => {
-				const { allPageRowsSelected } = pluginStates.select;
-				return createRender(DataTableCheckbox, {
-					checked: allPageRowsSelected,
-					'aria-label': 'Select all'
-				});
-			},
-			cell: ({ row }, { pluginStates }) => {
-				const { getRowState } = pluginStates.select;
-				const { isSelected } = getRowState(row);
-				return createRender(DataTableCheckbox, {
-					checked: isSelected,
-					'aria-label': 'Select row',
-					class: 'translate-y-[2px]'
-				});
-			},
-			plugins: {
-				sort: {
-					disable: true
-				}
-			}
-		}),
 		table.column({
-			accessor: 'id',
-			header: () => {
-				return 'Task';
-			},
-			id: 'task',
-			plugins: {
-				sort: {
-					disable: true
-				}
+			accessor: 'projectId',
+			header: 'Project',
+			id: 'projectId',
+			cell: ({ value }) => {
+				return createRender(DataTableProjectCell, {
+					projectId: value
+				});
 			}
 		}),
 		table.column({
@@ -148,6 +157,14 @@
 				}
 			}
 		}),
+		table.column({
+			accessor: 'deadline',
+			header: 'Due',
+			id: 'deadline',
+			cell: ({ value }) => {
+				return createRender(DataTableDeadline, { deadline: value });
+			}
+		}),
 		table.display({
 			id: 'actions',
 			header: () => {
@@ -167,18 +184,10 @@
 	const tableModel = table.createViewModel(columns);
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
 
-	// Fungsi untuk memproses label
-	const processLabel = (labelValue: string | Label | null | undefined) => {
-		if (!labelValue) return null;
-		if (typeof labelValue === 'string') {
-			return { value: labelValue, label: labelValue };
-		}
-		return labelValue;
-	};
 </script>
 
 <div class="space-y-4">
-	<OverviewToolbar {tableModel} {data} />
+	<OverviewToolbar {tableModel} data={$allTasks} />
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>
