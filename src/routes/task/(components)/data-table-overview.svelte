@@ -25,6 +25,7 @@
 	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { projectsStore } from '$lib/stores/projects';
 
 	export let projectId: string;
 
@@ -66,7 +67,17 @@
 
 	const allTasks = derived(tasksStore, $tasks => $tasks);
 
-	const table = createTable(allTasks, {
+	// Subscribe ke perubahan projectsStore untuk memfilter task yang projectnya sudah dihapus
+	const filteredTasks = derived(
+		[tasksStore, projectsStore], 
+		([$tasks, $projects]) => {
+			const projectIds = new Set($projects.map(p => p.id));
+			return $tasks.filter(task => projectIds.has(task.projectId));
+		}
+	);
+
+	// Gunakan filteredTasks untuk tabel
+	const table = createTable(filteredTasks, {
 		select: addSelectedRows(),
 		sort: addSortBy({
 			toggleOrder: ['asc', 'desc']

@@ -13,6 +13,7 @@
 	import { tasksStore } from '$lib/stores/tasks';
 	import { derived } from 'svelte/store';
 	import { Badge } from "$lib/components/ui/badge";
+	import { toast } from "svelte-sonner";
 
 	export let project: Project;
 
@@ -92,13 +93,24 @@
 			if (result.type === 'success') {
 				// Hapus project dari store
 				projectsStore.deleteProject(project.id);
+				
+				// Hapus semua task yang terkait dengan project yang dihapus
+				tasksStore.deleteTask(project.id);
+				
 				setIsDeleteDialogOpen(false);
+				toast.success('Project berhasil dihapus');
 			} else {
+				// Jika server mengembalikan error
 				throw new Error(result.error || 'Gagal menghapus project');
 			}
 		} catch (err) {
+			// Log error untuk debugging
 			console.error('Error deleting project:', err);
-			alert('Gagal menghapus project. Silakan coba lagi.');
+			
+			// Tampilkan pesan error yang lebih spesifik
+			const errorMessage = err instanceof Error ? err.message : 'Gagal menghapus project';
+			toast.error(errorMessage);
+			return;
 		}
 	}
 

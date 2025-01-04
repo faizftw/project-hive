@@ -48,6 +48,31 @@ export const load = (async ({ url, locals }) => {
 	};
 }) satisfies PageServerLoad;
 
+async function deleteProject(projectId: string, userId: string) {
+	try {
+		// Hapus semua task terkait project terlebih dahulu
+		await prisma.task.deleteMany({
+			where: {
+				projectId: projectId,
+				createdById: userId
+			}
+		});
+
+		// Kemudian hapus projectnya
+		await prisma.project.delete({
+			where: {
+				id: projectId,
+				createdById: userId
+			}
+		});
+
+		return true;
+	} catch (error) {
+		console.error('Error menghapus project:', error);
+		return false;
+	}
+}
+
 export const actions = {
 	createProject: async ({ request, locals }) => {
 		if (!locals.user) {
@@ -123,22 +148,11 @@ export const actions = {
 				return { type: 'error', error: 'Project ID tidak valid' };
 			}
 
-			// Pastikan project dimiliki oleh user yang sedang login
-			const project = await prisma.project.findUnique({
-				where: { 
-					id: projectId,
-					createdById: locals.user.id 
-				}
-			});
+			const success = await deleteProject(projectId, locals.user.id);
 
-			if (!project) {
-				return { type: 'error', error: 'Project tidak ditemukan' };
+			if (!success) {
+				return { type: 'error', error: 'Gagal menghapus project' };
 			}
-
-			// Hapus project
-			await prisma.project.delete({
-				where: { id: projectId }
-			});
 
 			return {
 				type: 'success',
@@ -148,7 +162,10 @@ export const actions = {
 
 		} catch (error) {
 			console.error('Server error deleting project:', error);
-			return { type: 'error', error: 'Gagal menghapus project' };
+			return { 
+				type: 'error', 
+				error: error instanceof Error ? error.message : 'Failed to delete project'
+			};
 		}
 	},
 

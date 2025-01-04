@@ -20,12 +20,6 @@ importers:
       lucide-svelte:
         specifier: ^0.453.0
         version: 0.453.0(svelte@4.2.19)
-      mode-watcher:
-        specifier: ^0.4.1
-        version: 0.4.1(svelte@4.2.19)
-      svelte-sonner:
-        specifier: ^0.3.28
-        version: 0.3.28(svelte@4.2.19)
     devDependencies:
       '@internationalized/date':
         specifier: ^3.5.6
@@ -81,6 +75,9 @@ importers:
       globals:
         specifier: ^15.0.0
         version: 15.11.0
+      mode-watcher:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@4.2.19)
       postcss:
         specifier: ^8.4.47
         version: 8.4.47
@@ -105,6 +102,9 @@ importers:
       svelte-radix:
         specifier: ^1.1.1
         version: 1.1.1(svelte@4.2.19)
+      svelte-sonner:
+        specifier: ^0.3.28
+        version: 0.3.28(svelte@4.2.19)
       sveltekit-superforms:
         specifier: ^2.20.0
         version: 2.20.0(@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@3.1.2(svelte@4.2.19)(vite@5.4.9))(svelte@4.2.19)(vite@5.4.9))(@types/json-schema@7.0.15)(svelte@4.2.19)(typescript@5.6.3)

@@ -21,6 +21,7 @@
 	import { Calendar } from '$lib/components/ui/calendar';
 	import * as Popover from '$lib/components/ui/popover';
 	import { projectsStore } from '$lib/stores/projects';
+	import { toast } from 'svelte-sonner';
 
 	const dispatch = createEventDispatcher<{
 		projectAdded: { data: Project };
@@ -135,6 +136,7 @@
 				dateValue = null;
 				timeValue = '';
 				open = false;
+				toast.success('Project berhasil dibuat');
 			} else {
 				throw new Error(result.error || 'Gagal membuat project');
 			}
