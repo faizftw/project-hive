@@ -176,6 +176,21 @@
 				return createRender(DataTableDeadline, { deadline: value });
 			}
 		}),
+        table.column({
+            accessor: 'createdAt',
+            header: 'Created At',
+            id: 'createdAt',
+            cell: ({ value }) => {
+                const date = new Date(value);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+					hour: '2-digit',
+					minute: '2-digit'
+                });
+            }
+        }),
 		table.display({
 			id: 'actions',
 			header: () => {

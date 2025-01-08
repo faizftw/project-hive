@@ -3,7 +3,7 @@
 
 	export let deadline: string | null; 
     const date = new Date(deadline || '');
-    const formattedDate = formatDate(date, 'MM/dd/yyyy hh:mm a');
+    const formattedDate = formatDate(date, 'MMM dd, yyyy hh:mm a');
 </script>
 
 <div class="flex space-x-2">
