@@ -163,12 +163,12 @@
 					</Tabs.List>
 					<Tabs.Content value="Upcoming">
 						<div class="w-full">
-							<DataTableOverview data={taskData} />
+							<DataTableOverview data={taskData} activeTab="Upcoming" />
 						</div>
 					</Tabs.Content>
 					<Tabs.Content value="Recent">
 						<div class="w-full">
-							<DataTableOverview data={taskData} />
+							<DataTableOverview data={taskData} activeTab="Recent" />
 						</div>
 					</Tabs.Content>
 				</Tabs.Root>

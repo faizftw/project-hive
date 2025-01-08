@@ -28,6 +28,7 @@
 	import { projectsStore } from '$lib/stores/projects';
 
 	export let projectId: string;
+	export let activeTab: string;
 
 	let isLoading = false;
 
@@ -67,17 +68,41 @@
 
 	const allTasks = derived(tasksStore, $tasks => $tasks);
 
-	// Subscribe ke perubahan projectsStore untuk memfilter task yang projectnya sudah dihapus
-	const filteredTasks = derived(
+	// Derived store untuk task yang difilter berdasarkan tab
+	const filteredAndSortedTasks = derived(
 		[tasksStore, projectsStore], 
 		([$tasks, $projects]) => {
-			const projectIds = new Set($projects.map(p => p.id));
-			return $tasks.filter(task => projectIds.has(task.projectId));
+			// Filter task yang projectnya masih ada
+			const validTasks = $tasks.filter(task => {
+				const projectIds = new Set($projects.map(p => p.id));
+				return projectIds.has(task.projectId);
+			});
+
+			if (activeTab === 'Upcoming') {
+				// Filter task yang belum selesai dan urutkan berdasarkan deadline terdekat
+				return validTasks
+					.filter(task => 
+						task.status !== 'Completed' && 
+						task.status !== 'Canceled' && 
+						task.deadline
+					)
+					.sort((a, b) => 
+						new Date(a.deadline || '').getTime() - new Date(b.deadline || '').getTime()
+					)
+					.slice(0, 5); // Ambil 5 task terdekat
+			} else {
+				// Urutkan berdasarkan createdAt terbaru
+				return validTasks
+					.sort((a, b) => 
+						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+					)
+					.slice(0, 5); // Ambil 5 task terbaru
+			}
 		}
 	);
 
-	// Gunakan filteredTasks untuk tabel
-	const table = createTable(filteredTasks, {
+	// Gunakan filteredAndSortedTasks untuk tabel
+	const table = createTable(filteredAndSortedTasks, {
 		select: addSelectedRows(),
 		sort: addSortBy({
 			toggleOrder: ['asc', 'desc']
@@ -115,6 +140,14 @@
 					});
 				}
 				return value;
+			}
+		}),
+		table.column({
+			accessor: 'description',
+			header: 'Description',
+			id: 'description',
+			cell: ({ value }) => {
+				return createRender(DataTableDescCell, { description: value });
 			}
 		}),
 		table.column({
@@ -169,28 +202,24 @@
 			}
 		}),
 		table.column({
-			accessor: 'deadline',
-			header: 'Due',
-			id: 'deadline',
+			accessor: activeTab === 'Upcoming' ? 'deadline' : 'createdAt',
+			header: activeTab === 'Upcoming' ? 'Due' : 'Created At',
+			id: activeTab === 'Upcoming' ? 'deadline' : 'createdAt',
 			cell: ({ value }) => {
-				return createRender(DataTableDeadline, { deadline: value });
+				if (activeTab === 'Upcoming') {
+					return createRender(DataTableDeadline, { deadline: value });
+				} else {
+					const date = new Date(value);
+					return date.toLocaleDateString('id-ID', {
+						year: 'numeric',
+						month: 'short',
+						day: '2-digit',
+						hour: '2-digit',
+						minute: '2-digit'
+					});
+				}
 			}
 		}),
-        table.column({
-            accessor: 'createdAt',
-            header: 'Created At',
-            id: 'createdAt',
-            cell: ({ value }) => {
-                const date = new Date(value);
-                return date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: '2-digit',
-					hour: '2-digit',
-					minute: '2-digit'
-                });
-            }
-        }),
 		table.display({
 			id: 'actions',
 			header: () => {
