@@ -35,11 +35,81 @@
 		}
 	}
 
-	// Menghitung progress
-	const projectTasks = derived(tasksStore, $tasks => 
+	// Derived store untuk mendapatkan tasks dari project tertentu
+	const projectTasks = derived(tasksStore, $tasks =>
 		$tasks.filter(task => task.projectId === project.id)
 	);
 
+	// Fungsi pembantu untuk menghitung status project berdasarkan kondisi task dan dueDate
+	// Mengembalikan salah satu nilai: "active", "completed", "cancelled" atau "on-hold"
+	function computeProjectStatus(
+		tasks: any[],
+		dueDate: string | null
+	): "active" | "completed" | "cancelled" | "on-hold" {
+		const now = new Date();
+		// Rule: Jika project memiliki dueDate dan waktu sekarang telah melewati dueDate,
+		// serta tidak ada task yang sedang dikerjakan atau sudah selesai, maka dianggap "cancelled" (alias Archived)
+		if (dueDate) {
+			const due = new Date(dueDate);
+			if (now > due) {
+				const startedOrCompleted = tasks.filter(
+					task => task.status === 'In Progress' || task.status === 'Completed'
+				);
+				if (startedOrCompleted.length === 0) {
+					return "cancelled";
+				}
+			}
+		}
+		// Rule: Jika terdapat tasks dan SEMUA task memiliki status "Completed", maka project jadi "completed"
+		if (tasks.length > 0 && tasks.every(task => task.status === 'Completed')) {
+			return "completed";
+		}
+		// Rule: Jika terdapat tasks dan task terbaru (berdasarkan createdAt) sudah lebih dari 7 hari yang lalu, maka project jadi "on-hold"
+		if (tasks.length > 0) {
+			const latestTaskTime = Math.max(...tasks.map(task => new Date(task.createdAt).getTime()));
+			if (now.getTime() - latestTaskTime > 7 * 24 * 60 * 60 * 1000) {
+				return "on-hold";
+			}
+		}
+		// Jika tidak memenuhi kondisi di atas, status default adalah "active"
+		return "active";
+	}
+
+	// Fungsi untuk memformat tampilan status.
+	// Jika status "cancelled", tampilkan "Archived" untuk user.
+	function formatProjectStatus(status: "active" | "completed" | "cancelled" | "on-hold") {
+		if (status === "cancelled") return "Archived";
+		return status.charAt(0).toUpperCase() + status.slice(1);
+	}
+
+	// Fungsi untuk menentukan variant badge berdasarkan status
+	function getBadgeVariant(status: "active" | "completed" | "cancelled" | "on-hold") {
+		switch (status) {
+			case 'completed': return 'success';
+			case 'active': return 'warning';
+			case 'on-hold': return 'info';
+			case 'cancelled': return 'error';
+			default: return 'default';
+		}
+	}
+
+	// Reactive block: Hitung status baru berdasarkan tasks dari projectTasks,
+	// dan jika berbeda dengan project.status, update project melalui projectsStore
+	$: {
+		let tasksArray: any[] = [];
+		const unsubscribe = projectTasks.subscribe(value => {
+			tasksArray = value;
+		});
+		unsubscribe();
+		if (project) {
+			const newStatus = computeProjectStatus(tasksArray, project.dueDate);
+			if (newStatus !== project.status) {
+				projectsStore.updateProject({ ...project, status: newStatus });
+			}
+		}
+	}
+
+	// Menghitung progress
 	const completedTasks = derived(projectTasks, $projectTasks => 
 		$projectTasks.filter(task => task.status === 'Completed').length
 	);
@@ -135,20 +205,10 @@
 	function handleCardClick() {
 		goto(`/task?projectId=${project.id}`);
 	}
-
-	function getBadgeVariant(status: string) {
-		switch (status) {
-			case 'completed': return 'success';
-			case 'active': return 'warning';
-			case 'on-hold': return 'info';
-			case 'cancelled': return 'error';
-			default: return 'default';
-		}
-	}
 </script>
 
 {#if project && project.id}
-	<Card.Root>
+	<Card.Root on:click={handleCardClick}>
 		<Card.Header>
 			<div class="ms-auto">
 				<DropdownMenu.Root>
@@ -192,7 +252,7 @@
 					{ $completedTasks }/{ $totalTasks } <CircleCheck class="h-4 w-4" color="#44ff00" /> 
 				</p>
 				<Progress value={ $progressPercentage } />
-				<Badge variant={getBadgeVariant(project.status || 'Unknown')} class="capitalize mt-3 ">{project.status || 'Unknown'}</Badge>
+				<Badge variant={getBadgeVariant(project.status)} class="capitalize mt-3 ">{formatProjectStatus(project.status)}</Badge>
 			</div>	
 		</Card.Footer>
 		<Card.Footer>

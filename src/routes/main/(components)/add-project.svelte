@@ -82,7 +82,7 @@
 
 		// Validasi apakah deadline tidak di masa lalu
 		if (selectedDateTime && selectedDateTime < new Date()) {
-			alert('Deadline tidak boleh berada di masa lalu.');
+			toast.error('Deadline must be in the future');
 			isSubmitting = false;
 			return;
 		}

@@ -17,6 +17,7 @@
 	import ClockIcon from 'lucide-svelte/icons/clock';
 	import { refreshTableData } from '$lib/utils/table-utils';
 	export let projectId: string;
+	import { projectsStore } from '$lib/stores/projects';
 
 	const dispatch = createEventDispatcher();
 
@@ -76,6 +77,26 @@
 			}
 		}
 
+		// Validasi apakah deadline tidak di masa lalu
+		if (formattedDateTime && new Date(formattedDateTime) < new Date()) {
+			toast.error('Deadline must be in the future');
+			isSubmitting = false;
+			return;
+		}
+
+		// Validasi apakah deadline task tidak melebihi deadline project
+		const project = $projectsStore.find(p => p.id === projectId);
+		if (project?.dueDate && formattedDateTime) {
+			const taskDeadline = new Date(formattedDateTime);
+			const projectDeadline = new Date(project.dueDate);
+
+			if (taskDeadline > projectDeadline) {
+				toast.error('Task deadline cannot exceed project deadline');
+				isSubmitting = false;
+				return;
+			}
+		}
+
 		const newTask = {
 			title,
 			description,
@@ -101,12 +122,12 @@
 				tasksStore.addTask(result.task);
 				await refreshTableData(projectId);
 				dispatch('taskAdded', result.task);
-				toast.success('Task berhasil ditambahkan!');
+				toast.success('Task added successfully');
 				resetForm();
 			} else {
 				const errorMessage = Array.isArray(result.error) 
 					? result.error.map((e: any) => e.message).join(', ') 
-					: result.error || 'Gagal menambahkan task.';
+					: result.error || 'Failed to add task.';
 				throw new Error(errorMessage);
 			}
 		} catch (error: any) {
