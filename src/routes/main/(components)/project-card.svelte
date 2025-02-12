@@ -35,20 +35,34 @@
 		}
 	}
 
-	// Derived store untuk mendapatkan tasks dari project tertentu
+	// Derived store untuk tasks dari project ini
 	const projectTasks = derived(tasksStore, $tasks =>
 		$tasks.filter(task => task.projectId === project.id)
 	);
 
-	// Fungsi pembantu untuk menghitung status project berdasarkan kondisi task dan dueDate
-	// Mengembalikan salah satu nilai: "active", "completed", "cancelled" atau "on-hold"
+	// Derived store untuk status project
+	const computedProjectStatus = derived(
+		[projectTasks], 
+		([$projectTasks]) => {
+			return computeProjectStatus($projectTasks, project.dueDate);
+		}
+	);
+
+	// Subscribe ke perubahan status dan update project jika berbeda
+	$: if (project && $computedProjectStatus !== project.status) {
+		projectsStore.updateProject({
+			...project,
+			status: $computedProjectStatus
+		});
+	}
+
 	function computeProjectStatus(
 		tasks: any[],
 		dueDate: string | null
 	): "active" | "completed" | "cancelled" | "on-hold" {
 		const now = new Date();
-		// Rule: Jika project memiliki dueDate dan waktu sekarang telah melewati dueDate,
-		// serta tidak ada task yang sedang dikerjakan atau sudah selesai, maka dianggap "cancelled" (alias Archived)
+		
+		// Rule 1: Jika deadline terlewat & tidak ada progress
 		if (dueDate) {
 			const due = new Date(dueDate);
 			if (now > due) {
@@ -60,18 +74,23 @@
 				}
 			}
 		}
-		// Rule: Jika terdapat tasks dan SEMUA task memiliki status "Completed", maka project jadi "completed"
+
+		// Rule 2: Jika semua task completed
 		if (tasks.length > 0 && tasks.every(task => task.status === 'Completed')) {
 			return "completed";
 		}
-		// Rule: Jika terdapat tasks dan task terbaru (berdasarkan createdAt) sudah lebih dari 7 hari yang lalu, maka project jadi "on-hold"
+
+		// Rule 3: Jika tidak ada update selama 7 hari
 		if (tasks.length > 0) {
-			const latestTaskTime = Math.max(...tasks.map(task => new Date(task.createdAt).getTime()));
+			const latestTaskTime = Math.max(
+				...tasks.map(task => new Date(task.createdAt).getTime())
+			);
 			if (now.getTime() - latestTaskTime > 7 * 24 * 60 * 60 * 1000) {
 				return "on-hold";
 			}
 		}
-		// Jika tidak memenuhi kondisi di atas, status default adalah "active"
+
+		// Default: Active
 		return "active";
 	}
 
@@ -90,22 +109,6 @@
 			case 'on-hold': return 'info';
 			case 'cancelled': return 'error';
 			default: return 'default';
-		}
-	}
-
-	// Reactive block: Hitung status baru berdasarkan tasks dari projectTasks,
-	// dan jika berbeda dengan project.status, update project melalui projectsStore
-	$: {
-		let tasksArray: any[] = [];
-		const unsubscribe = projectTasks.subscribe(value => {
-			tasksArray = value;
-		});
-		unsubscribe();
-		if (project) {
-			const newStatus = computeProjectStatus(tasksArray, project.dueDate);
-			if (newStatus !== project.status) {
-				projectsStore.updateProject({ ...project, status: newStatus });
-			}
 		}
 	}
 
@@ -208,7 +211,7 @@
 </script>
 
 {#if project && project.id}
-	<Card.Root on:click={handleCardClick}>
+	<Card.Root>
 		<Card.Header>
 			<div class="ms-auto">
 				<DropdownMenu.Root>

@@ -2,6 +2,41 @@ import { prisma } from '$lib/prisma';
 import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
 
+// Fungsi helper untuk menghitung status project berdasarkan tasks
+function computeProjectStatus(tasks: any[], dueDate: Date | null) {
+	const now = new Date();
+	
+	// Rule 1: Jika deadline terlewat & tidak ada progress
+	if (dueDate) {
+		if (now > dueDate) {
+			const startedOrCompleted = tasks.filter(
+				task => task.status === 'In Progress' || task.status === 'Completed'
+			);
+			if (startedOrCompleted.length === 0) {
+				return "cancelled";
+			}
+		}
+	}
+
+	// Rule 2: Jika semua task completed
+	if (tasks.length > 0 && tasks.every(task => task.status === 'Completed')) {
+		return "completed";
+	}
+
+	// Rule 3: Jika tidak ada update selama 7 hari
+	if (tasks.length > 0) {
+		const latestTaskTime = Math.max(
+			...tasks.map(task => new Date(task.createdAt).getTime())
+		);
+		if (now.getTime() - latestTaskTime > 7 * 24 * 60 * 60 * 1000) {
+			return "on-hold";
+		}
+	}
+
+	// Default: Active
+	return "active";
+}
+
 export const load = (async ({ url, locals }) => {
 	if (!locals.user) {
 		throw redirect(302, '/auth/login');
@@ -41,8 +76,33 @@ export const load = (async ({ url, locals }) => {
 		},
 	});
 
+	// Update status project berdasarkan tasks
+	const updatedProjects = await Promise.all(projects.map(async (project) => {
+		const projectTasks = tasks.filter(task => task.projectId === project.id);
+		const computedStatus = computeProjectStatus(projectTasks, project.dueDate);
+		
+		if (computedStatus !== project.status) {
+			// Update status di database
+			const updatedProject = await prisma.project.update({
+				where: { id: project.id },
+				data: { status: computedStatus },
+				include: {
+					createdBy: {
+						select: {
+							id: true,
+							name: true,
+							email: true
+						}
+					}
+				}
+			});
+			return updatedProject;
+		}
+		return project;
+	}));
+
 	return {
-		projects,
+		projects: updatedProjects,
 		tasks,
 		tag: 'all'
 	};
