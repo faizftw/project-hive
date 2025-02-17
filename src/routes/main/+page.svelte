@@ -131,12 +131,12 @@
 		</Card.Root>
 		<Card.Root>
 			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">Cancelled</Card.Title>
+				<Card.Title class="text-sm font-medium">Archived</Card.Title>
 				<FolderX class="text-muted-foreground h-4 w-4" />
 			</Card.Header>
 			<Card.Content>
 				<div class="text-2xl font-bold">{cancelledProjects}</div>
-				<p class="text-muted-foreground text-xs">Cancelled Projects</p>
+				<p class="text-muted-foreground text-xs">Archived Projects</p>
 			</Card.Content>
 		</Card.Root>
 		<Card.Root>

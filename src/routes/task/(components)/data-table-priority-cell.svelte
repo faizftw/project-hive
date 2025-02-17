@@ -7,8 +7,9 @@
 
 {#if priority}
 	<div class="flex items-center">
+
 		{#if Icon}
-			<Icon class="text-muted-foreground mr-2 h-4 w-4" />
+			<Icon class={value === 'Low' ? 'text-green-500 mr-2 h-4 w-4' : value === 'Medium' ? 'text-yellow-500 mr-2 h-4 w-4' : 'text-red-500 mr-2 h-4 w-4'}/>
 		{/if}
 		<span>{priority.label}</span>
 	</div>
