@@ -66,7 +66,7 @@
 				variant="outline"
 				class="h-8 w-8 p-0"
 				disabled={!$hasNextPage}
-				on:click={() => ($pageIndex = $pageIndex + 1)}
+				onclick={() => ($pageIndex = $pageIndex + 1)}
 			>
 				<span class="sr-only">Go to next page</span>
 				<ChevronRight size={15} />
@@ -75,7 +75,7 @@
 				variant="outline"
 				class="hidden h-8 w-8 p-0 lg:flex"
 				disabled={!$hasNextPage}
-				on:click={() => ($pageIndex = Math.ceil($rows.length / $pageRows.length) - 1)}
+				onclick={() => ($pageIndex = Math.ceil($rows.length / $pageRows.length) - 1)}
 			>
 				<span class="sr-only">Go to last page</span>
 				<DoubleArrowRight size={15} />

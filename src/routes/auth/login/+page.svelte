@@ -1,6 +1,6 @@
 <script lang="ts">
 	import UserLoginForm from '../(components)/user-login-form.svelte';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Sun } from 'svelte-radix';
 	import { Moon } from 'svelte-radix';
 	import { toggleMode } from 'mode-watcher';
@@ -41,7 +41,7 @@
 			style="
 				background-image:
 					url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80);"
-		/>
+		></div>
 		<div class="relative z-20 flex items-center text-lg font-medium">
 			<!-- <Command class="mr-2 h-6 w-6" /> -->
 			Project Hive

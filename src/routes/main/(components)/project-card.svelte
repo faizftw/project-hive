@@ -216,7 +216,7 @@
 			<div class="ms-auto">
 				<DropdownMenu.Root>
 					<DropdownMenu.Trigger class="focus:outline-none">
-						<Button variant="ghost" >
+						<Button variant="ghost" class='' >
 							<DotsHorizontal class="h-4 w-4 ms-auto" />
 						</Button>
 					</DropdownMenu.Trigger>
@@ -260,7 +260,7 @@
 		</Card.Footer>
 		<Card.Footer>
 			<div class="m-auto">
-				<Button on:click={handleCardClick}>Open Task</Button>
+				<Button onclick={handleCardClick} class=''>Open Task</Button>
 			</div>
 		</Card.Footer>
 	</Card.Root>

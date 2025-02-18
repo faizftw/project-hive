@@ -106,7 +106,7 @@
 					</button>
 				</div>
 			</div>
-			<Button type="submit" disabled={isLoading}>
+			<Button type="submit" disabled={isLoading} class=''>
 				{#if isLoading}
 					<Icons.spinner class="mr-2 h-4 w-4 animate-spin" />
 				{/if}

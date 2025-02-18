@@ -153,7 +153,7 @@
 
 <Dialog bind:open>
 	<DialogTrigger>
-		<Button
+		<Button class=''
 			aria-label="Add Project"
 		>
 			<Add class="mr-2 h-4 w-4" />
@@ -242,7 +242,7 @@
 				{/if}
 			</div>
 			<DialogFooter>
-				<Button type="submit" disabled={isSubmitting}>
+				<Button type="submit" disabled={isSubmitting} class=''>
 					{#if isSubmitting}
 						Creating...
 					{:else}

@@ -228,10 +228,10 @@
       </div>
       
       <Dialog.Footer>
-        <Button type="button" variant="outline" on:click={() => (open = false)}>
+        <Button type="button" variant="outline" onclick={() => (open = false)} class=''>
           Cancel
         </Button>
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} class=''>
           {isSubmitting ? 'Saving...' : 'Save'}
         </Button>
       </Dialog.Footer>
