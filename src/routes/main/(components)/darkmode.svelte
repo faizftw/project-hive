@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Sun } from 'svelte-radix';
 	import { Moon } from 'svelte-radix';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { toggleMode } from 'mode-watcher';
 </script>
 

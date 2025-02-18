@@ -21,7 +21,7 @@
 		DataTableDeadline,
 		DataTableProjectCell
 	} from './index.js';
-	import * as Table from '$lib/components/ui/table';
+	import * as Table from '$lib/components/ui/table/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';

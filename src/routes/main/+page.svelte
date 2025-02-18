@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
-	import * as Card from '$lib/components/ui/card';
+	import * as Card from '$lib/components/ui/card/index.js';
 	import { FolderCheck, FolderClock, CalendarClock, FolderX, CirclePause, FolderOpen } from 'lucide-svelte';
 	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
 	import type { Task } from '../task/(data)/schemas.js';
-	import * as Tabs from '$lib/components/ui/tabs';
-	import { Separator } from '$lib/components/ui/separator';
+	import * as Tabs from '$lib/components/ui/tabs/index.js';
+	import { Separator } from '$lib/components/ui/separator/index.js';
 	import ProjectCard from './(components)/project-card.svelte';
 	import type { Project, PageData } from '$lib/types';
 	import { projectsStore } from '$lib/stores/projects';

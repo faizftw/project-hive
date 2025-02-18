@@ -3,7 +3,7 @@
     import type { PageData } from './$types';
     import { tasksStore } from '$lib/stores/tasks';
     import { onMount } from 'svelte';
-    import * as Breadcrumb from "$lib/components/ui/breadcrumb";
+    import * as Breadcrumb from "$lib/components/ui/breadcrumb//index.js";
 
     export let data: PageData;
 

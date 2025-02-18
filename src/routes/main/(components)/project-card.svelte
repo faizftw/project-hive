@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import * as Card from '$lib/components/ui/card';
+	import * as Card from '$lib/components/ui/card/index.js';
 	import type { Project } from '$lib/types';
 	import { DotsHorizontal } from 'svelte-radix';
 	import { ClockAlert, SquarePen, CircleCheck } from 'lucide-svelte';
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-	import { Button } from '$lib/components/ui/button';
-	import * as AlertDialog from "$lib/components/ui/alert-dialog";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
 	import { projectsStore } from '$lib/stores/projects';
 	import EditProject from './edit-project.svelte';
-	import { Progress } from "$lib/components/ui/progress";
+	import { Progress } from "$lib/components/ui/progress/index.js";
 	import { tasksStore } from '$lib/stores/tasks';
 	import { derived } from 'svelte/store';
-	import { Badge } from "$lib/components/ui/badge";
+	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { toast } from "svelte-sonner";
 
 	export let project: Project;

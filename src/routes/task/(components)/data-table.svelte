@@ -20,7 +20,7 @@
 		DataTableDescCell,
 		DataTableDeadline
 	} from './index.js';
-	import * as Table from '$lib/components/ui/table';
+	import * as Table from '$lib/components/ui/table/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';

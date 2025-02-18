@@ -2,9 +2,9 @@
 	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
 	import { labels } from '../(data)/data.js';
 	import { type Task, taskSchema } from '../(data)/schemas.js';
-	import { Button } from '$lib/components/ui/button';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import * as AlertDialog from '$lib/components/ui/alert-dialog';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { toast } from 'svelte-sonner';
 	import EditTask from './edit-task.svelte';

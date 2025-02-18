@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Label } from '$lib/types';
-	import { Badge } from '$lib/components/ui/badge';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	export let value: string;
 	export let labelValue: Label | string | null;
 	const label = typeof labelValue === 'string'

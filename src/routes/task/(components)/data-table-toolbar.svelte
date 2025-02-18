@@ -5,8 +5,8 @@
 	import { priorities, statuses } from '../(data)/data.js';
 	import type { Task } from '../(data)/schemas.js';
 	import { DataTableFacetedFilter, DataTableViewOptions, AddTask } from './index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { Input } from '$lib/components/ui/input';
+	import {Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
 
 	export let tableModel: TableViewModel<Task>;
 	export let data: Task[] = []; // Nilai default array kosong

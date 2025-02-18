@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Icons } from '$lib/docs/index';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import { cn } from '$lib/utils.js';
 	import { goto } from '$app/navigation';
 	import { CrossCircled} from 'svelte-radix';

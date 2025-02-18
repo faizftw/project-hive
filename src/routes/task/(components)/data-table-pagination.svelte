@@ -5,8 +5,8 @@
 	import DoubleArrowLeft from 'svelte-radix/DoubleArrowLeft.svelte';
 	import type { TableViewModel } from 'svelte-headless-table';
 	import type { Task } from '../(data)/schemas.js';
-	import * as Select from '$lib/components/ui/select';
-	import { Button } from '$lib/components/ui/button';
+	import * as Select from '$lib/components/ui/select/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 
 	export let tableModel: TableViewModel<Task>;
 

@@ -2,7 +2,7 @@
 	import Add from 'lucide-svelte/icons/circle-plus';
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import ClockIcon from 'lucide-svelte/icons/clock';
-	import { Button } from '$lib/components/ui/button';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import type { Project } from '$lib/types';
 	import {
 		Dialog,
@@ -11,15 +11,15 @@
 		DialogTitle,
 		DialogTrigger,
 		DialogFooter
-	} from '$lib/components/ui/dialog';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
+	} from '$lib/components/ui/dialog/index.js';
+	import { Input } from '$lib/components/ui/input//index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
 	import { createEventDispatcher } from 'svelte';
 	import type { DateValue } from '@internationalized/date';
 	import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
 	import { cn } from '$lib/utils.js';
-	import { Calendar } from '$lib/components/ui/calendar';
-	import * as Popover from '$lib/components/ui/popover';
+	import { Calendar } from '$lib/components/ui/calendar/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { projectsStore } from '$lib/stores/projects';
 	import { toast } from 'svelte-sonner';
 

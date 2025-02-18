@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Avatar, AvatarFallback } from '$lib/components/ui/avatar';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Avatar, AvatarFallback } from '$lib/components/ui/avatar/index.js';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import { page } from '$app/stores';
 	import { invalidateAll } from '$app/navigation';
 

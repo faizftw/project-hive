@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button';
-  import * as Dialog from '$lib/components/ui/dialog';
-  import { Input } from '$lib/components/ui/input';
-  import { Label } from '$lib/components/ui/label';
+  import { Button } from '$lib/components/ui/button/index.js';
+  import * as Dialog from '$lib/components/ui/dialog/index.js';
+  import { Input } from '$lib/components/ui/input/index.js';
+  import { Label } from '$lib/components/ui/label/index.js';
   import type { Project } from '$lib/types';
   import { projectsStore } from '$lib/stores/projects';
   import CalendarIcon from 'lucide-svelte/icons/calendar';
   import type { DateValue } from '@internationalized/date';
-  import { Calendar } from '$lib/components/ui/calendar';
-  import * as Popover from '$lib/components/ui/popover';
+  import { Calendar } from '$lib/components/ui/calendar/index.js';
+  import * as Popover from '$lib/components/ui/popover/index.js';
   import { createEventDispatcher } from 'svelte';
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Input } from '$lib/components/ui/input';
+	import { Input } from '$lib/components/ui/input/index.js';
 	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher<{ search: string }>();
