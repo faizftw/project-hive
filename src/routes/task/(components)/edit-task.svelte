@@ -234,9 +234,8 @@
 					<LabelComponent for="deadline" class="text-right">Deadline</LabelComponent>
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
-							<Popover.Trigger asChild let:builder>
+							<Popover.Trigger >
 								<Button
-									builders={[builder]}
 									variant="outline"
 									class={cn(
 										'w-[240px] justify-start text-left font-normal',
@@ -273,10 +272,10 @@
 			</div>
 
 			<Dialog.Footer>
-				<Button type="button" variant="outline" on:click={() => (open = false)}>
+				<Button type="button" variant="outline" onclick={() => (open = false)} class="">
 					Cancel
 				</Button>
-				<Button type="submit" disabled={isSubmitting}>
+				<Button type="submit" disabled={isSubmitting} class="">
 					{isSubmitting ? 'Saving...' : 'Save'}
 				</Button>
 			</Dialog.Footer>

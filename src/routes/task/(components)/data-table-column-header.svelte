@@ -57,10 +57,9 @@
 {#if !props.sort.disabled}
 	<div class={cn('flex items-center', className)}>
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild let:builder>
+			<DropdownMenu.Trigger >
 				<Button
 					variant="ghost"
-					builders={[builder]}
 					class="data-[state=open]:bg-accent -ml-3 h-8"
 					size="sm"
 				>

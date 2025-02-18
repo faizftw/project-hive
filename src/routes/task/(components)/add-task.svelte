@@ -90,11 +90,11 @@
 		}
 
 		const newTask = {
-			title: $state.title,
-			description: $state.description,
-			priority: $state.priority,
-			status: $state.status,
-			deadline: $state.formattedDateTime,
+			title: state.title,
+			description: state.description,
+			priority: state.priority,
+			status: state.status,
+			deadline: state.formattedDateTime,
 			projectId,
 			label: finalLabel,
 		};
@@ -146,8 +146,8 @@
 	}
 </script>
 
-<Dialog.Root open={state.open} on:openChange={(e) => state.open = e.detail}>
-	<Dialog.Trigger asChild>
+<Dialog.Root bind:open={state.open} on:openChange={(e) => state.open = e.detail}>
+	<Dialog.Trigger>
 		<Button class="py-0 ml-auto me-2" size="sm">
 			<CirclePlus class="mr-2 h-4 w-4" />
 			Add Task
@@ -244,7 +244,7 @@
 					<LabelComponent for="deadline">Deadline</LabelComponent>
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
-							<Popover.Trigger asChild>
+							<Popover.Trigger>
 								<Button
 									variant="outline"
 									class={cn(
@@ -274,7 +274,7 @@
 						</Popover.Root>
 						
 						<Popover.Root>
-							<Popover.Trigger asChild>
+							<Popover.Trigger >
 								<Button
 									variant="outline"
 									class={cn(
@@ -294,7 +294,7 @@
 								<Input 
 									type="time" 
 									value={state.timeValue} 
-									oninput={(e) => state.timeValue = e.target.value} 
+									oninput={(e: Event) => state.timeValue = (e.target as HTMLInputElement).value} 
 								/>
 							</Popover.Content>
 						</Popover.Root>

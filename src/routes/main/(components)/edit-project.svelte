@@ -151,7 +151,7 @@
   }
 
   // Tetapkan tanggal minimum sebagai hari ini
-  let minDate = today();
+  let minDate = today(getLocalTimeZone());
 </script>
 
 <Dialog.Root bind:open>
@@ -203,8 +203,8 @@
           <Label class="text-right">Due Date</Label>
           <div class="col-span-3 flex gap-2">
             <Popover.Root>
-              <Popover.Trigger asChild let:builder>
-                <Button builders={[builder]} variant="outline" class="w-[240px] justify-start text-left font-normal">
+              <Popover.Trigger>
+                <Button variant="outline" class="w-[240px] justify-start text-left font-normal">
                   <CalendarIcon class="mr-2 h-4 w-4" />
                   {#if dateValue}
                     {new DateFormatter('id-ID', { dateStyle: 'long' }).format(dateValue.toDate(getLocalTimeZone()))}

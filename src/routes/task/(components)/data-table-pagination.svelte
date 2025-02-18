@@ -47,7 +47,7 @@
 			<Button
 				variant="outline"
 				class="hidden h-8 w-8 p-0 lg:flex"
-				on:click={() => ($pageIndex = 0)}
+				onclick={() => ($pageIndex = 0)}
 				disabled={!$hasPreviousPage}
 			>
 				<span class="sr-only">Go to first page</span>
@@ -56,7 +56,7 @@
 			<Button
 				variant="outline"
 				class="h-8 w-8 p-0"
-				on:click={() => ($pageIndex = $pageIndex - 1)}
+				onclick={() => ($pageIndex = $pageIndex - 1)}
 				disabled={!$hasPreviousPage}
 			>
 				<span class="sr-only">Go to previous page</span>

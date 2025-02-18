@@ -22,8 +22,8 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
-		<Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex" builders={[builder]}>
+	<DropdownMenu.Trigger >
+		<Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
 			<MixerHorizontal class="mr-2 h-4 w-4" />
 			View
 		</Button>

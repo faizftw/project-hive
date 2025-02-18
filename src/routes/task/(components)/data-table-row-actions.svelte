@@ -75,10 +75,9 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger asChild let:builder>
+	<DropdownMenu.Trigger >
 		<Button
 			variant="ghost"
-			builders={[builder]}
 			class="data-[state=open]:bg-muted flex h-8 w-8 p-0"
 		>
 			<DotsHorizontal class="h-4 w-4" />

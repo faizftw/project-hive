@@ -210,9 +210,8 @@
 							</Popover.Content>
 						</Popover.Root>
 						<Popover.Root>
-							<Popover.Trigger asChild let:builder>
+							<Popover.Trigger>
 								<Button
-									builders={[builder]}
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',
