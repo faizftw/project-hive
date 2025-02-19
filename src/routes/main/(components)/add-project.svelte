@@ -186,9 +186,8 @@
 					<Label for="dueDate" class="text-right">Deadline</Label>
 					<div class="col-span-3 flex gap-2">
 						<Popover.Root>
-							<Popover.Trigger asChild let:builder>
+							<Popover.Trigger >
 								<Button
-									builders={[builder]}
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { Project } from '$lib/types';
@@ -15,10 +17,14 @@
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { toast } from "svelte-sonner";
 
-	export let project: Project;
+	interface Props {
+		project: Project;
+	}
 
-	let isDeleteDialogOpen = false;
-	let isEditDialogOpen = false;
+	let { project = $bindable() }: Props = $props();
+
+	let isDeleteDialogOpen = $state(false);
+	let isEditDialogOpen = $state(false);
 
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
@@ -29,11 +35,11 @@
 	}
 
 	// Validasi data project
-	$: {
+	$effect(() => {
 		if (!project?.id || !project?.name) {
 			console.error('Invalid project data:', project);
 		}
-	}
+	});
 
 	// Derived store untuk tasks dari project ini
 	const projectTasks = derived(tasksStore, $tasks =>
@@ -49,12 +55,14 @@
 	);
 
 	// Subscribe ke perubahan status dan update project jika berbeda
-	$: if (project && $computedProjectStatus !== project.status) {
-		projectsStore.updateProject({
-			...project,
-			status: $computedProjectStatus
-		});
-	}
+	$effect(() => {
+		if (project && $computedProjectStatus !== project.status) {
+			projectsStore.updateProject({
+				...project,
+				status: $computedProjectStatus
+			});
+		}
+	});
 
 	function computeProjectStatus(
 		tasks: any[],

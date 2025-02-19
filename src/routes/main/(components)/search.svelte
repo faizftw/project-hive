@@ -4,7 +4,7 @@
 
 	const dispatch = createEventDispatcher<{ search: string }>();
 
-	let query = '';
+	let query = $state('');
 
 	function handleInput(event: Event) {
 		const input = event.target as HTMLInputElement;

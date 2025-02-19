@@ -9,56 +9,57 @@
 	import ProjectCard from './(components)/project-card.svelte';
 	import type { Project, PageData } from '$lib/types';
 	import { projectsStore } from '$lib/stores/projects';
-	import { writable, derived } from 'svelte/store';
-	import { fade } from 'svelte/transition';
 	import { tasksStore } from '$lib/stores/tasks';
+	import { fade } from 'svelte/transition';
 
-	export let data: {
+	// Gunakan $props untuk props
+	let { projects, tasks, tag } = $props<{
 		projects: Project[];
 		tasks: Task[];
 		tag: string;
-		PageData: PageData;
-	};
+	}>();
 
-	// Initialize store with data from server
-	$: {
-		if (data.projects) {
-			console.log('Initial projects data:', data.projects); // Debug log
-			const validProjects = data.projects.filter(p => p && p.id);
-			projectsStore.set(validProjects);
-		}
-		if (data.tasks) {
-			tasksStore.set(data.tasks);
-		}
-	}
-
-	const searchQuery = writable('');
-
-	// Store yang terfilter berdasarkan kata kunci pencarian
-	const filteredProjects = derived(
-		[projectsStore, searchQuery],
-		([$projectsStore, $searchQuery]) => {
-			if (!$searchQuery) return $projectsStore;
-			return $projectsStore.filter(project =>
-				project.name.toLowerCase().includes($searchQuery.toLowerCase())
-			);
-		}
+	// Gunakan $state untuk state
+	let searchQuery = $state('');
+	
+	// Gunakan $derived untuk computed values
+	let filteredProjects = $derived(
+		searchQuery 
+			? $projectsStore.filter((project: Project) =>
+				project.name.toLowerCase().includes(searchQuery.toLowerCase())
+			  )
+			: $projectsStore
 	);
 
-	// Reactive statements untuk metrics
-	$: totalProjects = $projectsStore.length;
-	$: completedProjects = $projectsStore.filter(p => p.status === 'completed').length;
-	$: inProgressProjects = $projectsStore.filter(p => p.status === 'active').length;
-	$: overdueProjects = $projectsStore.filter(p => {
-		if (p.dueDate && p.status !== 'completed') {
-			return new Date(p.dueDate) < new Date();
+	// Initialize store with data from server
+	$effect(() => {
+		if (projects) {
+			console.log('Initial projects data:', projects);
+			const validProjects = projects.filter((p: Project) => p && p.id);
+			projectsStore.set(validProjects);
 		}
-		return false;
-	}).length;
-	$: cancelledProjects = $projectsStore.filter(p => p.status === 'cancelled').length;
-	$: onHoldProjects = $projectsStore.filter(p => p.status === 'on-hold').length;
+		if (tasks) {
+			tasksStore.set(tasks);
+		}
+	});
 
-	async function handleProjectAdded(event: CustomEvent<{data: Project}>) {
+	// Reactive metrics menggunakan $derived
+	let totalProjects = $derived($projectsStore.length);
+	let completedProjects = $derived($projectsStore.filter((p: Project) => p.status === 'completed').length);
+	let inProgressProjects = $derived($projectsStore.filter((p: Project) => p.status === 'active').length);
+	let overdueProjects = $derived(
+		$projectsStore.filter((p: Project) => {
+			if (p.dueDate && p.status !== 'completed') {
+				return new Date(p.dueDate) < new Date();
+			}
+			return false;
+		}).length
+	);
+	let cancelledProjects = $derived($projectsStore.filter((p: Project) => p.status === 'cancelled').length);
+	let onHoldProjects = $derived($projectsStore.filter((p: Project) => p.status === 'on-hold').length);
+
+	// Event handlers
+	function handleProjectAdded(event: CustomEvent<{data: Project}>) {
 		try {
 			const projectData = event.detail.data;
 			console.log('Project added event data:', projectData);
@@ -71,11 +72,12 @@
 		}
 	}
 
-	const taskData: Task[] = [];
-
 	function handleSearch(event: CustomEvent<string>) {
-		searchQuery.set(event.detail);
+		searchQuery = event.detail;
 	}
+
+	// Derived tasks data
+	let taskData = $derived($tasksStore);
 </script>
 
 <div class="flex-1 space-y-4 p-8 pt-6">
@@ -163,12 +165,12 @@
 					</Tabs.List>
 					<Tabs.Content value="Upcoming">
 						<div class="w-full">
-							<DataTableOverview data={taskData} activeTab="Upcoming" />
+							<DataTableOverview projectId="" activeTab="Upcoming" />
 						</div>
 					</Tabs.Content>
 					<Tabs.Content value="Recent">
 						<div class="w-full">
-							<DataTableOverview data={taskData} activeTab="Recent" />
+							<DataTableOverview projectId="" activeTab="Recent" />
 						</div>
 					</Tabs.Content>
 				</Tabs.Root>
@@ -176,11 +178,10 @@
 		</Card.Root>
 	</div>
 	<Separator />
-	<!-- buat card project -->
 	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-		{#each $filteredProjects as project (project.id)}
+		{#each filteredProjects as project (project.id)}
 			<div transition:fade>
-				<ProjectCard {project} />
+				<ProjectCard project={project as Project} />
 			</div>
 		{/each}
 	</div>

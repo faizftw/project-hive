@@ -13,41 +13,26 @@
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';
 
-  export let project: Project;
-  export let open = false;
+  interface Props {
+    project: Project;
+    open?: boolean;
+  }
+
+  let { project = $bindable(), open = $bindable(false) }: Props = $props();
 
   const dispatch = createEventDispatcher<{
     projectUpdated: { project: Project };
   }>();
   
-  let isSubmitting = false;
-  let dateValue: DateValue | null = null;
-  let timeValue = '';
-  let name = '';
-  let description = '';
-  let status = '';
-  let formattedDateTime: string | null = null;
+  let isSubmitting = $state(false);
+  let dateValue: DateValue | null = $state(null);
+  let timeValue = $state('');
+  let name = $state('');
+  let description = $state('');
+  let status = $state('');
+  let formattedDateTime: string | null = $state(null);
 
-  // Reset form saat dialog dibuka
-  $: if (open) {
-    resetForm();
-  }
 
-  // Reactive statement untuk format tanggal
-  $: if (dateValue && timeValue) {
-    try {
-      const date = dateValue.toDate(getLocalTimeZone());
-      const [hours, minutes] = timeValue.split(':');
-      date.setHours(parseInt(hours));
-      date.setMinutes(parseInt(minutes));
-      formattedDateTime = date.toISOString();
-    } catch (err) {
-      console.error('Error formatting date time:', err);
-      formattedDateTime = null;
-    }
-  } else {
-    formattedDateTime = null;
-  }
 
   function resetForm() {
     name = project.name;
@@ -152,36 +137,60 @@
 
   // Tetapkan tanggal minimum sebagai hari ini
   let minDate = today(getLocalTimeZone());
+  // Reset form saat dialog dibuka
+  $effect(() => {
+    if (open) {
+      resetForm();
+    }
+  });
+  // Reactive statement untuk format tanggal
+  $effect(() => {
+    if (dateValue && timeValue) {
+      try {
+        const date = dateValue.toDate(getLocalTimeZone());
+        const [hours, minutes] = timeValue.split(':');
+        date.setHours(parseInt(hours));
+        date.setMinutes(parseInt(minutes));
+        formattedDateTime = date.toISOString();
+      } catch (err) {
+        console.error('Error formatting date time:', err);
+        formattedDateTime = null;
+      }
+    } else {
+      formattedDateTime = null;
+    }
+  });
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Content class="sm:max-w-[425px]">
+  
+  <Dialog.Content class="inline-block">
     <Dialog.Header>
       <Dialog.Title>Edit Project</Dialog.Title>
       <Dialog.Description>
         Edit project details here. Click save after finishing.
       </Dialog.Description>
     </Dialog.Header>
-    
-    <form on:submit={handleSubmit}>
+
+    <form onsubmit={handleSubmit}>
       <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="name" class="text-right">Nama</Label>
+          <Label for="name" class="text-right">Name</Label>
           <Input 
             id="name" 
             bind:value={name}
-            placeholder="Nama project" 
+            placeholder="Project Name" 
             class="col-span-3" 
             required 
           />
         </div>
         
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="description" class="text-right">Deskripsi</Label>
+          <Label for="description" class="text-right">Description</Label>
           <Input 
             id="description" 
             bind:value={description}
-            placeholder="Deskripsi project" 
+            placeholder="Project Description" 
             class="col-span-3" 
           />
         </div>
