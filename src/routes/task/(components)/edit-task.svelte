@@ -33,6 +33,8 @@
 	let timeValue = '';
 	let formattedDateTime: string | null = null;
 	let minDate = today(getLocalTimeZone());
+	let url = '';
+	let urlAlias = '';
 
 	function resetForm() {
 		if (task) {
@@ -66,6 +68,9 @@
 				dateValue = null;
 				timeValue = '';
 			}
+
+			url = task.url?.url || '';
+			urlAlias = task.url?.alias || '';
 		}
 	}
 
@@ -127,7 +132,11 @@
 					status,
 					deadline: formattedDateTime,
 					label: finalLabel,
-					newLabel: newLabel.trim()
+					newLabel: newLabel.trim(),
+					url: url ? {
+						url: url,
+						alias: urlAlias || null
+					} : null
 				})
 			});
 
@@ -152,7 +161,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="inline-block">
 		<Dialog.Header>
 			<Dialog.Title>Edit Task</Dialog.Title>
 			<Dialog.Description>Fill in the details of the task you want to edit.</Dialog.Description>
@@ -268,6 +277,27 @@
 							bind:value={timeValue}
 						/>
 					</div>
+				</div>
+
+				<div class="grid grid-cols-4 items-center gap-4">
+					<LabelComponent for="url" class="text-right">URL</LabelComponent>
+					<Input 
+						id="url" 
+						type="url"
+						bind:value={url}
+						placeholder="https://example.com" 
+						class="col-span-3"
+					/>
+				</div>
+
+				<div class="grid grid-cols-4 items-center gap-4">
+					<LabelComponent for="urlAlias" class="text-right">URL Alias</LabelComponent>
+					<Input 
+						id="urlAlias" 
+						bind:value={urlAlias}
+						placeholder="Nama tampilan untuk URL" 
+						class="col-span-3"
+					/>
 				</div>
 			</div>
 

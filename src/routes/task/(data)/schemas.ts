@@ -22,7 +22,11 @@ export const taskSchema = z.object({
 	deadline: z.string().nullable().or(z.date().nullable()), // Sesuaikan dengan Prisma
 	createdAt: z.string().or(z.date()),
 	projectId: z.string(),
-	createdById: z.string()
+	createdById: z.string(),
+	url: z.object({
+		url: z.string(),
+		alias: z.string().nullable()
+	}).nullable()
 });
 
 // Schema untuk membuat Task baru (tanpa 'id', 'createdAt', dan 'createdById')
@@ -38,6 +42,10 @@ export const taskCreateSchema = z.object({
 	priority: z.enum(['Low', 'Medium', 'High']),
 	deadline: z.string().nullable().or(z.date().nullable()), // Sesuaikan dengan Prisma
 	projectId: z.string(),
+	url: z.object({
+		url: z.string(),
+		alias: z.string().nullable()
+	}).nullable()
 });
 
 export type Task = z.infer<typeof taskSchema>;

@@ -6,26 +6,32 @@ import { z } from 'zod';
 
 
 export const GET: RequestHandler = async () => {
-	try {
-		const tasks = await prisma.task.findMany({
-			include: {
-				
-				createdBy: {
-					select: { id: true, name: true, email: true },
-				},
-				project: {
-					select: { id: true, name: true, description: true },
-				},
-				label: true,
-			},
-			orderBy: {
-				createdAt: 'desc',
-			},
-		});
-		return json(tasks);
-	} catch (error: any) {
-		return json({ error: error.message }, { status: 500 });
-	}
+  try {
+    const tasks = await prisma.task.findMany({
+      include: {
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
+        project: {
+          select: { id: true, name: true, description: true },
+        },
+        label: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Parse URL string menjadi objek
+    const parsedTasks = tasks.map(task => ({
+      ...task,
+      url: task.url ? JSON.parse(task.url) : null
+    }));
+
+    return json(parsedTasks);
+  } catch (error: any) {
+    return json({ error: error.message }, { status: 500 });
+  }
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -107,6 +113,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					connect: { id: locals.user.id },
 				},
 				label: labelConnect,
+				url: data.url ? JSON.stringify(data.url) : null,
 			},
 			include: {
 				label: true,

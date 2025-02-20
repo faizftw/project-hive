@@ -27,6 +27,10 @@ export interface Task {
 	status: 'Backlog' | 'Pending' | 'Todo' | 'In Progress' | 'Completed' | 'Canceled';
 	label: Label | null;
 	deadline: string | null;
+	url: {
+		url: string;
+		alias: string | null;
+	} | null;
 	createdAt: string;
 	projectId: string;
 	createdById: string;

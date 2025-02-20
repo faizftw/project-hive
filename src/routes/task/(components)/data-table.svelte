@@ -18,7 +18,8 @@
 		DataTableTitleCell,
 		DataTableToolbar,
 		DataTableDescCell,
-		DataTableDeadline
+		DataTableDeadline,
+		DataTableUrlCell
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
@@ -113,6 +114,14 @@
 			id: 'description',
 			cell: ({ value }) => {
 				return createRender(DataTableDescCell, { description: value });
+			}
+		}),
+		table.column({
+			accessor: 'url',
+			header: 'URL',
+			id: 'url',
+			cell: ({ value }) => {
+				return createRender(DataTableUrlCell, { url: value });
 			}
 		}),
 		table.column({

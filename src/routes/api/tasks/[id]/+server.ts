@@ -55,7 +55,8 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 				priority: data.priority,
 				status: data.status,
 				deadline: data.deadline ? new Date(data.deadline) : null,
-				label: labelConnect
+				label: labelConnect,
+				url: data.url ? JSON.stringify(data.url) : null,
 			},
 			include: {
 				label: true,

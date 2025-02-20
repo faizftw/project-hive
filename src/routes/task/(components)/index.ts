@@ -15,3 +15,4 @@ export { default as DataTableDescCell } from './data-table-desc-cell.svelte';
 export { default as EditTask } from './edit-task.svelte';
 export { default as DataTableDeadline } from './data-table-deadline.svelte';
 export { default as DataTableProjectCell } from './data-table-project-cell.svelte';
+export { default as DataTableUrlCell } from './data-table-url-cell.svelte';

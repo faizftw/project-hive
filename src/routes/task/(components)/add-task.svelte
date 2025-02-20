@@ -33,7 +33,9 @@
 		showNewLabelInput: false,
 		dateValue: null as DateValue | null,
 		timeValue: '',
-		formattedDateTime: null as string | null
+		formattedDateTime: null as string | null,
+		url: '',
+		urlAlias: ''
 	});
 
 	const minDate = today(getLocalTimeZone());
@@ -97,6 +99,10 @@
 			deadline: state.formattedDateTime,
 			projectId,
 			label: finalLabel,
+			url: state.url ? {
+				url: state.url,
+				alias: state.urlAlias || null
+			} : null,
 		};
 
 		try {
@@ -139,6 +145,8 @@
 		state.newLabel = '';
 		state.showNewLabelInput = false;
 		state.open = false;
+		state.url = '';
+		state.urlAlias = '';
 	}
 
 	function capitalizeLabel(label: string) {
@@ -154,7 +162,7 @@
 		</Button>
 	</Dialog.Trigger>
 	
-	<Dialog.Content class="sm:max-w-[425px]">
+	<Dialog.Content class="inline-block">
 		<Dialog.Header>
 			<Dialog.Title>Add New Task</Dialog.Title>
 			<Dialog.Description>Fill in the details of the task you want to add.</Dialog.Description>
@@ -306,6 +314,27 @@
 						Selected: {state.formattedDateTime}
 					</div>
 				{/if}
+
+				<div class="grid grid-cols-4 items-center gap-4">
+					<LabelComponent for="url">URL</LabelComponent>
+					<Input 
+						id="url" 
+						type="url"
+						bind:value={state.url}
+						placeholder="https://example.com" 
+						class="col-span-3"
+					/>
+				</div>
+
+				<div class="grid grid-cols-4 items-center gap-4">
+					<LabelComponent for="urlAlias">URL Alias</LabelComponent>
+					<Input 
+						id="urlAlias" 
+						bind:value={state.urlAlias}
+						placeholder="Name of the URL" 
+						class="col-span-3"
+					/>
+				</div>
 
 				<div class="flex justify-end space-x-2">
 					<Button type="button" variant="outline" onclick={() => state.open = false} class=''>
