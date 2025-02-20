@@ -3,19 +3,15 @@ import type { PageServerLoad, Actions } from './$types';
 import { redirect, fail } from '@sveltejs/kit';
 
 // Fungsi helper untuk menghitung status project berdasarkan tasks
-function computeProjectStatus(tasks: any[], dueDate: Date | null) {
+function computeProjectStatus(tasks: any[], dueDate: Date | null): 'active' | 'completed' | 'cancelled' | 'on-hold' {
 	const now = new Date();
 	
 	// Rule 1: Jika deadline terlewat & tidak ada progress
-	if (dueDate) {
-		if (now > dueDate) {
-			const startedOrCompleted = tasks.filter(
-				task => task.status === 'In Progress' || task.status === 'Completed'
-			);
-			if (startedOrCompleted.length === 0) {
-				return "cancelled";
-			}
-		}
+	if (dueDate && now > new Date(dueDate)) {
+		const hasProgress = tasks.some(task => 
+			task.status === 'In Progress' || task.status === 'Completed'
+		);
+		if (!hasProgress) return "cancelled";
 	}
 
 	// Rule 2: Jika semua task completed
@@ -25,67 +21,32 @@ function computeProjectStatus(tasks: any[], dueDate: Date | null) {
 
 	// Rule 3: Jika tidak ada update selama 7 hari
 	if (tasks.length > 0) {
-		const latestTaskTime = Math.max(
+		const latestUpdate = Math.max(
 			...tasks.map(task => new Date(task.createdAt).getTime())
 		);
-		if (now.getTime() - latestTaskTime > 7 * 24 * 60 * 60 * 1000) {
+		const oneWeek = 7 * 24 * 60 * 60 * 1000;
+		if (now.getTime() - latestUpdate > oneWeek) {
 			return "on-hold";
 		}
 	}
 
-	// Default: Active
+	// Default status
 	return "active";
 }
 
-export const load = (async ({ url, locals }) => {
+export const load = (async ({ locals }) => {
+	// Cek autentikasi
 	if (!locals.user) {
 		throw redirect(302, '/auth/login');
 	}
 
-	// Ambil semua proyek untuk user yang sedang login
-	const projects = await prisma.project.findMany({
-		where: {
-			createdById: locals.user.id
-		},
-		include: {
-			createdBy: {
-				select: {
-					id: true,
-					name: true,
-					email: true
-				}
-			}
-		},
-		orderBy: {
-			createdAt: 'desc'
-		}
-	});
-
-	// Ambil semua tugas untuk proyek-proyek tersebut
-	const tasks = await prisma.task.findMany({
-		where: {
-			projectId: {
-				in: projects.map(project => project.id)
-			}
-		},
-		include: {
-			label: true,
-		},
-		orderBy: {
-			createdAt: 'desc',
-		},
-	});
-
-	// Update status project berdasarkan tasks
-	const updatedProjects = await Promise.all(projects.map(async (project) => {
-		const projectTasks = tasks.filter(task => task.projectId === project.id);
-		const computedStatus = computeProjectStatus(projectTasks, project.dueDate);
-		
-		if (computedStatus !== project.status) {
-			// Update status di database
-			const updatedProject = await prisma.project.update({
-				where: { id: project.id },
-				data: { status: computedStatus },
+	try {
+		// Ambil semua proyek dan tasks secara parallel untuk optimasi
+		const [projects, tasks] = await Promise.all([
+			prisma.project.findMany({
+				where: {
+					createdById: locals.user.id
+				},
 				include: {
 					createdBy: {
 						select: {
@@ -94,18 +55,78 @@ export const load = (async ({ url, locals }) => {
 							email: true
 						}
 					}
+				},
+				orderBy: {
+					createdAt: 'desc'
 				}
-			});
-			return updatedProject;
-		}
-		return project;
-	}));
+			}),
+			prisma.task.findMany({
+				where: {
+					createdById: locals.user.id
+				},
+				include: {
+					label: true,
+					project: true,
+					createdBy: {
+						select: {
+							id: true,
+							name: true,
+							email: true
+						}
+					}
+				},
+				orderBy: {
+					createdAt: 'desc'
+				}
+			})
+		]);
 
-	return {
-		projects: updatedProjects,
-		tasks,
-		tag: 'all'
-	};
+		// Parse URL string menjadi objek untuk setiap task
+		const parsedTasks = tasks.map(task => ({
+			...task,
+			url: task.url ? JSON.parse(task.url) : null
+		}));
+
+		// Hitung dan update status untuk setiap project
+		const updatedProjects = await Promise.all(
+			projects.map(async (project) => {
+				const projectTasks = parsedTasks.filter(task => task.projectId === project.id);
+				const newStatus = computeProjectStatus(projectTasks, project.dueDate);
+
+				if (newStatus !== project.status) {
+					return prisma.project.update({
+						where: { id: project.id },
+						data: { status: newStatus },
+						include: {
+							createdBy: {
+								select: {
+									id: true,
+									name: true,
+									email: true
+								}
+							}
+						}
+					});
+				}
+				return project;
+			})
+		);
+
+		return {
+			projects: updatedProjects,
+			tasks: parsedTasks,
+			tag: 'all'
+		};
+
+	} catch (error) {
+		console.error('Error loading data:', error);
+		return {
+			projects: [],
+			tasks: [],
+			tag: 'all',
+			error: 'Gagal memuat data'
+		};
+	}
 }) satisfies PageServerLoad;
 
 async function deleteProject(projectId: string, userId: string) {
@@ -193,7 +214,6 @@ export const actions = {
 			return { type: 'error', error: 'Gagal membuat project' };
 		}
 	},
-
 
 	deleteProject: async ({ request, locals }) => {
 		if (!locals.user) {

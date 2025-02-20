@@ -8,9 +8,13 @@
 	import {Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
-	export let tableModel: TableViewModel<Task>;
-	export let data: Task[] = []; // Nilai default array kosong
-	export let projectId: string;
+	interface Props {
+		tableModel: TableViewModel<Task>;
+		data?: Task[]; // Nilai default array kosong
+		projectId: string;
+	}
+
+	let { tableModel, data = [], projectId }: Props = $props();
 
 	// Tambahkan logging untuk debugging
 	console.log('Data diterima di DataTableToolbar:', data);
@@ -46,7 +50,7 @@
 		}>;
 	} = pluginStates.colFilter;
 
-	$: showReset = Object.values({ ...$filterValues, $filterValue }).some((v) => v.length > 0);
+	let showReset = $derived(Object.values({ ...$filterValues, $filterValue }).some((v) => v.length > 0));
 </script>
 
 <div class="flex items-center justify-between">

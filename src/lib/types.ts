@@ -39,5 +39,7 @@ export interface Task {
 export interface PageData {
 	projects: Project[];
 	tasks: Task[];
+	tag: string;
+	error?: string;
 }
 

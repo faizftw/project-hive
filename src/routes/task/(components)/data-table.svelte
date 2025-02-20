@@ -23,17 +23,20 @@
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 
 	export let projectId: string;
 
 	let isLoading = false;
 
-	async function refreshTableData() {
+	async function refreshTableData(projectId?: string) {
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/tasks?projectId=${projectId}`);
+			const url = projectId ? `/api/tasks?projectId=${projectId}` : '/api/tasks';
+			const response = await fetch(url);
 			const tasks = await response.json();
 			tasksStore.set(tasks);
 		} catch (error) {
@@ -58,6 +61,12 @@
 		$tasks.filter(task => task.projectId === projectId)
 	);
 
+	// Pindahkan fetch ke onMount
+	onMount(async () => {
+		if (browser) {
+			await refreshTableData($page.params.projectId);
+		}
+	});
 
 	// Gunakan filteredTasks untuk tabel
 	const table = createTable(filteredTasks, {

@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import type { Task } from '$lib/types';
+import { browser } from '$app/environment';
 
 function createTaskStore() {
 	const { subscribe, set, update } = writable<Task[]>([]);
@@ -7,12 +8,14 @@ function createTaskStore() {
 	return {
 		subscribe,
 		set: (tasks: Task[]) => {
-			const validTasks = tasks.filter(t => 
-				t && 
-				typeof t.id === 'string' && 
-				typeof t.title === 'string'
-			);
-			set(validTasks);
+			if (browser) {
+				const validTasks = tasks.filter(t => 
+					t && 
+					typeof t.id === 'string' && 
+					typeof t.title === 'string'
+				);
+				set(validTasks);
+			}
 		},
 		addTask: (task: Task) => {
 			if (!task?.id || !task?.title) {
@@ -46,6 +49,11 @@ function createTaskStore() {
 		},
 		deleteTask: (taskId: string) => {
 			update(tasks => tasks.filter(t => t.id !== taskId));
+		},
+		update: (updater: (tasks: Task[]) => Task[]) => {
+			if (browser) {
+				update(updater);
+			}
 		}
 	};
 }
