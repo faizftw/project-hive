@@ -47,7 +47,7 @@
 			</DropdownMenu.Label>
 			<DropdownMenu.Separator />
 			<DropdownMenu.Item
-				on:click={handleLogout}
+				onclick={handleLogout}
 				class="cursor-pointer text-red-500 focus:text-red-500"
 			>
 				Log Out

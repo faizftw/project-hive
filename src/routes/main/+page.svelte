@@ -12,38 +12,43 @@
 	import { tasksStore } from '$lib/stores/tasks';
 	import { fade } from 'svelte/transition';
 
-	// Gunakan $props untuk props
-	let { projects, tasks, tag } = $props<{
-		projects: Project[];
-		tasks: Task[];
-		tag: string;
+	// 1. Tambahkan data prop dari server
+	let { data } = $props<{
+		data: {
+			projects: Project[];
+			tasks: Task[];
+			tag: string;
+		}
 	}>();
 
-	// Gunakan $state untuk state
+	// 2. Inisialisasi state
 	let searchQuery = $state('');
-	
-	// Gunakan $derived untuk computed values
+
+	// 3. Initialize stores dengan data dari server
+	$effect(() => {
+		console.log('Data from server:', data);
+		
+		if (data?.projects) {
+			projectsStore.set(data.projects);
+			console.log('Projects loaded into store:', data.projects);
+		}
+		
+		if (data?.tasks) {
+			tasksStore.set(data.tasks);
+			console.log('Tasks loaded into store:', data.tasks);
+		}
+	});
+
+	// 4. Derived values
 	let filteredProjects = $derived(
 		searchQuery 
 			? $projectsStore.filter((project: Project) =>
 				project.name.toLowerCase().includes(searchQuery.toLowerCase())
-			  )
+			)
 			: $projectsStore
 	);
 
-	// Initialize store with data from server
-	$effect(() => {
-		if (projects) {
-			console.log('Initial projects data:', projects);
-			const validProjects = projects.filter((p: Project) => p && p.id);
-			projectsStore.set(validProjects);
-		}
-		if (tasks) {
-			tasksStore.set(tasks);
-		}
-	});
-
-	// Reactive metrics menggunakan $derived
+	// 5. Metrics calculations
 	let totalProjects = $derived($projectsStore.length);
 	let completedProjects = $derived($projectsStore.filter((p: Project) => p.status === 'completed').length);
 	let inProgressProjects = $derived($projectsStore.filter((p: Project) => p.status === 'active').length);
@@ -57,6 +62,13 @@
 	);
 	let cancelledProjects = $derived($projectsStore.filter((p: Project) => p.status === 'cancelled').length);
 	let onHoldProjects = $derived($projectsStore.filter((p: Project) => p.status === 'on-hold').length);
+
+	// 6. Debug logging
+	$effect(() => {
+		console.log('Current filtered projects:', filteredProjects);
+		console.log('Total projects:', totalProjects);
+		console.log('Store state:', $projectsStore);
+	});
 
 	// Event handlers
 	function handleProjectAdded(event: CustomEvent<{data: Project}>) {
@@ -80,109 +92,121 @@
 	let taskData = $derived($tasksStore);
 </script>
 
-<div class="flex-1 space-y-4 p-8 pt-6">
-	<div class="flex items-center justify-between space-y-2">
-		<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-		<div class="flex items-center space-x-2">
-			<Avatar />
-			<DarkMode />
-			<AddProject on:projectAdded={handleProjectAdded} />
-			<Search on:search={handleSearch} />
+<!-- 7. Add loading state -->
+{#if !data}
+	<div class="flex-1 space-y-4 p-8 pt-6">
+		<p>Loading...</p>
+	</div>
+{:else if $projectsStore.length === 0}
+	<div class="flex-1 space-y-4 p-8 pt-6">
+		<p>No projects found. Create your first project!</p>
+		<AddProject on:projectAdded={handleProjectAdded} />
+	</div>
+{:else}
+	<div class="flex-1 space-y-4 p-8 pt-6">
+		<div class="flex items-center justify-between space-y-2">
+			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+			<div class="flex items-center space-x-2">
+				<Avatar />
+				<DarkMode />
+				<AddProject on:projectAdded={handleProjectAdded} />
+				<Search on:search={handleSearch} />
+			</div>
+		</div>
+		<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">Projects</Card.Title>
+					<FolderOpen class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{totalProjects}</div>
+					<p class="text-muted-foreground text-xs">Total Projects</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">Completed</Card.Title>
+					<FolderCheck class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{completedProjects}</div>
+					<p class="text-muted-foreground text-xs">Completed Projects</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">In Progress</Card.Title>
+					<FolderClock class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{inProgressProjects}</div>
+					<p class="text-muted-foreground text-xs">Active Projects</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">Overdue</Card.Title>
+					<CalendarClock class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{overdueProjects}</div>
+					<p class="text-muted-foreground text-xs">Overdue Projects</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">Archived</Card.Title>
+					<FolderX class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{cancelledProjects}</div>
+					<p class="text-muted-foreground text-xs">Archived Projects</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+					<Card.Title class="text-sm font-medium">On Hold</Card.Title>
+					<CirclePause class="text-muted-foreground h-4 w-4" />
+				</Card.Header>
+				<Card.Content>
+					<div class="text-2xl font-bold">{onHoldProjects}</div>
+					<p class="text-muted-foreground text-xs">On Hold Projects</p>
+				</Card.Content>
+			</Card.Root>
+		</div>
+		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+			<Card.Root class="col-span-7">
+				<Card.Header>
+					<Card.Title>Task Overview</Card.Title>
+				</Card.Header>
+				<Card.Content>
+					<Tabs.Root value="Upcoming" class="w-full">
+						<Tabs.List>
+							<Tabs.Trigger value="Upcoming">Upcoming Deadline</Tabs.Trigger>
+							<Tabs.Trigger value="Recent">Recent Task</Tabs.Trigger>
+						</Tabs.List>
+						<Tabs.Content value="Upcoming">
+							<div class="w-full">
+								<DataTableOverview data={taskData} activeTab="Upcoming" />
+							</div>
+						</Tabs.Content>
+						<Tabs.Content value="Recent">
+							<div class="w-full">
+								<DataTableOverview data={taskData} activeTab="Recent" />
+							</div>
+						</Tabs.Content>
+					</Tabs.Root>
+				</Card.Content>
+			</Card.Root>
+		</div>
+		<Separator />
+		<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+			{#each filteredProjects as project (project.id)}
+				<div transition:fade>
+					<ProjectCard project={project as Project} />
+				</div>
+			{/each}
 		</div>
 	</div>
-	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">Projects</Card.Title>
-				<FolderOpen class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{totalProjects}</div>
-				<p class="text-muted-foreground text-xs">Total Projects</p>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">Completed</Card.Title>
-				<FolderCheck class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{completedProjects}</div>
-				<p class="text-muted-foreground text-xs">Completed Projects</p>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">In Progress</Card.Title>
-				<FolderClock class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{inProgressProjects}</div>
-				<p class="text-muted-foreground text-xs">Active Projects</p>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">Overdue</Card.Title>
-				<CalendarClock class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{overdueProjects}</div>
-				<p class="text-muted-foreground text-xs">Overdue Projects</p>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">Archived</Card.Title>
-				<FolderX class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{cancelledProjects}</div>
-				<p class="text-muted-foreground text-xs">Archived Projects</p>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root>
-			<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-				<Card.Title class="text-sm font-medium">On Hold</Card.Title>
-				<CirclePause class="text-muted-foreground h-4 w-4" />
-			</Card.Header>
-			<Card.Content>
-				<div class="text-2xl font-bold">{onHoldProjects}</div>
-				<p class="text-muted-foreground text-xs">On Hold Projects</p>
-			</Card.Content>
-		</Card.Root>
-	</div>
-	<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-		<Card.Root class="col-span-7">
-			<Card.Header>
-				<Card.Title>Task Overview</Card.Title>
-			</Card.Header>
-			<Card.Content>
-				<Tabs.Root value="Upcoming" class="w-full">
-					<Tabs.List>
-						<Tabs.Trigger value="Upcoming">Upcoming Deadline</Tabs.Trigger>
-						<Tabs.Trigger value="Recent">Recent Task</Tabs.Trigger>
-					</Tabs.List>
-					<Tabs.Content value="Upcoming">
-						<div class="w-full">
-							<DataTableOverview projectId="" activeTab="Upcoming" />
-						</div>
-					</Tabs.Content>
-					<Tabs.Content value="Recent">
-						<div class="w-full">
-							<DataTableOverview projectId="" activeTab="Recent" />
-						</div>
-					</Tabs.Content>
-				</Tabs.Root>
-			</Card.Content>
-		</Card.Root>
-	</div>
-	<Separator />
-	<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-		{#each filteredProjects as project (project.id)}
-			<div transition:fade>
-				<ProjectCard project={project as Project} />
-			</div>
-		{/each}
-	</div>
-</div>
+{/if}
