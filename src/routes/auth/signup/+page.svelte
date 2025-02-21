@@ -14,11 +14,11 @@
 <div
 	class="container relative hidden h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0 sm:grid max-sm:grid"
 >
-	<Button variant="ghost" class="absolute right-4 top-4 md:right-8 md:top-8" on:click={handleLogin}>
+	<Button variant="ghost" class="absolute right-4 top-4 md:right-8 md:top-8" onclick={handleLogin}>
 		Login
 	</Button>
 	<Button
-		on:click={toggleMode}
+		onclick={toggleMode}
 		variant="outline"
 		size="icon"
 		class="absolute right-28 top-4 max-md:left-4 md:top-8"

@@ -116,9 +116,13 @@
 
 			if (response.ok) {
 				tasksStore.addTask(result.task);
-				await refreshTableData(projectId);
+				
+				setTimeout(async () => {
+					await refreshTableData(projectId);
+				}, 500);
+				
 				dispatch('taskAdded', result.task);
-				toast.success('Task added successfully');
+				toast.success('Task berhasil ditambahkan');
 				resetForm();
 			} else {
 				const errorMessage = Array.isArray(result.error) 

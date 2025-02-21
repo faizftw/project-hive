@@ -92,17 +92,6 @@
 	let taskData = $derived($tasksStore);
 </script>
 
-<!-- 7. Add loading state -->
-{#if !data}
-	<div class="flex-1 space-y-4 p-8 pt-6">
-		<p>Loading...</p>
-	</div>
-{:else if $projectsStore.length === 0}
-	<div class="flex-1 space-y-4 p-8 pt-6">
-		<p>No projects found. Create your first project!</p>
-		<AddProject on:projectAdded={handleProjectAdded} />
-	</div>
-{:else}
 	<div class="flex-1 space-y-4 p-8 pt-6">
 		<div class="flex items-center justify-between space-y-2">
 			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
@@ -209,4 +198,3 @@
 			{/each}
 		</div>
 	</div>
-{/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { formatDate } from "date-fns";
-
 	export let deadline: string | null; 
     const date = new Date(deadline || '');
     const formattedDate = formatDate(date, 'MMM dd, yyyy hh:mm a');

@@ -17,12 +17,12 @@
 	<Button
 		variant="ghost"
 		class="absolute right-4 top-4 md:right-8 md:top-8"
-		on:click={handlesignup}
+		onclick={handlesignup}
 	>
 		Sign Up
 	</Button>
 	<Button
-		on:click={toggleMode}
+		onclick={toggleMode}
 		variant="outline"
 		size="icon"
 		class="absolute right-28 top-4 max-md:left-4 md:top-8"
