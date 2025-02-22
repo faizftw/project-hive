@@ -9,10 +9,14 @@
 	import { toast } from 'svelte-sonner';
 	import EditTask from './edit-task.svelte';
 
-	export let row: Task;
+	interface Props {
+		row: Task;
+	}
+
+	let { row }: Props = $props();
 	const task = taskSchema.parse(row);
-	let isDeleteDialogOpen = false;
-	let isEditDialogOpen = false;
+	let isDeleteDialogOpen = $state(false);
+	let isEditDialogOpen = $state(false);
 
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
@@ -86,8 +90,6 @@
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="w-[160px]" align="end">
 		<DropdownMenu.Item on:click={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>
-		<DropdownMenu.Item>Make a copy</DropdownMenu.Item>
-		<DropdownMenu.Item>Favorite</DropdownMenu.Item>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Sub>
 			<DropdownMenu.SubTrigger>Labels</DropdownMenu.SubTrigger>
