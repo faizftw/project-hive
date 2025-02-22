@@ -92,7 +92,7 @@
 	let taskData = $derived($tasksStore);
 </script>
 
-	<div class="flex-1 space-y-4 p-8 pt-6">
+	<div class="flex-0 space-y-4 p-8 pt-6">
 		<div class="flex items-center justify-between space-y-2">
 			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
 			<div class="flex items-center space-x-2">
@@ -102,7 +102,7 @@
 				<Search on:search={handleSearch} />
 			</div>
 		</div>
-		<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
+		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">Projects</Card.Title>
@@ -164,7 +164,7 @@
 				</Card.Content>
 			</Card.Root>
 		</div>
-		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+		<div class="grid gap-4 grid-cols-7">
 			<Card.Root class="col-span-7">
 				<Card.Header>
 					<Card.Title>Task Overview</Card.Title>
@@ -190,7 +190,7 @@
 			</Card.Root>
 		</div>
 		<Separator />
-		<div class="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
 			{#each filteredProjects as project (project.id)}
 				<div transition:fade>
 					<ProjectCard project={project as Project} />
