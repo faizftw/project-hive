@@ -68,7 +68,7 @@
 		/>
 		{#if showReset}
 			<Button
-				on:click={() => {
+				onclick={() => {
 					$filterValue = '';
 					$filterValues.status = [];
 					$filterValues.priority = [];

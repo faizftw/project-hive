@@ -5,7 +5,7 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
-	export let tableModel: TableViewModel<Task>;
+	let { tableModel }: { tableModel: TableViewModel<Task> } = $props();
 	const { pluginStates, flatColumns } = tableModel;
 	const { hiddenColumnIds } = pluginStates.hide;
 
@@ -35,7 +35,7 @@
 			{#if hidableCols.includes(col.id)}
 				<DropdownMenu.CheckboxItem
 					checked={!$hiddenColumnIds.includes(col.id)}
-					on:click={() => handleHide(col.id)}
+					onclick={() => handleHide(col.id)}
 				>
 					{col.header}
 				</DropdownMenu.CheckboxItem>

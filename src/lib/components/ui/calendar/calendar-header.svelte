@@ -1,13 +1,12 @@
 <script>
-	import { Calendar as CalendarPrimitive } from 'bits-ui';
-	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	import { Calendar as CalendarPrimitive } from "bits-ui";
+	import { cn } from "$lib/utils.js";
+
+	let { ref = $bindable(null), class: className, ...restProps } = $props();
 </script>
 
 <CalendarPrimitive.Header
-	class={cn('relative flex w-full items-center justify-between pt-1', className)}
-	{...$$restProps}
->
-	<slot />
-</CalendarPrimitive.Header>
+	bind:ref
+	class={cn("relative flex w-full items-center justify-between pt-1", className)}
+	{...restProps}
+/>

@@ -86,7 +86,7 @@
 			<Alert.Description>{errorMessage}</Alert.Description>
 		</Alert.Root>
 	{/if}
-	<form on:submit|preventDefault={onSubmit}>
+	<form onsubmit={onSubmit}>
 		<div class="grid gap-2">
 			<div class="grid gap-1">
 				<Label for="email">Email</Label>

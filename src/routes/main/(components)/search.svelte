@@ -19,6 +19,6 @@
 		placeholder="Search..."
 		class="h-9 md:w-[100px] lg:w-[300px]"
 		bind:value={query}
-		on:input={handleInput}
+		oninput={handleInput}
 	/>
 </div>

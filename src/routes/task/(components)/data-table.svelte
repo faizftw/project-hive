@@ -33,10 +33,14 @@
 	let isLoading = false;
 
 	async function refreshTableData(projectId?: string) {
+		if (isLoading) return;
+		
 		isLoading = true;
 		try {
 			const url = projectId ? `/api/tasks?projectId=${projectId}` : '/api/tasks';
 			const response = await fetch(url);
+			if (!response.ok) throw new Error('Gagal mengambil data');
+			
 			const tasks = await response.json();
 			tasksStore.set(tasks);
 		} catch (error) {
@@ -47,26 +51,22 @@
 		}
 	}
 
-	// Subscribe ke event taskAdded dan taskUpdated
-	const unsubscribe = tasksStore.subscribe(() => {
-		refreshTableData();
-	});
-
-	onDestroy(() => {
-		unsubscribe();
-	});
-
 	// Buat derived store untuk memfilter task berdasarkan projectId
 	const filteredTasks = derived(tasksStore, $tasks => 
 		$tasks.filter(task => task.projectId === projectId)
 	);
 
-	// Pindahkan fetch ke onMount
+	// Pindahkan fetch ke onMount dan tambahkan cleanup
 	onMount(async () => {
 		if (browser) {
-			await refreshTableData($page.params.projectId);
+			await refreshTableData(projectId);
 		}
 	});
+
+	// Subscribe ke perubahan projectId
+	$: if (browser && projectId) {
+		refreshTableData(projectId);
+	}
 
 	// Gunakan filteredTasks untuk tabel
 	const table = createTable(filteredTasks, {

@@ -189,7 +189,11 @@
 				</Card.Content>
 			</Card.Root>
 		</div>
-		<Separator />
+		
+		
+		<Separator class='' />
+		<h2 class="text-2xl font-bold tracking-tight">Projects</h2>
+		
 		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
 			{#each filteredProjects as project (project.id)}
 				<div transition:fade>

@@ -104,7 +104,7 @@
 		try {
 			// Validasi input
 			if (!title.trim()) {
-				throw new Error('Judul task tidak boleh kosong');
+				throw new Error('Title cannot be empty');
 			}
 
 			let finalLabel = null;
@@ -167,7 +167,7 @@
 			<Dialog.Description>Fill in the details of the task you want to edit.</Dialog.Description>
 		</Dialog.Header>
 		
-		<form on:submit={handleSubmit}>
+		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="title" class="text-right">Title</LabelComponent>
@@ -217,7 +217,7 @@
 						id="label" 
 						bind:value={label} 
 						class="col-span-3 p-2 border rounded"
-						on:change={() => showNewLabelInput = label === 'add-new'}
+						onchange={() => showNewLabelInput = label === 'add-new'}
 					>
 						{#each labels as lbl}
 							<option value={lbl.value}>{lbl.label}</option>

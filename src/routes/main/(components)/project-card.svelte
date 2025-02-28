@@ -230,10 +230,10 @@
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content>
 					  <DropdownMenu.Group>
-						<DropdownMenu.Item on:click={() => isEditDialogOpen = true}>
+						<DropdownMenu.Item onclick={() => isEditDialogOpen = true}>
 							Edit
 						</DropdownMenu.Item>
-						<DropdownMenu.Item on:click={() => setIsDeleteDialogOpen(true)}>
+						<DropdownMenu.Item onclick={() => setIsDeleteDialogOpen(true)}>
 							Delete
 						</DropdownMenu.Item>
 					  </DropdownMenu.Group>
@@ -284,7 +284,7 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 		  <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-		  <AlertDialog.Action on:click={handleDelete}>Delete</AlertDialog.Action>
+		  <AlertDialog.Action onclick={handleDelete}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	  </AlertDialog.Content>
 </AlertDialog.Root>

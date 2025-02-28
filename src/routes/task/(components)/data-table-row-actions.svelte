@@ -14,7 +14,10 @@
 	}
 
 	let { row }: Props = $props();
-	const task = taskSchema.parse(row);
+	const task = taskSchema.parse({
+  	...row,
+  	url: typeof row.url === 'string' ? { url: row.url, alias: null } : row.url
+	});
 	let isDeleteDialogOpen = $state(false);
 	let isEditDialogOpen = $state(false);
 
@@ -89,7 +92,7 @@
 		</Button>
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="w-[160px]" align="end">
-		<DropdownMenu.Item on:click={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>
+		<DropdownMenu.Item onclick={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>
 		<DropdownMenu.Separator />
 		<DropdownMenu.Sub>
 			<DropdownMenu.SubTrigger>Labels</DropdownMenu.SubTrigger>
@@ -104,7 +107,7 @@
 			</DropdownMenu.SubContent>
 		</DropdownMenu.Sub>
 		<DropdownMenu.Separator />
-		<DropdownMenu.Item on:click={() => setIsDeleteDialogOpen(true)}>
+		<DropdownMenu.Item onclick={() => setIsDeleteDialogOpen(true)}>
 			Delete 
 			<DropdownMenu.Shortcut>⌘⌫</DropdownMenu.Shortcut>
 		</DropdownMenu.Item>
@@ -128,7 +131,7 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 		  <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-		  <AlertDialog.Action on:click={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
+		  <AlertDialog.Action onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	  </AlertDialog.Content>
 </AlertDialog.Root>

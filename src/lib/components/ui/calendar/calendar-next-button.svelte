@@ -1,23 +1,23 @@
 <script>
-	import { Calendar as CalendarPrimitive } from 'bits-ui';
-	import ChevronRight from 'svelte-radix/ChevronRight.svelte';
-	import { buttonVariants } from '$lib/components/ui/button/index.js';
-	import { cn } from '$lib/utils.js';
-	let className = undefined;
-	export { className as class };
+	import { Calendar as CalendarPrimitive } from "bits-ui";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
+	import { buttonVariants } from "$lib/components/ui/button/index.js";
+	import { cn } from "$lib/utils.js";
+
+	let { ref = $bindable(null), class: className, children, ...restProps } = $props();
 </script>
 
+{#snippet Fallback()}
+	<ChevronRight />
+{/snippet}
+
 <CalendarPrimitive.NextButton
-	on:click
+	bind:ref
 	class={cn(
-		buttonVariants({ variant: 'outline' }),
-		'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100',
+		buttonVariants({ variant: "outline" }),
+		"size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
 		className
 	)}
-	{...$$restProps}
-	let:builder
->
-	<slot {builder}>
-		<ChevronRight class="h-4 w-4" />
-	</slot>
-</CalendarPrimitive.NextButton>
+	{...restProps}
+	children={children || Fallback}
+/>

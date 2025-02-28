@@ -37,7 +37,7 @@
 		url: '',
 		urlAlias: ''
 	});
-
+	
 	const minDate = today(getLocalTimeZone());
 
 	$effect(() => {

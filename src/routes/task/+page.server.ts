@@ -42,4 +42,4 @@ export const load = (async ({ url, locals }) => {
 		tasks,
 		project,
 	};
-}) satisfies PageServerLoad; 
+}) satisfies PageServerLoad;

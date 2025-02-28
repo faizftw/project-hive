@@ -16,8 +16,6 @@
 
 	let { tableModel, data = [], projectId }: Props = $props();
 
-	// Tambahkan logging untuk debugging
-	console.log('Data diterima di DataTableToolbar:', data);
 
 	const counts = data.reduce<{
 		status: { [index: string]: number };
@@ -76,7 +74,7 @@
 		/>
 		{#if showReset}
 			<Button
-				on:click={() => {
+				onclick={() => {
 					$filterValue = '';
 					$filterValues.status = [];
 					$filterValues.priority = [];

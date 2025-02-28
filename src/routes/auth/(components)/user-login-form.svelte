@@ -63,7 +63,7 @@
 			<Alert.Description>{errorMessage}</Alert.Description>
 		</Alert.Root>
 	{/if}
-	<form on:submit|preventDefault={onSubmit}>
+	<form onsubmit={onSubmit}>
 		<div class="grid gap-2">
 			<div class="grid gap-1">
 				<Label for="email">Email</Label>
@@ -96,7 +96,7 @@
 					<button 
 						type="button"
 						class="absolute right-3 top-1/2 -translate-y-1/2"
-						on:click={() => showPassword = !showPassword}
+						onclick={() => showPassword = !showPassword}
 					>
 						{#if showPassword}
 							<EyeNone class="h-4 w-4 text-muted-foreground" />

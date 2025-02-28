@@ -166,7 +166,7 @@
 		</DialogHeader>
 		<form 
 			method="POST"
-			on:submit={handleSubmit}
+			onsubmit={handleSubmit}
 		>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
@@ -226,7 +226,7 @@
 								</Button>
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-3">
-								<Input type="time" value={timeValue} on:input={handleTimeInput} />
+								<Input type="time" value={timeValue} oninput={handleTimeInput} />
 							</Popover.Content>
 						</Popover.Root>
 					</div>

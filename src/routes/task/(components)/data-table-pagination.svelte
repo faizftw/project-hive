@@ -8,13 +8,22 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 
-	export let tableModel: TableViewModel<Task>;
+	let { tableModel }: { tableModel: TableViewModel<Task> } = $props();
 
 	const { pageRows, pluginStates, rows } = tableModel;
 
-	const { hasNextPage, hasPreviousPage, pageIndex, pageCount, pageSize } = pluginStates.page;
+	const { hasNextPage, hasPreviousPage, pageIndex, pageCount } = pluginStates.page;
 
 	const { selectedDataIds } = pluginStates.select;
+
+	// Gunakan state untuk page size
+	let currentPageSize = $state(10);
+
+	function handlePageSizeChange(value: string) {
+		const newSize = Number(value);
+		currentPageSize = newSize;
+		pluginStates.page.pageSize.set(newSize);
+	}
 </script>
 
 <div class="flex items-center justify-between px-2">
@@ -25,18 +34,20 @@
 		<div class="flex items-center space-x-2">
 			<p class="text-sm font-medium">Rows per page</p>
 			<Select.Root
-				onSelectedChange={(selected) => pageSize.set(Number(selected?.value))}
-				selected={{ value: 10, label: '10' }}
+				allowDeselect={false}
+				type="single"
+				value={`${currentPageSize}`}
+				onValueChange={handlePageSizeChange}
 			>
 				<Select.Trigger class="h-8 w-[70px]">
-					<Select.Value placeholder="Select page size" />
+					{String(currentPageSize)}
 				</Select.Trigger>
-				<Select.Content>
-					<Select.Item value="10">10</Select.Item>
-					<Select.Item value="20">20</Select.Item>
-					<Select.Item value="30">30</Select.Item>
-					<Select.Item value="40">40</Select.Item>
-					<Select.Item value="50">50</Select.Item>
+				<Select.Content class="min-w-[70px]" side="top">
+					{#each [10, 20, 30, 40, 50] as size (size)}
+						<Select.Item value={`${size}`} class="text-sm">
+							{size}
+						</Select.Item>
+					{/each}
 				</Select.Content>
 			</Select.Root>
 		</div>
