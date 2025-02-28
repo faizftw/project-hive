@@ -158,7 +158,7 @@
 	}
 </script>
 
-<Dialog.Root bind:open={state.open} on:openChange={(e) => state.open = e.detail}>
+<Dialog.Root bind:open={state.open} on:openChange={(e) => state.open = e}>
 	<Dialog.Trigger>
 		<Button class="py-0 ml-auto me-2" size="sm">
 			<CirclePlus class="mr-2 h-4 w-4" />

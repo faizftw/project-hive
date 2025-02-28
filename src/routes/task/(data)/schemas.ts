@@ -28,8 +28,14 @@ export const taskSchema = z.object({
 		  url: z.string(),
 		  alias: z.string().nullable()
 		}),
-		z.string()
-	  ]).nullable()
+		z.string().transform((str) => {
+			try {
+				return JSON.parse(str);
+			} catch {
+				return { url: str, alias: null };
+			}
+		})
+	]).nullable().optional()
 });
 
 // Schema untuk membuat Task baru (tanpa 'id', 'createdAt', dan 'createdById')
@@ -50,8 +56,14 @@ export const taskCreateSchema = z.object({
 		  url: z.string(),
 		  alias: z.string().nullable()
 		}),
-		z.string()
-	  ]).nullable()
+		z.string().transform((str) => {
+			try {
+				return JSON.parse(str);
+			} catch {
+				return { url: str, alias: null };
+			}
+		})
+	]).nullable().optional()
 });
 
 export type Task = z.infer<typeof taskSchema>;
