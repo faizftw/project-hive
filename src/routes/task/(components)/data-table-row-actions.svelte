@@ -7,13 +7,16 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { toast } from 'svelte-sonner';
+	import { refreshTableData } from '$lib/utils/table-utils';
 	import EditTask from './edit-task.svelte';
+	import { projectsStore } from '$lib/stores/projects';
 
 	interface Props {
 		row: Task;
+		projectId: string;
 	}
 
-	let { row }: Props = $props();
+	let { row, projectId }: Props = $props();
 	const task = taskSchema.parse({
   	...row,
   	url: typeof row.url === 'string' ? { url: row.url, alias: null } : row.url
@@ -42,6 +45,9 @@
 			if (response.ok) {
 				// Hapus task dari store
 				tasksStore.deleteTask(id);
+				setTimeout(async () => {
+					await refreshTableData(projectId);
+				}, 500);
 				setIsDeleteDialogOpen(false);
 				toast.success('Task berhasil dihapus');
 			} else {
