@@ -6,7 +6,7 @@
 	import { RangeCalendar } from "$lib/components/ui/range-calendar/index.js";
 	import type { ComponentProps } from 'svelte';
 	import { formatDate } from "date-fns";
-
+	import { onMount } from 'svelte';
 
 	let {
 		ref = $bindable(null),
@@ -14,48 +14,99 @@
 		...restProps
 	}: ComponentProps<typeof Sidebar.Root> & { projectId: string } = $props();
 
-	const project = $projectsStore.find(p => p.id === projectId);         
-	const projectDeadline = project?.dueDate;
-	console.log(projectDeadline);
-	console.log(project);
-	
-	// Start date is today
+	// Start date adalah hari ini
 	const start = today(getLocalTimeZone());
 	
-	// Fungsi untuk mendapatkan end date
-	function getEndDate() {
-		if (projectDeadline) {
-			try {
-				// Mengikuti format di edit-task.svelte
-				const date = new Date(projectDeadline);
-				const dateStr = date.toISOString().split('T')[0];
-				console.log(dateStr);
-				console.log(parseDate(dateStr));
-				return parseDate(dateStr);
-			} catch (error) {
-				console.error('Error parsing project deadline:', error);
-				return start;
-			}
-		} else {
-			// Fallback to today's date if no deadline exists
-			return start;
-		}
-		
-	}
-
-	// Inisialisasi value di luar $derived
+	// Inisialisasi value dengan default
 	let value = $state({
-		start,
-		end: start // Default ke start, akan diupdate oleh effect
+		start: start,
+		end: start // Default ke start, akan diupdate saat project ditemukan
 	});
-
-	// Update value.end ketika projectDeadline berubah
+	
+	let endDate: CalendarDate | null = null;
+	let initializing = true;
+	
+	// Fungsi untuk memperbarui end date tanpa menyebabkan loop reaktivitas
+	function updateEndDate(date: CalendarDate) {
+		console.log("Memperbarui end date ke:", date);
+		endDate = date;
+		// Buat objek baru untuk value tetapi hanya sekali saat inisialisasi
+		// atau saat end date benar-benar berubah
+		if (initializing) {
+			initializing = false;
+			setTimeout(() => {
+				value = {
+					start: start,
+					end: date
+				};
+				console.log("Nilai range calendar diinisialisasi:", value);
+			}, 0);
+		} else {
+			// Untuk update selanjutnya, langsung ubah properti end
+			value.end = date;
+			console.log("Nilai range calendar diperbarui:", value);
+		}
+	}
+	
+	// Menggunakan onMount untuk inisialisasi pertama
+	onMount(() => {
+		if (!projectId) return;
+		
+		const findProject = () => {
+			console.log("Mencari project dengan ID:", projectId);
+			const project = $projectsStore.find(p => p.id === projectId);
+			console.log("Project yang ditemukan:", project);
+			
+			if (project?.dueDate) {
+				try {
+					console.log("Project dueDate:", project.dueDate);
+					const date = new Date(project.dueDate);
+					const dateStr = date.toISOString().split('T')[0];
+					console.log("Due date string:", dateStr);
+					
+					const parsedDate = parseDate(dateStr);
+					console.log("End date parsed:", parsedDate);
+					
+					updateEndDate(parsedDate);
+				} catch (error) {
+					console.error('Error memproses project deadline:', error);
+				}
+			} else {
+				console.log("Project tidak memiliki due date");
+			}
+		};
+		
+		// Coba cari project setelah komponen di-mount
+		findProject();
+		
+		// Coba lagi setelah beberapa saat jika project store belum diisi
+		setTimeout(findProject, 500);
+	});
+	
+	// Mencari project dan mengupdate end date saat projectId berubah
 	$effect(() => {
-		try {
-			value.end = getEndDate();
-		} catch (error) {
-			console.error('Error updating end date:', error);
-			value.end = start; // Fallback ke start jika ada error
+		if (initializing || !projectId) return;
+		
+		console.log("Project ID berubah:", projectId);
+		const project = $projectsStore.find(p => p.id === projectId);
+		
+		if (project?.dueDate) {
+			try {
+				const date = new Date(project.dueDate);
+				const dateStr = date.toISOString().split('T')[0];
+				const parsedDate = parseDate(dateStr);
+				
+				// Update hanya jika tanggal berubah (bukan string comparison)
+				if (!endDate || 
+					endDate.year !== parsedDate.year || 
+					endDate.month !== parsedDate.month || 
+					endDate.day !== parsedDate.day) {
+					
+					updateEndDate(parsedDate);
+				}
+			} catch (error) {
+				console.error('Error memproses project deadline:', error);
+			}
 		}
 	});
 </script>
@@ -71,5 +122,10 @@
 			readonly={true}
 			locale="en"
 		/>
+		<div class="mt-4 text-sm text-muted-foreground">
+			<p>Tanggal mulai: {value.start.toString()}</p>
+			<p>Deadline project: {value.end.toString()}</p>
+			<p class="mt-2 text-xs">ProjectID: {projectId}</p>
+		</div>
 	</Sidebar.Content>
 </Sidebar.Root>

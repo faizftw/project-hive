@@ -7,21 +7,23 @@
   import * as Breadcrumb from "$lib/components/ui/breadcrumb/index.js";
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import AppSidebar from "./(components)/app-sidebar.svelte";
+  import type { Project } from '$lib/types';
 
   let { data }: { data: PageData } = $props();
 
   onMount(() => {
       tasksStore.set(data.tasks);
       if (data.project) {
-          projectsStore.update(projects => {
-              const existingProjectIndex = projects.findIndex(p => p.id === data.project.id);
-              if (existingProjectIndex >= 0) {
-                  projects[existingProjectIndex] = data.project;
-                  return [...projects];
-              } else {
-                  return [...projects, data.project];
-              }
-          });
+          const project: Project = {
+              ...data.project,
+              createdBy: data.project.createdBy || {
+                  id: data.project.createdById,
+                  name: 'Unknown',
+                  email: ''
+              },
+              dueDate: data.project.dueDate ? data.project.dueDate.toString() : null
+          };
+          projectsStore.addProject(project);
       }
   });
 </script>
