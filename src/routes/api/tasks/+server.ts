@@ -65,6 +65,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ error: 'Project tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
 		}
 
+		// Validasi deadline task tidak melebihi deadline project
+		if (deadline && project.dueDate) {
+			const taskDeadline = new Date(deadline);
+			const projectDeadline = new Date(project.dueDate);
+
+			if (taskDeadline > projectDeadline) {
+				return json({ error: 'Deadline task tidak boleh melebihi deadline project.' }, { status: 400 });
+			}
+		}
+
 		let labelConnect = undefined;
 
 		if (label) {

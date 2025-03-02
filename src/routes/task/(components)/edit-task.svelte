@@ -14,6 +14,7 @@
 	import CalendarIcon from 'lucide-svelte/icons/calendar';
 	import type { Task } from '../(data)/schemas';
 	import { toast } from 'svelte-sonner';
+	import { projectsStore } from '$lib/stores/projects';
 	export let open = false;
 	export let task: Task | null = null;
 	import { refreshTableData } from '$lib/utils/table-utils';
@@ -105,6 +106,21 @@
 			// Validasi input
 			if (!title.trim()) {
 				throw new Error('Title cannot be empty');
+			}
+
+			// Validasi deadline project
+			if (formattedDateTime && task.projectId) {
+				const project = $projectsStore.find(p => p.id === task.projectId);
+				if (project?.dueDate && formattedDateTime) {
+					const taskDeadline = new Date(formattedDateTime);
+					const projectDeadline = new Date(project.dueDate);
+
+					if (taskDeadline > projectDeadline) {
+						toast.error('Deadline task tidak boleh melebihi deadline project');
+						isSubmitting = false;
+						return;
+					}
+				}
 			}
 
 			let finalLabel = null;

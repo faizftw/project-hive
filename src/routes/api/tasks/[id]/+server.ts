@@ -21,11 +21,24 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			where: {
 				id: taskId,
 				createdById: locals.user.id
+			},
+			include: {
+				project: true
 			}
 		});
 
 		if (!existingTask) {
 			return json({ error: 'Task tidak ditemukan' }, { status: 404 });
+		}
+
+		// Validasi deadline task tidak melebihi deadline project
+		if (data.deadline && existingTask.project.dueDate) {
+			const taskDeadline = new Date(data.deadline);
+			const projectDeadline = new Date(existingTask.project.dueDate);
+
+			if (taskDeadline > projectDeadline) {
+				return json({ error: 'Deadline task tidak boleh melebihi deadline project' }, { status: 400 });
+			}
 		}
 
 		// Persiapkan data label
