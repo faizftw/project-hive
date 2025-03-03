@@ -48,8 +48,8 @@ export const statuses = [
 		icon: CheckCircled
 	},
 	{
-		value: 'Canceled',
-		label: 'Canceled',
+		value: 'Cancelled',
+		label: 'Cancelled',
 		icon: CrossCircled
 	}
 ];

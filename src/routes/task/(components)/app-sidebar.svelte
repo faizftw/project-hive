@@ -2,17 +2,55 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import GalleryVerticalEnd from 'lucide-svelte/icons/gallery-vertical-end';
 	import { projectsStore } from '$lib/stores/projects';
+	import { tasksStore } from '$lib/stores/tasks';
 	import { getLocalTimeZone, today, parseDate, CalendarDate } from "@internationalized/date";
 	import { RangeCalendar } from "$lib/components/ui/range-calendar/index.js";
 	import type { ComponentProps } from 'svelte';
 	import { formatDate } from "date-fns";
 	import { onMount } from 'svelte';
+	import { Badge } from "$lib/components/ui/badge/index.js";
+	import { derived } from 'svelte/store';
 
 	let {
 		ref = $bindable(null),
 		projectId,
 		...restProps
 	}: ComponentProps<typeof Sidebar.Root> & { projectId: string } = $props();
+
+	// Derived store untuk menghitung jumlah task berdasarkan status
+	const taskCounts = derived(tasksStore, ($tasks) => {
+		const counts = {
+			backlog: 0,
+			todo: 0,
+			inProgress: 0,
+			completed: 0,
+			cancelled: 0
+		};
+
+		$tasks
+			.filter(task => task.projectId === projectId)
+			.forEach(task => {
+				switch (task.status) {
+					case 'Backlog':
+						counts.backlog++;
+						break;
+					case 'Todo':
+						counts.todo++;
+						break;
+					case 'In Progress':
+						counts.inProgress++;
+						break;
+					case 'Completed':
+						counts.completed++;
+						break;
+					case 'Canceled':
+						counts.cancelled++;
+						break;
+				}
+			});
+
+		return counts;
+	});
 
 	// Start date adalah hari ini
 	const start = today(getLocalTimeZone());
@@ -112,20 +150,40 @@
 </script>
 
 <Sidebar.Root variant="floating" {...restProps}>
-	<Sidebar.Header>
+	<Sidebar.Header class="p-4">
 		<h2 class="text-2xl font-bold tracking-tight">Project Details</h2>
 	</Sidebar.Header>
-	<Sidebar.Content>
-		<RangeCalendar 
-			bind:value 
-			class="rounded-md border" 
-			readonly={true}
-			locale="en"
-		/>
-		<div class="mt-4 text-sm text-muted-foreground">
-			<p>Tanggal mulai: {value.start.toString()}</p>
-			<p>Deadline project: {value.end.toString()}</p>
-			<p class="mt-2 text-xs">ProjectID: {projectId}</p>
+	<Sidebar.Content class="p-4">
+		<div class="space-y-4">
+			<div>
+				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Project Deadline</h4>
+				<RangeCalendar 
+					bind:value 
+					class="rounded-md border" 
+					readonly={true}
+					disabled={true}
+					locale="en"
+				/>
+			</div>
+			
+			<div>
+				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Task Status</h4>
+				<div class="flex flex-wrap gap-2">
+						<Badge variant="outline">Backlog {$taskCounts.backlog}</Badge>
+					
+						<Badge variant="outline">Todo {$taskCounts.todo}</Badge>
+					
+					
+						<Badge variant="outline">In Progress {$taskCounts.inProgress}</Badge>
+					
+					
+						<Badge variant="outline">Completed {$taskCounts.completed}</Badge>
+		
+					
+						<Badge variant="outline">Cancelled {$taskCounts.cancelled}</Badge>
+					
+				</div>
+			</div>
 		</div>
 	</Sidebar.Content>
 </Sidebar.Root>
