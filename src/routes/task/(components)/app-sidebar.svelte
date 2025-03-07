@@ -24,7 +24,8 @@
 			todo: 0,
 			inProgress: 0,
 			completed: 0,
-			cancelled: 0
+			cancelled: 0,
+			pending: 0
 		};
 
 		$tasks
@@ -45,6 +46,9 @@
 						break;
 					case 'Canceled':
 						counts.cancelled++;
+						break;
+					case 'Pending':
+						counts.pending++;
 						break;
 				}
 			});
@@ -181,6 +185,7 @@
 		
 					
 						<Badge variant="outline">Cancelled {$taskCounts.cancelled}</Badge>
+						<Badge variant="outline">Pending {$taskCounts.pending}</Badge>
 					
 				</div>
 			</div>
