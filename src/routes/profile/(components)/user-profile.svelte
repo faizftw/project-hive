@@ -9,23 +9,23 @@
   import { CalendarDays, Mail, User } from "lucide-svelte";
   import { page } from '$app/stores';
 
-  // Ambil data dari store page
-  $: userData = $page.data.user || {
+  // Get data from page store using runes
+  const userData = $state(($page.data.user || {
     id: "",
     name: "",
     email: "",
     joinDate: ""
-  };
+  }));
 
-  $: tasksCount = $page.data.tasksCount || 0;
-  $: projectsCount = $page.data.projectsCount || 0;
-  $: recentActivities = $page.data.recentActivities || [];
+  const tasksCount = $derived($page.data.tasksCount || 0);
+  const projectsCount = $derived($page.data.projectsCount || 0);
+  const recentActivities = $derived($page.data.recentActivities || []);
 
-  let isEditDialogOpen = false;
+  let isEditDialogOpen = $state(false);
 
   async function handleProfileUpdate(updatedData) {
     try {
-      // Panggil API untuk update profil
+      // Call API to update profile
       const response = await fetch('/api/profile/update', {
         method: 'POST',
         headers: {
@@ -40,12 +40,12 @@
 
       const result = await response.json();
       
-      // Update data lokal
-      userData = { ...userData, ...result.user };
+      // Update local data
+      Object.assign(userData, result.user);
       isEditDialogOpen = false;
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Gagal memperbarui profil. Silakan coba lagi.');
+      alert('Failed to update profile. Please try again.');
     }
   }
 
@@ -53,13 +53,11 @@
     isEditDialogOpen = value;
   }
 
-  // Fungsi untuk mendapatkan inisial nama untuk avatar
+  // Function to get name initials for avatar
   function getInitials(name) {
     if (!name) return '';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
   }
-
-  
 </script>
 
 <div class="space-y-8">
@@ -78,7 +76,7 @@
           </div>
           <div class="flex items-center gap-1">
             <CalendarDays class="h-4 w-4" />
-            <span> Joined {userData.joinDate}</span>
+            <span>Joined {userData.joinDate}</span>
           </div>
         </div>
       </div>
@@ -101,7 +99,7 @@
       <Card class="p-6">
         <div class="space-y-4">
           <div>
-            <h3 class="text-sm font-medium text-muted-foreground">Username</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">Full Name</h3>
             <p class="text-base">{userData.name}</p>
           </div>
           <div>

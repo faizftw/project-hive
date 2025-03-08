@@ -4,41 +4,42 @@
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
 
-  export let onOpenChange;
-  export let user;
-  export let onUpdate;
-  export let open;
+  // Props using runes
+  const { user, onUpdate, open = false } = $props();
 
-  let name = user?.name || '';
-  let currentPassword = "";
-  let newPassword = "";
-  let confirmPassword = "";
-  let isSubmitting = false;
+  // State with runes
+  let name = $state(user?.name || '');
+  let currentPassword = $state('');
+  let newPassword = $state('');
+  let confirmPassword = $state('');
+  let isSubmitting = $state(false);
+  let errors = $state({});
 
-  // Reset form saat user berubah
-  $: if (user && user.name) {
-    name = user.name;
-  }
+  // Update name when user prop changes
+  $effect(() => {
+    if (user && user.name) {
+      name = user.name;
+    }
+  });
 
-  $: formData = {
+  // Form data derived from state
+  const formData = $derived({
     name,
     currentPassword,
     newPassword,
     confirmPassword
-  };
-
-  let errors = {};
+  });
 
   function handleChange(e) {
     const { name: fieldName, value } = e.target;
     
-    // Update variabel yang sesuai
+    // Update the corresponding variable
     if (fieldName === 'name') name = value;
     if (fieldName === 'currentPassword') currentPassword = value;
     if (fieldName === 'newPassword') newPassword = value;
     if (fieldName === 'confirmPassword') confirmPassword = value;
 
-    // Hapus error saat user mengetik
+    // Clear error when user types
     if (errors[fieldName]) {
       errors = {...errors, [fieldName]: ""};
     }
@@ -48,21 +49,21 @@
     const newErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Nama tidak boleh kosong";
+      newErrors.name = "Name is required";
     }
 
-    // Validasi password hanya jika user mencoba mengubah password
+    // Only validate password fields if the user is trying to change password
     if (formData.newPassword) {
       if (!formData.currentPassword) {
-        newErrors.currentPassword = "Password saat ini diperlukan";
+        newErrors.currentPassword = "Current password is required";
       }
 
       if (formData.newPassword.length < 8) {
-        newErrors.newPassword = "Password harus minimal 8 karakter";
+        newErrors.newPassword = "Password must be at least 8 characters";
       }
 
       if (formData.newPassword !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Password tidak cocok";
+        newErrors.confirmPassword = "Passwords do not match";
       }
     }
 
@@ -77,12 +78,12 @@
       return;
     }
 
-    // Kumpulkan data yang akan dikirim
+    // Collect data to be sent
     const updatedData = {
       name: formData.name
     };
 
-    // Tambahkan data password jika diisi
+    // Add password data if filled
     if (formData.newPassword) {
       updatedData.currentPassword = formData.currentPassword;
       updatedData.newPassword = formData.newPassword;
@@ -90,13 +91,17 @@
 
     isSubmitting = true;
     try {
-      // Panggil fungsi update yang dilewatkan dari komponen induk
+      // Call the update function passed from parent component
       await onUpdate(updatedData);
       
-      // Reset form password
+      // Reset password fields
       currentPassword = "";
       newPassword = "";
       confirmPassword = "";
+      
+      // Close dialog
+      const event = new CustomEvent('update:open', { detail: false });
+      dispatchEvent(event);
     } catch (error) {
       console.error("Error updating profile:", error);
     } finally {
@@ -104,7 +109,7 @@
     }
   }
 
-  // Reset form saat dialog ditutup
+  // Handle dialog state change
   function handleDialogChange(isOpen) {
     if (!isOpen) {
       currentPassword = "";
@@ -112,19 +117,20 @@
       confirmPassword = "";
       errors = {};
     }
-    onOpenChange(isOpen);
+    const event = new CustomEvent('update:open', { detail: isOpen });
+    dispatchEvent(event);
   }
 </script>
 
-<Dialog bind:open onOpenChange={handleDialogChange}>
-  <DialogContent>
+<Dialog {open} onOpenChange={handleDialogChange}>
+  <DialogContent class="sm:max-w-[425px]">
     <DialogHeader>
       <DialogTitle>Edit Profile</DialogTitle>
     </DialogHeader>
-    <form on:submit={handleSubmit} class="space-y-4 py-4">
+    <form onsubmit={handleSubmit} class="space-y-4 py-4">
       <div class="space-y-2">
-        <Label for="name">Username</Label>
-        <Input id="name" name="name" value={name} oninput={handleChange} />
+        <Label for="name" class="font-medium">Username</Label>
+        <Input id="name" name="name" value={name} oninput={handleChange} class="w-full" />
         {#if errors.name}
           <p class="text-sm text-destructive">{errors.name}</p>
         {/if}
@@ -134,13 +140,14 @@
         <h4 class="text-sm font-medium mb-4">Change Password</h4>
 
         <div class="space-y-2">
-          <Label for="currentPassword">Current Password</Label>
+          <Label for="currentPassword" class="font-medium">Current Password</Label>
           <Input
             id="currentPassword"
             name="currentPassword"
             type="password"
             value={currentPassword}
             oninput={handleChange}
+            class="w-full"
           />
           {#if errors.currentPassword}
             <p class="text-sm text-destructive">{errors.currentPassword}</p>
@@ -148,13 +155,14 @@
         </div>
 
         <div class="space-y-2 mt-2">
-          <Label for="newPassword">New Password</Label>
+          <Label for="newPassword" class="font-medium">New Password</Label>
           <Input
             id="newPassword"
             name="newPassword"
             type="password"
             value={newPassword}
             oninput={handleChange}
+            class="w-full"
           />
           {#if errors.newPassword}
             <p class="text-sm text-destructive">{errors.newPassword}</p>
@@ -162,13 +170,14 @@
         </div>
 
         <div class="space-y-2 mt-2">
-          <Label for="confirmPassword">Confirm New Password</Label>
+          <Label for="confirmPassword" class="font-medium">Confirm New Password</Label>
           <Input
             id="confirmPassword"
             name="confirmPassword"
             type="password"
             value={confirmPassword}
             oninput={handleChange}
+            class="w-full"
           />
           {#if errors.confirmPassword}
             <p class="text-sm text-destructive">{errors.confirmPassword}</p>
@@ -176,9 +185,9 @@
         </div>
       </div>
 
-      <DialogFooter>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+      <DialogFooter class="gap-2">
+        <Button type="submit" disabled={isSubmitting} class="w-full sm:w-auto">
+          {isSubmitting ? 'Saving...' : 'Save Changes'}
         </Button>
       </DialogFooter>
     </form>

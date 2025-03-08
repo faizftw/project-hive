@@ -3,27 +3,27 @@
   import { Clock, FileEdit, FolderKanban } from "lucide-svelte";
   import { page } from '$app/stores';
 
-  export let activities = [];
+  const { activities = [] } = $props();
 
-  // Fungsi untuk memformat timestamp
+  // Function to format timestamp
   function formatTimestamp(timestamp) {
     const date = new Date(timestamp);
     const now = new Date();
     const yesterday = new Date(now);
     yesterday.setDate(now.getDate() - 1);
     
-    // Jika hari ini
+    // If today
     if (date.toDateString() === now.toDateString()) {
-      return `Hari ini pukul ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+      return `Today at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
     }
     
-    // Jika kemarin
+    // If yesterday
     if (date.toDateString() === yesterday.toDateString()) {
-      return `Kemarin pukul ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
+      return `Yesterday at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
     }
     
-    // Jika lebih dari kemarin
-    return date.toLocaleDateString('id-ID', { 
+    // If earlier
+    return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric', 
@@ -32,7 +32,7 @@
     });
   }
 
-  // Mendapatkan icon berdasarkan tipe aktivitas
+  // Get icon based on activity type
   function getIcon(activity) {
     if (activity.type === 'task') {
       return FileEdit;
@@ -42,7 +42,7 @@
     return FileEdit; // Default icon
   }
 
-  // Membuat deskripsi berdasarkan tipe aktivitas
+  // Create description based on activity type
   function getDescription(activity) {
     if (activity.type === 'task') {
       return `Created new task "${activity.title}"`;
@@ -51,6 +51,7 @@
     }
     return activity.title;
   }
+  const Component = $derived(getIcon(activities));
 </script>
 
 <Card class="p-6">
@@ -62,7 +63,7 @@
       {#each activities as activity}
         <div class="flex items-start gap-4">
           <div class="mt-0.5 bg-muted rounded-full p-2">
-            <svelte:component this={getIcon(activity)} class="h-4 w-4 text-muted-foreground" />
+            <Component class="h-4 w-4 text-muted-foreground" />
           </div>
           <div class="flex-1">
             <p class="text-sm font-medium">{getDescription(activity)}</p>
