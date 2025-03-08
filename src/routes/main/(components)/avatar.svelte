@@ -46,6 +46,9 @@
 				{$page?.data?.user?.name || 'User'}
 			</DropdownMenu.Label>
 			<DropdownMenu.Separator />
+			<DropdownMenu.Item onclick={() => (window.location.href = '/profile')}>
+				Profile
+			</DropdownMenu.Item>
 			<DropdownMenu.Item
 				onclick={handleLogout}
 				class="cursor-pointer text-red-500 focus:text-red-500"
