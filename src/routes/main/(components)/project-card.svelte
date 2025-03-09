@@ -288,7 +288,7 @@
 		</Card.Content>
 		
 		<Card.Footer class="flex justify-between gap-2 pt-2">
-			<Button class="w-full" on:click={handleCardClick}>
+			<Button class="w-full" onclick={handleCardClick}>
 				<ExternalLink class="mr-2 h-4 w-4" />
 				Open Project
 			</Button>

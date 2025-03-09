@@ -89,6 +89,9 @@
 			console.log("Nilai range calendar diperbarui:", value);
 		}
 	}
+
+	const project = $projectsStore.find(p => p.id === projectId);
+	let title = project?.name;
 	
 	// Menggunakan onMount untuk inisialisasi pertama
 	onMount(() => {
@@ -157,7 +160,13 @@
 	<Sidebar.Header class="p-4">
 		<h2 class="text-2xl font-bold tracking-tight">Project Details</h2>
 	</Sidebar.Header>
+	
 	<Sidebar.Content class="p-4">
+		<Sidebar.Group>
+			<h3 class="text-xl font-bold tracking-tight">{title}</h3>
+			<p class="text-sm text-muted-foreground">{project?.description || 'No description'}</p>
+		</Sidebar.Group>
+		<Sidebar.Group>
 		<div class="space-y-4">
 			<div>
 				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Project Deadline</h4>
@@ -190,5 +199,6 @@
 				</div>
 			</div>
 		</div>
+	</Sidebar.Group>
 	</Sidebar.Content>
 </Sidebar.Root>
