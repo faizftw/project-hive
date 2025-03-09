@@ -3,7 +3,7 @@
 	import { Skeleton } from "$lib/components/ui/skeleton";
 	import { ArrowRight } from "lucide-svelte";
 	import { Button } from "$lib/components/ui/button/index.js";
-	import { Code, Hexagon, Workflow } from "lucide-svelte";
+	import { Code, Hexagon, Workflow, ListOrdered } from "lucide-svelte";
 	import Darkmode from "./main/(components)/darkmode.svelte";
 </script>
 
@@ -43,7 +43,7 @@
 				<p class="text-muted-foreground text-sm">Track progress and keep projects on schedule</p>
 			</div>
 			<div class="flex flex-col items-center p-4">
-				<Hexagon class="h-10 w-10 text-primary mb-4" />
+				<ListOrdered class="h-10 w-10 text-primary mb-4" />
 				<h3 class="text-lg font-semibold mb-2">Priority Planning</h3>
 				<p class="text-muted-foreground text-sm">Focus on what matters most with clear priorities</p>
 			</div>
