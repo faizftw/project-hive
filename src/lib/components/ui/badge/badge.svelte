@@ -10,10 +10,10 @@
 				destructive:
 					"bg-destructive text-destructive-foreground hover:bg-destructive/80 border-transparent shadow",
 				outline: "text-foreground",
-				success: 'bg-green-500 text-white hover:bg-green-600 border-transparent shadow',
-				warning: 'bg-yellow-500 text-white hover:bg-yellow-600 border-transparent shadow',
-				info: 'bg-blue-500 text-white hover:bg-blue-600 border-transparent shadow',
-				error: 'bg-red-500 text-white hover:bg-red-600 border-transparent shadow',
+				success: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-transparent shadow px-2 py-1 rounded-full text-xs font-medium items-center gap-1.5',
+				warning: 'text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 border-transparent shadow px-2 py-1 rounded-full text-xs font-medium items-center gap-1.5',
+				info: 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 border-transparent shadow px-2 py-1 rounded-full text-xs font-medium  items-center gap-1.5',
+				error: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-transparent shadow px-2 py-1 rounded-full text-xs font-medium  items-center gap-1.5',
 			},
 		},
 		defaultVariants: {

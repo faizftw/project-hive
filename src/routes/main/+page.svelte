@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
-	import { FolderCheck, FolderClock, CalendarClock, FolderX, CirclePause, FolderOpen } from 'lucide-svelte';
+	import { FolderCheck, FolderClock, CalendarClock, Archive, CirclePause, FolderOpen } from 'lucide-svelte';
 	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
 	import type { Task } from '../task/(data)/schemas.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
@@ -110,13 +110,13 @@
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{totalProjects}</div>
-					<p class="text-muted-foreground text-xs">Total Projects</p>
+					<p class=" text-xs">Total Projects</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">Completed</Card.Title>
-					<FolderCheck class="text-muted-foreground h-4 w-4" />
+					<FolderCheck class="text-green-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{completedProjects}</div>
@@ -126,7 +126,7 @@
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">In Progress</Card.Title>
-					<FolderClock class="text-muted-foreground h-4 w-4" />
+					<FolderClock class="text-blue-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{inProgressProjects}</div>
@@ -136,7 +136,7 @@
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">Overdue</Card.Title>
-					<CalendarClock class="text-muted-foreground h-4 w-4" />
+					<CalendarClock class="h-4 w-4 text-red-500" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{overdueProjects}</div>
@@ -146,7 +146,7 @@
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">Archived</Card.Title>
-					<FolderX class="text-muted-foreground h-4 w-4" />
+					<Archive class="text-slate-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{cancelledProjects}</div>
@@ -156,7 +156,7 @@
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">On Hold</Card.Title>
-					<CirclePause class="text-muted-foreground h-4 w-4" />
+					<CirclePause class="text-amber-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{onHoldProjects}</div>

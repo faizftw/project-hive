@@ -83,10 +83,10 @@
 
 	// Status konfigurasi untuk badge dan label
 	const statusConfig = {
-		'active': { label: "Active", variant: "warning" },
+		'active': { label: "Active", variant: "info" },
 		'completed': { label: "Completed", variant: "success" },
 		'cancelled': { label: "Archived", variant: "error" },
-		'on-hold': { label: "On Hold", variant: "info" },
+		'on-hold': { label: "On Hold", variant: "warning" },
 	} as const;
 
 	// Update computed values when relevant data changes
