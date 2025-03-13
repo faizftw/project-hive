@@ -29,9 +29,81 @@ export const load: PageServerLoad = async ({ locals }) => {
       where: { createdById: locals.user.id }
     });
 
+    // Hitung jumlah task berdasarkan status
+    const completedTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'Completed'
+      }
+    });
+
+    const inProgressTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'In Progress'
+      }
+    });
+
+    const todoTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'Todo'
+      }
+    });
+
+    const backlogTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'Backlog'
+      }
+    });
+
+    const canceledTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'Canceled'
+      }
+    });
+
+    const pendingTasksCount = await prisma.task.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'Pending'
+      }
+    });
+    
     // Hitung jumlah project yang dimiliki pengguna
     const projectsCount = await prisma.project.count({
       where: { createdById: locals.user.id }
+    });
+
+    // Hitung jumlah project berdasarkan status
+    const activeProjectsCount = await prisma.project.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'active'
+      }
+    });
+
+    const completedProjectsCount = await prisma.project.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'completed'
+      }
+    });
+
+    const cancelledProjectsCount = await prisma.project.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'cancelled'
+      }
+    });
+
+    const onHoldProjectsCount = await prisma.project.count({
+      where: { 
+        createdById: locals.user.id,
+        status: 'on-hold'
+      }
     });
 
     // Ambil aktivitas terbaru (tasks dan projects)
@@ -72,7 +144,19 @@ export const load: PageServerLoad = async ({ locals }) => {
         })
       },
       tasksCount,
+      completedTasksCount,
+      inProgressTasksCount,
+      todoTasksCount,
+      backlogTasksCount,
+      canceledTasksCount,
+      pendingTasksCount,
+      
       projectsCount,
+      activeProjectsCount,
+      completedProjectsCount,
+      cancelledProjectsCount, 
+      onHoldProjectsCount,
+      
       recentActivities: [
         ...recentTasks.map(task => ({
           id: task.id,

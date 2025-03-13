@@ -1,53 +1,50 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id         String   @id @default(uuid())
-  name       String
-  email      String   @unique
-  password   String
-  createdAt  DateTime @default(now())
-  projects   Project[] @relation("UserProjects")
-  tasks      Task[]    @relation("UserTasks")
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  projects  Project[] @relation("UserProjects")
+  tasks     Task[]    @relation("UserTasks")
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
-  status      String   @default("active")
+  status      String    @default("active")
   dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User     @relation(fields: [createdById], references: [id], name: "UserProjects")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   createdById String
+  createdBy   User      @relation("UserProjects", fields: [createdById], references: [id])
   tasks       Task[]
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
   priority    String
   status      String
   labelId     String?
-  label       Label?   @relation("TaskLabels", fields: [labelId], references: [id])
-  deadline    DateTime? 
+  deadline    DateTime?
   url         String?
-  createdAt   DateTime @default(now())
-  project     Project  @relation(fields: [projectId], references: [id])
+  createdAt   DateTime  @default(now())
   projectId   String
-  createdBy   User     @relation(fields: [createdById], references: [id], name: "UserTasks")
   createdById String
+  createdBy   User      @relation("UserTasks", fields: [createdById], references: [id])
+  label       Label?    @relation("TaskLabels", fields: [labelId], references: [id])
+  project     Project   @relation(fields: [projectId], references: [id])
 }
 
 model Label {
@@ -56,4 +53,3 @@ model Label {
   label String
   tasks Task[] @relation("TaskLabels")
 }
-

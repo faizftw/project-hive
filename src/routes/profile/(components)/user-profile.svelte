@@ -17,8 +17,23 @@
     joinDate: ""
   }));
 
+  // Task data
   const tasksCount = $derived($page.data.tasksCount || 0);
+  const completedTasksCount = $derived($page.data.completedTasksCount || 0);
+  const inProgressTasksCount = $derived($page.data.inProgressTasksCount || 0);
+  const todoTasksCount = $derived($page.data.todoTasksCount || 0);
+  const backlogTasksCount = $derived($page.data.backlogTasksCount || 0);
+  const canceledTasksCount = $derived($page.data.canceledTasksCount || 0);
+  const pendingTasksCount = $derived($page.data.pendingTasksCount || 0);
+  
+  // Project data
   const projectsCount = $derived($page.data.projectsCount || 0);
+  const activeProjectsCount = $derived($page.data.activeProjectsCount || 0);
+  const completedProjectsCount = $derived($page.data.completedProjectsCount || 0);
+  const cancelledProjectsCount = $derived($page.data.cancelledProjectsCount || 0);
+  const onHoldProjectsCount = $derived($page.data.onHoldProjectsCount || 0);
+  
+  // Activities data
   const recentActivities = $derived($page.data.recentActivities || []);
 
   let isEditDialogOpen = $state(false);
@@ -85,7 +100,20 @@
     </div>
   </Card>
 
-  <MetricCards tasksCount={tasksCount} projectsCount={projectsCount} />
+  <MetricCards 
+    tasksCount={tasksCount} 
+    completedTasksCount={completedTasksCount}
+    inProgressTasksCount={inProgressTasksCount}
+    todoTasksCount={todoTasksCount}
+    backlogTasksCount={backlogTasksCount}
+    canceledTasksCount={canceledTasksCount}
+    pendingTasksCount={pendingTasksCount}
+    projectsCount={projectsCount} 
+    activeProjectsCount={activeProjectsCount}
+    completedProjectsCount={completedProjectsCount}
+    cancelledProjectsCount={cancelledProjectsCount}
+    onHoldProjectsCount={onHoldProjectsCount}
+  />
 
   <Tabs value="activity" class="w-full">
     <TabsList class="grid w-full grid-cols-2 mb-6">

@@ -57,6 +57,7 @@
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
 		"cookie": "^1.0.1",
-		"date-fns": "^4.1.0"
+		"date-fns": "^4.1.0",
+		"pg": "^8.14.0"
 	}
 }
