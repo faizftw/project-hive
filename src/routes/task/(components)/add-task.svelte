@@ -160,10 +160,12 @@
 
 <Dialog.Root bind:open={state.open} on:openChange={(e) => state.open = e}>
 	<Dialog.Trigger>
-		<Button class="py-0 ml-auto me-2" size="sm">
-			<CirclePlus class="mr-2 h-4 w-4" />
-			Add Task
-		</Button>
+		{#snippet child({ props })}
+			<Button class="py-0 ml-auto me-2" size="sm" {...props}>
+				<CirclePlus class="mr-2 h-4 w-4" />
+				Add Task
+			</Button>
+		{/snippet}
 	</Dialog.Trigger>
 	
 	<Dialog.Content class="inline-block">
@@ -257,12 +259,14 @@
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
 							<Popover.Trigger>
+								{#snippet child({ props })}
 								<Button
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',
 										!state.dateValue && 'text-muted-foreground'
 									)}
+									{...props}
 								>
 									<CalendarIcon class="mr-2 h-4 w-4" />
 									{#if state.dateValue}
@@ -273,6 +277,7 @@
 										<span>Select date</span>
 									{/if}
 								</Button>
+								{/snippet}
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-0">
 								<Calendar 
@@ -287,12 +292,14 @@
 						
 						<Popover.Root>
 							<Popover.Trigger >
+								{#snippet child({ props })}
 								<Button
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',
 										!state.timeValue && 'text-muted-foreground'
 									)}
+									{...props}
 								>
 									<ClockIcon class="mr-2 h-4 w-4" />
 									{#if state.timeValue}
@@ -301,6 +308,7 @@
 										<span>Select time</span>
 									{/if}
 								</Button>
+								{/snippet}
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-3">
 								<Input 

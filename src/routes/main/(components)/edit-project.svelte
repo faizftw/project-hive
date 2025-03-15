@@ -213,7 +213,8 @@
           <div class="col-span-3 flex gap-2">
             <Popover.Root>
               <Popover.Trigger>
-                <Button variant="outline" class="w-[240px] justify-start text-left font-normal">
+                {#snippet child({ props })}
+                <Button variant="outline" class="w-[240px] justify-start text-left font-normal" {...props}>
                   <CalendarIcon class="mr-2 h-4 w-4" />
                   {#if dateValue}
                     {new DateFormatter('id-ID', { dateStyle: 'long' }).format(dateValue.toDate(getLocalTimeZone()))}
@@ -221,6 +222,7 @@
                     Choose a date
                   {/if}
                 </Button>
+                {/snippet}
               </Popover.Trigger>
               <Popover.Content class="w-auto p-0">
                 <Calendar mode="single" bind:value={dateValue} selected={dateValue} minDate={minDate} />

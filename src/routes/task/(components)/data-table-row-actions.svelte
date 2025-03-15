@@ -89,13 +89,16 @@
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger >
-		<Button
-			variant="ghost"
-			class="data-[state=open]:bg-muted flex h-8 w-8 p-0"
-		>
-			<DotsHorizontal class="h-4 w-4" />
-			<span class="sr-only">Open Menu</span>
-		</Button>
+		{#snippet child({ props })}
+			<Button
+				variant="ghost"
+				class="data-[state=open]:bg-muted flex h-8 w-8 p-0"
+				{...props}
+			>
+				<DotsHorizontal class="h-4 w-4" />
+				<span class="sr-only">Open Menu</span>
+			</Button>
+		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content class="w-[160px]" align="end">
 		<DropdownMenu.Item onclick={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>

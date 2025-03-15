@@ -260,12 +260,14 @@
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
 							<Popover.Trigger >
+								{#snippet child({ props })}
 								<Button
 									variant="outline"
 									class={cn(
 										'w-[240px] justify-start text-left font-normal',
 										!dateValue && 'text-muted-foreground'
 									)}
+									{...props}
 								>
 									<CalendarIcon class="mr-2 h-4 w-4" />
 									{#if dateValue}
@@ -276,6 +278,7 @@
 										<span>Pick a date</span>
 									{/if}
 								</Button>
+								{/snippet}
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-0">
 								<Calendar 

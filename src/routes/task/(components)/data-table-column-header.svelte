@@ -57,14 +57,16 @@
 {#if !props.sort.disabled}
 	<div class={cn('flex items-center', className)}>
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger >
-				<Button
-					variant="ghost"
-					class="data-[state=open]:bg-accent -ml-3 h-8"
-					size="sm"
-				>
-					<slot />
-					{#if props.sort.order === 'desc'}
+			<DropdownMenu.Trigger>
+				
+					<Button
+						variant="ghost"
+						class="data-[state=open]:bg-accent -ml-3 h-8"
+						size="sm"
+						
+					>
+						<slot />
+						{#if props.sort.order === 'desc'}
 						<ArrowDown class="ml-2 h-4 w-4" />
 					{:else if props.sort.order === 'asc'}
 						<ArrowUp class="ml-2 h-4 w-4" />

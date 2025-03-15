@@ -23,10 +23,12 @@
 
 <DropdownMenu.Root>
 	<DropdownMenu.Trigger >
-		<Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex">
-			<MixerHorizontal class="mr-2 h-4 w-4" />
-			View
-		</Button>
+		{#snippet child({ props })}
+			<Button variant="outline" size="sm" class="ml-auto hidden h-8 lg:flex" {...props}>
+				<MixerHorizontal class="mr-2 h-4 w-4" />
+				View
+			</Button>
+		{/snippet}
 	</DropdownMenu.Trigger>
 	<DropdownMenu.Content>
 		<DropdownMenu.Label>Toggle columns</DropdownMenu.Label>

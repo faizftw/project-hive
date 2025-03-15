@@ -232,9 +232,11 @@
 					
 					<DropdownMenu.Root>
 						<DropdownMenu.Trigger class="focus:outline-none">
-							<Button variant="ghost" class="h-8 w-8 p-0">
-								<DotsHorizontal class="h-4 w-4" />
-							</Button>
+							{#snippet child({ props })}
+								<Button variant="ghost" class="h-8 w-8 p-0" {...props}>
+									<DotsHorizontal class="h-4 w-4" />
+								</Button>
+							{/snippet}
 						</DropdownMenu.Trigger>
 						<DropdownMenu.Content class="z-50" portalProps={{}}>
 							<DropdownMenu.Group>

@@ -190,12 +190,14 @@
 					<div class="col-span-3 flex gap-2">
 						<Popover.Root>
 							<Popover.Trigger >
+								{#snippet child({ props })}
 								<Button
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',
 										!dateValue && 'text-muted-foreground'
 									)}
+									{...props}
 								>
 									<CalendarIcon class="mr-2 h-4 w-4" />
 									{#if dateValue}
@@ -206,6 +208,7 @@
 										<span>Select date</span>
 									{/if}
 								</Button>
+								{/snippet}
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-0">
 								<Calendar mode="single" selected={dateValue} bind:value={dateValue} initialFocus minDate={minDate} />
@@ -213,12 +216,14 @@
 						</Popover.Root>
 						<Popover.Root>
 							<Popover.Trigger>
+								{#snippet child({ props })}
 								<Button
 									variant="outline"
 									class={cn(
 										'w-full justify-start text-left font-normal',
 										!timeValue && 'text-muted-foreground'
 									)}
+									{...props}
 								>
 									<ClockIcon class="mr-2 h-4 w-4" />
 									{#if timeValue}
@@ -227,6 +232,7 @@
 										<span>Select time</span>
 									{/if}
 								</Button>
+								{/snippet}
 							</Popover.Trigger>
 							<Popover.Content class="w-auto p-3">
 								<Input type="time" value={timeValue} oninput={handleTimeInput} />
