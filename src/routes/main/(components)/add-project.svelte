@@ -153,12 +153,15 @@
 
 <Dialog bind:open>
 	<DialogTrigger>
+		{#snippet child({ props })}
 		<Button class=''
 			aria-label="Add Project"
+			{...props}
 		>
 			<Add class="mr-2 h-4 w-4" />
 			Add Project
 		</Button>
+		{/snippet}
 	</DialogTrigger>
 	<DialogContent>
 		<DialogHeader>
