@@ -40,7 +40,7 @@
 			class="absolute inset-0 bg-cover"
 			style="
 				background-image:
-					url(https://images.unsplash.com/photo-1590069261209-f8e9b8642343?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1376&q=80);"
+					url(https://img.freepik.com/free-vector/3d-abstract-wave-pattern-background-vector_53876-171403.jpg?t=st=1742117591~exp=1742121191~hmac=b4589786ebaa74ff81785c5655b5fe80ee23486b0fa1fd15124262b81327366a&auto=format&fit=crop&w=1376&q=80);"
 		></div>
 		<div class="relative z-20 flex items-center text-lg font-medium">
 			<!-- <Command class="mr-2 h-6 w-6" /> -->
