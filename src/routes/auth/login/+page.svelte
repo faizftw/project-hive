@@ -55,7 +55,6 @@
 					streamlined approach to project management, keeping users on top of deadlines and
 					priorities to achieve their goals efficiently.
 				</p>
-				<footer class="text-sm">Sofia Davis</footer>
 			</blockquote>
 		</div>
 	</div>
