@@ -15,6 +15,7 @@
 	import type { Task } from '../(data)/schemas';
 	import { toast } from 'svelte-sonner';
 	import { projectsStore } from '$lib/stores/projects';
+	import * as Select from "$lib/components/ui/select/index.js";
 	export let open = false;
 	export let task: Task | null = null;
 	import { refreshTableData } from '$lib/utils/table-utils';
@@ -105,7 +106,12 @@
 		try {
 			// Validasi input
 			if (!title.trim()) {
-				throw new Error('Title cannot be empty');
+				throw new Error('Title is required');
+			}
+			
+			// Validasi deadline
+			if (!dateValue || !timeValue) {
+				throw new Error('Deadline task (date and time) is required');
 			}
 
 			// Validasi deadline project
@@ -177,18 +183,21 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="inline-block">
-		<Dialog.Header>
-			<Dialog.Title>Edit Task</Dialog.Title>
-			<Dialog.Description>Fill in the details of the task you want to edit.</Dialog.Description>
+	<Dialog.Content class="inline-block" portalProps={{}}>
+		<Dialog.Header class="space-y-2">
+			<Dialog.Title class="text-xl font-semibold">Edit Task</Dialog.Title>
+			<Dialog.Description class="text-sm text-muted-foreground">Fill in the details of the task you want to edit.</Dialog.Description>
 		</Dialog.Header>
 		
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="title" class="text-right">Title</LabelComponent>
+					<LabelComponent for="title" class="text-right">
+						Title
+					</LabelComponent>
 					<Input 
 						id="title" 
+						type="text"
 						bind:value={title}
 						placeholder="Task Name" 
 						class="col-span-3" 
@@ -200,6 +209,7 @@
 					<LabelComponent for="description" class="text-right">Description</LabelComponent>
 					<Input 
 						id="description" 
+						type="text"
 						bind:value={description}
 						placeholder="Description" 
 						class="col-span-3" 
@@ -208,38 +218,48 @@
 
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="priority" class="text-right">Priority</LabelComponent>
-					<select id="priority" bind:value={priority} class="col-span-3 p-2 border rounded">
-						<option value="Low">Low</option>
-						<option value="Medium">Medium</option>
-						<option value="High">High</option>
-					</select>
+					<Select.Root type="single" bind:value={priority}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{priority}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+							<Select.Item class="cursor-pointer" value="Low" label="Low">Low</Select.Item>
+							<Select.Item class="cursor-pointer" value="Medium" label="Medium">Medium</Select.Item>
+							<Select.Item class="cursor-pointer" value="High" label="High">High</Select.Item>
+						</Select.Content>
+					</Select.Root>
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="status" class="text-right">Status</LabelComponent>
-					<select id="status" bind:value={status} class="col-span-3 p-2 border rounded">
-						<option value="Backlog">Backlog</option>
-						<option value="Pending">Pending</option>
-						<option value="Todo">Todo</option>
-						<option value="In Progress">In Progress</option>
-						<option value="Completed">Completed</option>
-						<option value="Canceled">Canceled</option>
-					</select>
+					<Select.Root type="single" bind:value={status}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{status}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+							<Select.Item class="cursor-pointer" value="Backlog" label="Backlog">Backlog</Select.Item>
+							<Select.Item class="cursor-pointer" value="Pending" label="Pending">Pending</Select.Item>
+							<Select.Item class="cursor-pointer" value="Todo" label="Todo">Todo</Select.Item>
+							<Select.Item class="cursor-pointer" value="In Progress" label="In Progress">In Progress</Select.Item>
+							<Select.Item class="cursor-pointer" value="Completed" label="Completed">Completed</Select.Item>
+							<Select.Item class="cursor-pointer" value="Canceled" label="Canceled">Canceled</Select.Item>
+						</Select.Content>
+					</Select.Root>
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="label" class="text-right">Label</LabelComponent>
-					<select 
-						id="label" 
-						bind:value={label} 
-						class="col-span-3 p-2 border rounded"
-						onchange={() => showNewLabelInput = label === 'add-new'}
-					>
-						{#each labels as lbl}
-							<option value={lbl.value}>{lbl.label}</option>
-						{/each}
-						<option value="add-new">Add New Label</option>
-					</select>
+					<Select.Root type="single" bind:value={label} onValueChange={(value) => showNewLabelInput = value === 'add-new'}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{label}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+							{#each labels as lbl}
+								<Select.Item class="cursor-pointer" value={lbl.value} label={lbl.label}>{lbl.label}</Select.Item>
+							{/each}
+							<Select.Item class="cursor-pointer" value="add-new" label="Add New Label">Add New Label</Select.Item>
+						</Select.Content>
+					</Select.Root>
 				</div>
 
 				{#if showNewLabelInput}
@@ -247,6 +267,7 @@
 						<LabelComponent for="newLabel" class="text-right">New Label</LabelComponent>
 						<Input 
 							id="newLabel" 
+							type="text"
 							bind:value={newLabel} 
 							placeholder="Enter new label" 
 							class="col-span-3" 
@@ -256,7 +277,9 @@
 				{/if}
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="deadline" class="text-right">Deadline</LabelComponent>
+					<LabelComponent for="deadline" class="text-right">
+						Deadline
+					</LabelComponent>
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
 							<Popover.Trigger >
@@ -280,12 +303,13 @@
 								</Button>
 								{/snippet}
 							</Popover.Trigger>
-							<Popover.Content class="w-auto p-0">
+							<Popover.Content class="w-auto p-0" portalProps={{}}>
 								<Calendar 
 									mode="single" 
 									bind:value={dateValue} 
 									selected={dateValue} 
-									minDate={minDate} 
+									minDate={minDate}
+									class="border rounded-md" 
 								/>
 							</Popover.Content>
 						</Popover.Root>
@@ -313,6 +337,7 @@
 					<LabelComponent for="urlAlias" class="text-right">URL Alias</LabelComponent>
 					<Input 
 						id="urlAlias" 
+						type="text"
 						bind:value={urlAlias}
 						placeholder="Nama tampilan untuk URL" 
 						class="col-span-3"
@@ -320,7 +345,7 @@
 				</div>
 			</div>
 
-			<Dialog.Footer>
+			<Dialog.Footer class="flex justify-end space-x-2">
 				<Button type="button" variant="outline" onclick={() => (open = false)} class="">
 					Cancel
 				</Button>

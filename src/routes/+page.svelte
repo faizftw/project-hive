@@ -10,7 +10,7 @@
 
 <div class="min-h-screen flex flex-col items-center justify-center  px-4 sm:px-6">
 	<div class="pointer-events-none fixed inset-0 z-[-999]">
-        <div class="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" ></div>
+        <div class="absolute inset-0 bg-linear-to-b from-background via-background/90 to-background" ></div>
         <div class="absolute right-0 top-0 h-[500px] w-[500px] bg-blue-500/10 blur-[100px]" ></div>
         <div class="absolute bottom-0 left-0 h-[500px] w-[500px] bg-purple-500/10 blur-[100px]" ></div>
       </div>

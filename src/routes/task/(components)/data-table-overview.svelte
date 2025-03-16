@@ -229,20 +229,6 @@
 				}
 			}
 		}),
-		table.display({
-			id: 'actions',
-			header: () => {
-				return '';
-			},
-			cell: ({ row }) => {
-				if (row.isData() && row.original) {
-					return createRender(DataTableRowActions, {
-						row: row.original
-					});
-				}
-				return '';
-			}
-		})
 	]);
 
 	const tableModel = table.createViewModel(columns);

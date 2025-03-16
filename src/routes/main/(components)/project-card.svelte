@@ -231,7 +231,7 @@
 					{/if}
 					
 					<DropdownMenu.Root>
-						<DropdownMenu.Trigger class="focus:outline-none">
+						<DropdownMenu.Trigger class="focus:outline-hidden">
 							{#snippet child({ props })}
 								<Button variant="ghost" class="h-8 w-8 p-0" {...props}>
 									<DotsHorizontal class="h-4 w-4" />

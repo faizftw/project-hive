@@ -12,6 +12,7 @@
   import { createEventDispatcher } from 'svelte';
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';
+  import * as Select from "$lib/components/ui/select/index.js";
 
   interface Props {
     project: Project;
@@ -60,6 +61,13 @@
     event.preventDefault();
     isSubmitting = true;
 
+    // Validasi nama project
+    if (!name.trim()) {
+      alert('Project name is required');
+      isSubmitting = false;
+      return;
+    }
+
     // Gabungkan dateValue dan timeValue menjadi objek Date
     let selectedDateTime: Date | null = null;
     if (dateValue && timeValue) {
@@ -73,6 +81,10 @@
         console.error('Error formatting date time:', err);
         selectedDateTime = null;
       }
+    } else {
+      alert('Deadline project (date and time) is required');
+      isSubmitting = false;
+      return;
     }
 
     // Validasi apakah deadline tidak di masa lalu
@@ -164,10 +176,10 @@
 
 <Dialog.Root bind:open>
   
-  <Dialog.Content class="inline-block">
-    <Dialog.Header>
-      <Dialog.Title>Edit Project</Dialog.Title>
-      <Dialog.Description>
+  <Dialog.Content class="inline-block" portalProps={{}}>
+    <Dialog.Header class="space-y-2">
+      <Dialog.Title class="text-xl font-semibold">Edit Project</Dialog.Title>
+      <Dialog.Description class="text-sm text-muted-foreground">
         Edit project details here. Click save after finishing.
       </Dialog.Description>
     </Dialog.Header>
@@ -178,6 +190,7 @@
           <Label for="name" class="text-right">Name</Label>
           <Input 
             id="name" 
+            type="text"
             bind:value={name}
             placeholder="Project Name" 
             class="col-span-3" 
@@ -189,6 +202,7 @@
           <Label for="description" class="text-right">Description</Label>
           <Input 
             id="description" 
+            type="text"
             bind:value={description}
             placeholder="Project Description" 
             class="col-span-3" 
@@ -197,15 +211,17 @@
 
         <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">Status</Label>
-          <select 
-            bind:value={status} 
-            class="col-span-3 p-2 border rounded"
-          >
-            <option value="active">Active</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="on-hold">On Hold</option>
-          </select>
+          <Select.Root type="single" bind:value={status}>
+            <Select.Trigger class="col-span-3 p-2 border rounded"   >
+              {status}
+            </Select.Trigger>
+            <Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+              <Select.Item class="cursor-pointer" value="active" label="Active">Active</Select.Item>
+              <Select.Item class="cursor-pointer" value="completed" label="Completed">Completed</Select.Item>
+              <Select.Item class="cursor-pointer" value="cancelled" label="Cancelled">Cancelled</Select.Item>
+              <Select.Item class="cursor-pointer" value="on-hold" label="On Hold">On Hold</Select.Item>
+            </Select.Content>
+          </Select.Root>
         </div>
 
         <div class="grid grid-cols-4 items-center gap-4">
@@ -224,8 +240,14 @@
                 </Button>
                 {/snippet}
               </Popover.Trigger>
-              <Popover.Content class="w-auto p-0">
-                <Calendar mode="single" bind:value={dateValue} selected={dateValue} minDate={minDate} />
+              <Popover.Content class="w-auto p-0" portalProps={{}}>
+                <Calendar 
+                  mode="single" 
+                  bind:value={dateValue} 
+                  selected={dateValue} 
+                  minDate={minDate}
+                  class="border rounded-md" 
+                />
               </Popover.Content>
             </Popover.Root>
             
@@ -238,7 +260,7 @@
         </div>
       </div>
       
-      <Dialog.Footer>
+      <Dialog.Footer class="flex justify-end space-x-2">
         <Button type="button" variant="outline" onclick={() => (open = false)} class=''>
           Cancel
         </Button>

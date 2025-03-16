@@ -58,34 +58,35 @@
 	<div class={cn('flex items-center', className)}>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger>
-				
+				{#snippet child({ props: buttonProps })}
 					<Button
 						variant="ghost"
 						class="data-[state=open]:bg-accent -ml-3 h-8"
 						size="sm"
-						
+						{...buttonProps}
 					>
 						<slot />
 						{#if props.sort.order === 'desc'}
-						<ArrowDown class="ml-2 h-4 w-4" />
-					{:else if props.sort.order === 'asc'}
-						<ArrowUp class="ml-2 h-4 w-4" />
-					{:else}
-						<CaretSort class="ml-2 h-4 w-4" />
-					{/if}
-				</Button>
+							<ArrowDown class="ml-2 h-4 w-4" />
+						{:else if props.sort.order === 'asc'}
+							<ArrowUp class="ml-2 h-4 w-4" />
+						{:else}
+							<CaretSort class="ml-2 h-4 w-4" />
+						{/if}
+					</Button>
+				{/snippet}
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content align="start">
-				<DropdownMenu.Item onclick={handleAscSort}>
+			<DropdownMenu.Content align="start" class="w-[200px]" portalProps={{}}>
+				<DropdownMenu.Item onclick={handleAscSort} class="cursor-default" inset={false}>
 					<ArrowUp class="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
 					Asc
 				</DropdownMenu.Item>
-				<DropdownMenu.Item onclick={handleDescSort}>
+				<DropdownMenu.Item onclick={handleDescSort} class="cursor-default" inset={false}>
 					<ArrowDown class="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
 					Desc
 				</DropdownMenu.Item>
-				<DropdownMenu.Separator />
-				<DropdownMenu.Item onclick={handleHide}>
+				<DropdownMenu.Separator class="my-1" />
+				<DropdownMenu.Item onclick={handleHide} class="cursor-default" inset={false}>
 					<EyeNone class="text-muted-foreground/70 mr-2 h-3.5 w-3.5" />
 					Hide
 				</DropdownMenu.Item>

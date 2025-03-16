@@ -65,6 +65,17 @@
 		event.preventDefault();
 		isSubmitting = true;
 
+		const form = event.target as HTMLFormElement;
+		const formData = new FormData(form);
+		
+		// Validasi nama project
+		const projectName = formData.get('name') as string;
+		if (!projectName || !projectName.trim()) {
+			toast.error('Nama project wajib diisi');
+			isSubmitting = false;
+			return;
+		}
+
 		// Gabungkan dateValue dan timeValue menjadi objek Date
 		let selectedDateTime: Date | null = null;
 		if (dateValue && timeValue) {
@@ -78,6 +89,10 @@
 				console.error('Error formatting date time:', err);
 				selectedDateTime = null;
 			}
+		} else {
+			toast.error('Deadline project (date and time) is required');
+			isSubmitting = false;
+			return;
 		}
 
 		// Validasi apakah deadline tidak di masa lalu
@@ -87,9 +102,6 @@
 			return;
 		}
 
-		const form = event.target as HTMLFormElement;
-		const formData = new FormData(form);
-		
 		if (formattedDateTime) {
 			formData.append('dueDate', formattedDateTime);
 		}
@@ -163,9 +175,9 @@
 		</Button>
 		{/snippet}
 	</DialogTrigger>
-	<DialogContent>
-		<DialogHeader>
-			<DialogTitle>Create New Project</DialogTitle>
+	<DialogContent class="w-full max-w-lg" portalProps={{}}>
+		<DialogHeader class="space-y-2">
+			<DialogTitle class="text-xl font-semibold">Create New Project</DialogTitle>
 		</DialogHeader>
 		<form 
 			method="POST"
@@ -174,13 +186,14 @@
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="name" class="text-right">Name</Label>
-					<Input name="name" id="name" placeholder="Project name" class="col-span-3" required />
+					<Input name="name" id="name" type="text" placeholder="Project name" class="col-span-3" required />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
 					<Label for="description" class="text-right">Description</Label>
 					<Input
 						name="description"
 						id="description"
+						type="text"
 						placeholder="Project description"
 						class="col-span-3"
 					/>
@@ -210,8 +223,15 @@
 								</Button>
 								{/snippet}
 							</Popover.Trigger>
-							<Popover.Content class="w-auto p-0">
-								<Calendar mode="single" selected={dateValue} bind:value={dateValue} initialFocus minDate={minDate} />
+							<Popover.Content class="w-auto p-0" portalProps={{}}>
+								<Calendar 
+									mode="single" 
+									selected={dateValue} 
+									bind:value={dateValue} 
+									initialFocus 
+									minDate={minDate}
+									class="border rounded-md"
+								/>
 							</Popover.Content>
 						</Popover.Root>
 						<Popover.Root>
@@ -234,8 +254,13 @@
 								</Button>
 								{/snippet}
 							</Popover.Trigger>
-							<Popover.Content class="w-auto p-3">
-								<Input type="time" value={timeValue} oninput={handleTimeInput} />
+							<Popover.Content class="w-auto p-3" portalProps={{}}>
+								<Input 
+									type="time" 
+									value={timeValue} 
+									oninput={handleTimeInput}
+									class="w-full"
+								/>
 							</Popover.Content>
 						</Popover.Root>
 					</div>
@@ -248,7 +273,7 @@
 					</div>
 				{/if}
 			</div>
-			<DialogFooter>
+			<DialogFooter class="flex justify-end space-x-2">
 				<Button type="submit" disabled={isSubmitting} class=''>
 					{#if isSubmitting}
 						Creating...

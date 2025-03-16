@@ -17,6 +17,7 @@
 	import ClockIcon from 'lucide-svelte/icons/clock';
 	import { refreshTableData } from '$lib/utils/table-utils';
 	let { projectId }: { projectId: string } = $props();
+	import * as Select from "$lib/components/ui/select/index.js";
 	import { projectsStore } from '$lib/stores/projects';
 
 	const dispatch = createEventDispatcher();
@@ -57,9 +58,28 @@
 		}
 	});
 
+	$effect(() => {
+		// Update showNewLabelInput saat label berubah
+		state.showNewLabelInput = state.label === 'add-new';
+	});
+
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		state.isSubmitting = true;
+
+		// Validasi judul task
+		if (!state.title.trim()) {
+			toast.error('Title is required');
+			state.isSubmitting = false;
+			return;
+		}
+
+		// Validasi deadline
+		if (!state.dateValue || !state.timeValue) {
+			toast.error('Deadline task (date and time) is required');
+			state.isSubmitting = false;
+			return;
+		}
 
 		let finalLabel = null;
 		
@@ -156,9 +176,13 @@
 	function capitalizeLabel(label: string) {
 		return label.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 	}
+
+	const handleOpenChange = (e: CustomEvent<boolean>) => {
+		state.open = e.detail;
+	};
 </script>
 
-<Dialog.Root bind:open={state.open} on:openChange={(e) => state.open = e}>
+<Dialog.Root bind:open={state.open} on:openChange={handleOpenChange}>
 	<Dialog.Trigger>
 		{#snippet child({ props })}
 			<Button class="py-0 ml-auto me-2" size="sm" {...props}>
@@ -168,18 +192,21 @@
 		{/snippet}
 	</Dialog.Trigger>
 	
-	<Dialog.Content class="inline-block">
-		<Dialog.Header>
-			<Dialog.Title>Add New Task</Dialog.Title>
-			<Dialog.Description>Fill in the details of the task you want to add.</Dialog.Description>
+	<Dialog.Content class="inline-block" portalProps={{}}>
+		<Dialog.Header class="space-y-2">
+			<Dialog.Title class="text-xl font-semibold">Add New Task</Dialog.Title>
+			<Dialog.Description class="text-sm text-muted-foreground">Fill in the details of the task you want to add.</Dialog.Description>
 		</Dialog.Header>
 		
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="title" class="text-right">Title</LabelComponent>
+					<LabelComponent for="title" class="text-right">
+						Title
+					</LabelComponent>
 					<Input 
 						id="title" 
+						type="text"
 						bind:value={state.title}
 						placeholder="Task Name" 
 						class="col-span-3" 
@@ -188,9 +215,10 @@
 				</div>
 				
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="description">Description</LabelComponent>
+					<LabelComponent for="description" class="text-right">Description</LabelComponent>
 					<Input 
 						id="description" 
+						type="text"
 						bind:value={state.description}
 						placeholder="Description" 
 						class="col-span-3" 
@@ -198,53 +226,56 @@
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="priority">Priority</LabelComponent>
-					<select 
-						id="priority" 
-						bind:value={state.priority} 
-						class="mt-1 block w-full col-span-3"
-					>
-						<option value="Low">Low</option>
-						<option value="Medium">Medium</option>
-						<option value="High">High</option>
-					</select>
+					<LabelComponent for="priority" class="text-right">Priority</LabelComponent>
+					<Select.Root type="single" bind:value={state.priority}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{state.priority}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+						  <Select.Item class="cursor-pointer" value="Low" label="Low">Low</Select.Item>
+						  <Select.Item class="cursor-pointer" value="Medium" label="Medium">Medium</Select.Item>
+						  <Select.Item class="cursor-pointer" value="High" label="High">High</Select.Item>
+						</Select.Content>
+					  </Select.Root>
 				</div>
 				
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="status">Status</LabelComponent>
-					<select 
-						id="status" 
-						bind:value={state.status} 
-						class="mt-1 block w-full col-span-3"
-					>
-						<option value="Backlog">Backlog</option>
-						<option value="Pending">Pending</option>
-						<option value="Todo">Todo</option>
-						<option value="In Progress">In Progress</option>
-						<option value="Completed">Completed</option>
-						<option value="Canceled">Canceled</option>
-					</select>
+					<LabelComponent for="status" class="text-right">Status</LabelComponent>
+					<Select.Root type="single" bind:value={state.status}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{state.status}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+							<Select.Item class="cursor-pointer" value="Backlog" label="Backlog">Backlog</Select.Item>
+							<Select.Item class="cursor-pointer" value="Pending" label="Pending">Pending</Select.Item>
+							<Select.Item class="cursor-pointer" value="Todo" label="Todo">Todo</Select.Item>
+							<Select.Item class="cursor-pointer" value="In Progress" label="In Progress">In Progress</Select.Item>
+							<Select.Item class="cursor-pointer" value="Completed" label="Completed">Completed</Select.Item>
+							<Select.Item class="cursor-pointer" value="Canceled" label="Canceled">Canceled</Select.Item>
+						</Select.Content>
+					</Select.Root>
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="label">Label</LabelComponent>
-					<select 
-						id="label" 
-						bind:value={state.label} 
-						class="mt-1 block w-full col-span-3" 
-						onchange={() => state.showNewLabelInput = state.label === 'add-new'}
-					>
-						{#each labels as lbl}
-							<option value={lbl.value}>{lbl.label}</option>
-						{/each}
-						<option value="add-new">Add New Label</option>
-					</select>
+					<LabelComponent for="label" class="text-right">Label</LabelComponent>
+					<Select.Root type="single" bind:value={state.label}>
+						<Select.Trigger class="mt-1 w-full col-span-3">
+							{state.label}
+						</Select.Trigger>
+						<Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
+							{#each labels as lbl}
+								<Select.Item class="cursor-pointer" value={lbl.value} label={lbl.label}>{lbl.label}</Select.Item>
+							{/each}
+							<Select.Item class="cursor-pointer" value="add-new" label="Add New Label">Add New Label</Select.Item>
+						</Select.Content>
+						</Select.Root>
 				</div>
 				
 				{#if state.showNewLabelInput}
 					<div class="grid grid-cols-4 items-center gap-4">
-						<LabelComponent for="newLabel">New Label</LabelComponent>
+						<LabelComponent for="newLabel" class="text-right">New Label</LabelComponent>
 						<Input 
+							type="text"
 							class="col-span-3" 
 							id="newLabel" 
 							bind:value={state.newLabel} 
@@ -255,7 +286,9 @@
 				{/if}
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="deadline">Deadline</LabelComponent>
+					<LabelComponent for="deadline" class="text-right">
+						Deadline
+					</LabelComponent>
 					<div class="flex gap-2 col-span-3">
 						<Popover.Root>
 							<Popover.Trigger>
@@ -279,13 +312,14 @@
 								</Button>
 								{/snippet}
 							</Popover.Trigger>
-							<Popover.Content class="w-auto p-0">
+							<Popover.Content class="w-auto p-0" portalProps={{}}>
 								<Calendar 
 									mode="single" 
 									selected={state.dateValue} 
 									bind:value={state.dateValue} 
 									initialFocus 
-									minDate={minDate} 
+									minDate={minDate}
+									class="border rounded-md"
 								/>
 							</Popover.Content>
 						</Popover.Root>
@@ -310,11 +344,12 @@
 								</Button>
 								{/snippet}
 							</Popover.Trigger>
-							<Popover.Content class="w-auto p-3">
+							<Popover.Content class="w-auto p-3" portalProps={{}}>
 								<Input 
 									type="time" 
 									value={state.timeValue} 
-									oninput={(e: Event) => state.timeValue = (e.target as HTMLInputElement).value} 
+									oninput={(e: Event) => state.timeValue = (e.target as HTMLInputElement).value}
+									class="w-full"
 								/>
 							</Popover.Content>
 						</Popover.Root>
@@ -328,7 +363,7 @@
 				{/if}
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="url">URL</LabelComponent>
+					<LabelComponent for="url" class="text-right">URL</LabelComponent>
 					<Input 
 						id="url" 
 						type="url"
@@ -339,15 +374,15 @@
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="urlAlias">URL Alias</LabelComponent>
+					<LabelComponent for="urlAlias" class="text-right">URL Alias</LabelComponent>
 					<Input 
 						id="urlAlias" 
+						type="text"
 						bind:value={state.urlAlias}
 						placeholder="Name of the URL" 
 						class="col-span-3"
 					/>
 				</div>
-
 				<div class="flex justify-end space-x-2">
 					<Button type="button" variant="outline" onclick={() => state.open = false} class=''>
 						Cancel

@@ -88,7 +88,7 @@
 </script>
 
 <DropdownMenu.Root>
-	<DropdownMenu.Trigger >
+	<DropdownMenu.Trigger>
 		{#snippet child({ props })}
 			<Button
 				variant="ghost"
@@ -100,25 +100,25 @@
 			</Button>
 		{/snippet}
 	</DropdownMenu.Trigger>
-	<DropdownMenu.Content class="w-[160px]" align="end">
-		<DropdownMenu.Item onclick={() => setIsEditDialogOpen(true)}>Edit</DropdownMenu.Item>
-		<DropdownMenu.Separator />
+	<DropdownMenu.Content class="w-[160px]" align="end" portalProps={{}}>
+		<DropdownMenu.Item onclick={() => setIsEditDialogOpen(true)} class="cursor-default" inset={false}>Edit</DropdownMenu.Item>
+		<DropdownMenu.Separator class="my-1" />
 		<DropdownMenu.Sub>
-			<DropdownMenu.SubTrigger>Labels</DropdownMenu.SubTrigger>
-			<DropdownMenu.SubContent>
-				<DropdownMenu.RadioGroup value={task.label}>
+			<DropdownMenu.SubTrigger class="cursor-default" inset={false}>Labels</DropdownMenu.SubTrigger>
+			<DropdownMenu.SubContent class="p-1" portalProps={{}}>
+				<DropdownMenu.RadioGroup value={task.label?.value || ''}>
 					{#each labels as label}
-						<DropdownMenu.RadioItem value={label.value}>
+						<DropdownMenu.RadioItem value={label.value} class="cursor-default">
 							{label.label}
 						</DropdownMenu.RadioItem>
 					{/each}
 				</DropdownMenu.RadioGroup>
 			</DropdownMenu.SubContent>
 		</DropdownMenu.Sub>
-		<DropdownMenu.Separator />
-		<DropdownMenu.Item onclick={() => setIsDeleteDialogOpen(true)}>
+		<DropdownMenu.Separator class="my-1" />
+		<DropdownMenu.Item onclick={() => setIsDeleteDialogOpen(true)} class="cursor-default" inset={false}>
 			Delete 
-			<DropdownMenu.Shortcut>⌘⌫</DropdownMenu.Shortcut>
+			<DropdownMenu.Shortcut class="ml-auto text-xs">⌘⌫</DropdownMenu.Shortcut>
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>
@@ -126,21 +126,20 @@
 <EditTask 
 	bind:open={isEditDialogOpen} 
 	task={task}
-	projectId={task.projectId}
 	on:taskUpdated={handleEditTask}
 />
 
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-	<AlertDialog.Content>
-		<AlertDialog.Header>
-		  <AlertDialog.Title>This task will be deleted </AlertDialog.Title>
-		  <AlertDialog.Description>
+	<AlertDialog.Content class="sm:max-w-[425px]" portalProps={{}}>
+		<AlertDialog.Header class="space-y-2">
+		  <AlertDialog.Title class="text-xl font-semibold">This task will be deleted </AlertDialog.Title>
+		  <AlertDialog.Description class="text-sm text-muted-foreground">
 			This action cannot be undone. This will permanently delete the task.
 		  </AlertDialog.Description>
 		</AlertDialog.Header>
-		<AlertDialog.Footer>
-		  <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-		  <AlertDialog.Action onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
+		<AlertDialog.Footer class="flex justify-end space-x-2">
+		  <AlertDialog.Cancel class="mt-2">Cancel</AlertDialog.Cancel>
+		  <AlertDialog.Action class="mt-2" onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	  </AlertDialog.Content>
 </AlertDialog.Root>
