@@ -17,12 +17,40 @@
 	}
 
 	let { row, projectId }: Props = $props();
-	const task = taskSchema.parse({
-  	...row,
-  	url: typeof row.url === 'string' ? JSON.parse(row.url) : row.url
-	});
+	
+	// Normalisasi task dengan hati-hati
+	let task: Task;
+	try {
+		// Clone objek row untuk menghindari referensi
+		let normalizedRow = JSON.parse(JSON.stringify(row));
+		
+		// Parse URL dengan hati-hati
+		if (typeof normalizedRow.url === 'string' && normalizedRow.url) {
+			try {
+				normalizedRow.url = JSON.parse(normalizedRow.url);
+			} catch (e) {
+				console.error('Error parsing URL string:', e);
+				normalizedRow.url = { url: normalizedRow.url, alias: null };
+			}
+		}
+		
+		// Pastikan properti yang diperlukan hadir
+		normalizedRow.label = normalizedRow.label || null;
+		normalizedRow.priority = normalizedRow.priority || 'Low';
+		normalizedRow.status = normalizedRow.status || 'Pending';
+		
+		// Validate dengan schema
+		task = taskSchema.parse(normalizedRow);
+		
+	} catch (error) {
+		console.error('Error normalizing task:', error);
+		// Fallback jika ada error
+		task = row as Task;
+	}
+	
 	let isDeleteDialogOpen = $state(false);
 	let isEditDialogOpen = $state(false);
+	let isSubmitting = $state(false);
 
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
@@ -33,66 +61,97 @@
 	}
 
 	const deleteTask = async (id: string) => {
+		if (isSubmitting) return;
+		isSubmitting = true;
+		
 		try {
-			const response = await fetch(`/api/tasks`, {
+			// Tambahkan timestamp untuk mencegah cache
+			const timestamp = new Date().getTime();
+			
+			const response = await fetch(`/api/tasks?_ts=${timestamp}`, {
 				method: 'DELETE',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache'
 				},
 				body: JSON.stringify({ id })
 			});
 			
+			const result = await response.json();
+			
 			if (response.ok) {
-				// Hapus task dari store
-				tasksStore.deleteTask(id);
-				setTimeout(async () => {
-					await refreshTableData(projectId);
-				}, 500);
+				console.log('Task berhasil dihapus, hasil:', result);
+				
+				// Refresh data berdasarkan projectId yang dikembalikan atau gunakan projectId saat ini
+				const refreshProjectId = result.projectId || projectId;
+				await refreshTableData(refreshProjectId);
+				
 				setIsDeleteDialogOpen(false);
-				toast.success('Task Deleted');
+				toast.success('Task berhasil dihapus');
 			} else {
-				const data = await response.json();
-				throw new Error(data.error || 'Failed to delete task');
+				throw new Error(result.error || 'Gagal menghapus task');
 			}
 		} catch (error: any) {
-			console.error('Error deleting task:', error);
+			console.error('Error menghapus task:', error);
 			toast.error(error.message);
+		} finally {
+			isSubmitting = false;
 		}
 	}
 
 	const handleEditTask = async (event: CustomEvent<Task>) => {
+		if (isSubmitting) return;
+		isSubmitting = true;
+		
 		try {
+			// Tambahkan timestamp untuk mencegah cache
+			const timestamp = new Date().getTime();
+			
 			const updatedTask = event.detail;
-			const response = await fetch(`/api/tasks/${task.id}`, {
+			console.log('Sending update for task:', updatedTask);
+			
+			const response = await fetch(`/api/tasks/${task.id}?_ts=${timestamp}`, {
 				method: 'PUT',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache'
 				},
 				body: JSON.stringify(updatedTask)
 			});
 
 			if (response.ok) {
-				const result = await response.json();
-				tasksStore.updateTask(result.task);
+				// Refresh data dari server
+				await refreshTableData(projectId);
 				setIsEditDialogOpen(false);
-				toast.success('Task Updated');
+				toast.success('Task berhasil diperbarui');
 			} else {
 				const data = await response.json();
-				throw new Error(data.error || 'Failed to update task');
+				throw new Error(data.error || 'Gagal memperbarui task');
 			}
 		} catch (error: any) {
 			console.error('Error updating task:', error);
 			toast.error(error.message);
+		} finally {
+			isSubmitting = false;
 		}
 	}
 
 	const handleSetStatus = async (status: string) => {
+		if (isSubmitting) return;
+		isSubmitting = true;
+		
 		try {
+			// Tambahkan timestamp untuk mencegah cache
+			const timestamp = new Date().getTime();
+			
 			// Mengambil nilai status yang diterima
 			const statusValue = statuses.find(s => s.value === status)?.value || status;
 			
 			// Pastikan kita punya semua data task yang dibutuhkan
 			const taskUpdate = {
+				id: task.id,
 				title: task.title,
 				description: task.description,
 				priority: task.priority,
@@ -106,25 +165,21 @@
 				} : null
 			};
 			
-			const response = await fetch(`/api/tasks/${task.id}`, {
+			console.log('Updating task status:', taskUpdate);
+			
+			const response = await fetch(`/api/tasks/${task.id}?_ts=${timestamp}`, {
 				method: 'PUT',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache'
 				},
 				body: JSON.stringify(taskUpdate)
 			});
 			
 			if (response.ok) {
-				const result = await response.json();
-				
-				// Perbarui task di store dengan hasil dari server
-				tasksStore.updateTask(result.task);
-				
-				// Refresh table data
-				setTimeout(async () => {
-					await refreshTableData(projectId);
-				}, 500);
-				
+				// Refresh data dari server 
+				await refreshTableData(projectId);
 				toast.success('Status berhasil diperbarui');
 			} else {
 				const data = await response.json();
@@ -133,9 +188,10 @@
 		} catch (error: any) {
 			console.error('Error setting status:', error);
 			toast.error(error.message);
+		} finally {
+			isSubmitting = false;
 		}
 	} 
-	
 </script>
 
 <DropdownMenu.Root>
@@ -145,6 +201,7 @@
 				variant="ghost"
 				class="data-[state=open]:bg-muted flex h-8 w-8 p-0"
 				{...props}
+				disabled={isSubmitting}
 			>
 				<DotsHorizontal class="h-4 w-4" />
 				<span class="sr-only">Open Menu</span>
@@ -183,7 +240,7 @@
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 	<AlertDialog.Content class="sm:max-w-[425px]" portalProps={{}}>
 		<AlertDialog.Header class="space-y-2">
-		  <AlertDialog.Title class="text-xl font-semibold">This task will be deleted </AlertDialog.Title>
+		  <AlertDialog.Title class="text-xl font-semibold">This task will be deleted</AlertDialog.Title>
 		  <AlertDialog.Description class="text-sm text-muted-foreground">
 			This action cannot be undone. This will permanently delete the task.
 		  </AlertDialog.Description>

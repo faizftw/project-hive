@@ -4,10 +4,20 @@
 	import type { Task } from '../(data)/schemas.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
+	import { onMount } from 'svelte';
 
 	let { tableModel }: { tableModel: TableViewModel<Task> } = $props();
 	const { pluginStates, flatColumns } = tableModel;
 	const { hiddenColumnIds } = pluginStates.hide;
+
+	onMount(() => {
+		hiddenColumnIds.update((ids: string[]) => {
+			if (!ids.includes('createdAt')) {
+				return [...ids, 'createdAt'];
+			}
+			return ids;
+		});
+	});
 
 	function handleHide(id: string) {
 		hiddenColumnIds.update((ids: string[]) => {
@@ -18,7 +28,7 @@
 		});
 	}
 
-	const hidableCols = ['title', 'description', 'status', 'priority'];
+	const hidableCols = ['title', 'description', 'status', 'priority', 'deadline'];
 </script>
 
 <DropdownMenu.Root>

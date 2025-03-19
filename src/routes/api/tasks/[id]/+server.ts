@@ -58,6 +58,15 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 				};
 			}
 		}
+		
+		// Persiapkan URL dengan benar
+		let urlData = null;
+		if (data.url) {
+			urlData = JSON.stringify({
+				url: data.url.url || data.url,
+				alias: data.url.alias || null
+			});
+		}
 
 		// Update task
 		const updatedTask = await prisma.task.update({
@@ -69,7 +78,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 				status: data.status,
 				deadline: data.deadline ? new Date(data.deadline) : null,
 				label: labelConnect,
-				url: data.url ? JSON.stringify(data.url) : null,
+				url: urlData,
 			},
 			include: {
 				label: true,
@@ -88,7 +97,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 	} catch (error: any) {
 		console.error('Error updating task:', error);
 		return json({ 
-			error: 'Terjadi kesalahan saat mengupdate task' 
+			error: 'An error occurred while updating the task' 
 		}, { status: 500 });
 	}
 }; 

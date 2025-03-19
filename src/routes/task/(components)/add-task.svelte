@@ -76,7 +76,7 @@
 
 		// Validasi deadline
 		if (!state.dateValue || !state.timeValue) {
-			toast.error('Deadline task (date and time) is required');
+			toast.error('Task deadline (date and time) is required');
 			state.isSubmitting = false;
 			return;
 		}
@@ -126,28 +126,32 @@
 		};
 
 		try {
-			const response = await fetch('/api/tasks', {
+			// Tambahkan timestamp untuk mencegah cache
+			const timestamp = new Date().getTime();
+			
+			const response = await fetch(`/api/tasks?_ts=${timestamp}`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: { 
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache'
+				},
 				body: JSON.stringify(newTask)
 			});
 
 			const result = await response.json();
 
 			if (response.ok) {
-				tasksStore.addTask(result.task);
-				
-				setTimeout(async () => {
-					await refreshTableData(projectId);
-				}, 500);
+				// Pastikan data direfresh dari server dengan timestamp baru
+				await refreshTableData(projectId);
 				
 				dispatch('taskAdded', result.task);
-				toast.success('Task berhasil ditambahkan');
+				toast.success('Task added successfully');
 				resetForm();
 			} else {
 				const errorMessage = Array.isArray(result.error) 
 					? result.error.map((e: any) => e.message).join(', ') 
-					: result.error || 'Failed to add task.';
+					: result.error || 'Failed to add task';
 				throw new Error(errorMessage);
 			}
 		} catch (error: any) {
@@ -279,7 +283,7 @@
 							class="col-span-3" 
 							id="newLabel" 
 							bind:value={state.newLabel} 
-							placeholder="Enter the new label" 
+							placeholder="Enter new label" 
 							required 
 						/>
 					</div>
@@ -379,7 +383,7 @@
 						id="urlAlias" 
 						type="text"
 						bind:value={state.urlAlias}
-						placeholder="Name of the URL" 
+						placeholder="Display name for URL" 
 						class="col-span-3"
 					/>
 				</div>

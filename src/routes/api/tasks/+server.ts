@@ -5,9 +5,16 @@ import { taskCreateSchema } from '../../task/(data)/schemas.js';
 import { z } from 'zod';
 
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ url }) => {
   try {
+    // Dapatkan projectId dari query parameter jika ada
+    const projectId = url.searchParams.get('projectId');
+
+    // Buat where clause berdasarkan projectId jika ada
+    const where = projectId ? { projectId } : {};
+
     const tasks = await prisma.task.findMany({
+      where,
       include: {
         createdBy: {
           select: { id: true, name: true, email: true },
@@ -22,14 +29,38 @@ export const GET: RequestHandler = async () => {
       },
     });
 
-    // Parse URL string menjadi objek
-    const parsedTasks = tasks.map(task => ({
-      ...task,
-      url: task.url ? JSON.parse(task.url) : null
-    }));
+    // Normalisasi data task sebelum dikirim ke client
+    const parsedTasks = tasks.map(task => {
+      // Parse URL string menjadi objek jika ada
+      let parsedUrl = null;
+      if (task.url) {
+        try {
+          parsedUrl = typeof task.url === 'string' ? JSON.parse(task.url) : task.url;
+        } catch (e) {
+          console.error(`Error parsing URL for task ${task.id}:`, e);
+          parsedUrl = { url: task.url, alias: null };
+        }
+      }
 
+      // Pastikan semua field ada dan valid
+      return {
+        ...task,
+        url: parsedUrl,
+        // Pastikan label konsisten
+        label: task.label || null,
+        // Pastikan prioritas konsisten
+        priority: task.priority || 'Low',
+        // Pastikan status konsisten
+        status: task.status || 'Pending',
+      };
+    });
+
+    // Log untuk debugging
+    console.log(`API: Returning ${parsedTasks.length} tasks for projectId: ${projectId || 'all'}`);
+    
     return json(parsedTasks);
   } catch (error: any) {
+    console.error('API Error fetching tasks:', error);
     return json({ error: error.message }, { status: 500 });
   }
 };
@@ -37,13 +68,10 @@ export const GET: RequestHandler = async () => {
 export const POST: RequestHandler = async ({ request, locals }) => {
 	try {
 		if (!locals.user) {
-			return json({ error: 'Pengguna tidak terautentikasi.' }, { status: 401 });
+			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
 
 		const data = await request.json();
-
-		// Debug: Tampilkan data yang diterima
-		console.log('Data diterima dari frontend:', data);
 
 		// Validasi data menggunakan taskCreateSchema
 		const parsedData = taskCreateSchema.parse(data);
@@ -51,7 +79,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { title, description, priority, status, deadline, projectId, label } = parsedData;
 
 		if (!title || !projectId) {
-			return json({ error: 'Judul dan Project ID diperlukan.' }, { status: 400 });
+			return json({ error: 'Title and Project ID are required' }, { status: 400 });
 		}
 
 		const project = await prisma.project.findUnique({
@@ -62,7 +90,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		});
 
 		if (!project) {
-			return json({ error: 'Project tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
+			return json({ error: 'Project not found or not owned by the user' }, { status: 404 });
 		}
 
 		// Validasi deadline task tidak melebihi deadline project
@@ -71,7 +99,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			const projectDeadline = new Date(project.dueDate);
 
 			if (taskDeadline > projectDeadline) {
-				return json({ error: 'Deadline task tidak boleh melebihi deadline project.' }, { status: 400 });
+				return json({ error: 'Task deadline cannot exceed project deadline' }, { status: 400 });
 			}
 		}
 
@@ -108,6 +136,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				}
 			}
 		}
+		
+		// Persiapkan URL dengan benar
+		let urlData = null;
+		if (data.url) {
+			urlData = JSON.stringify({
+				url: data.url.url || data.url,
+				alias: data.url.alias || null
+			});
+		}
 
 		const newTask = await prisma.task.create({
 			data: {
@@ -123,7 +160,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					connect: { id: locals.user.id },
 				},
 				label: labelConnect,
-				url: data.url ? JSON.stringify(data.url) : null,
+				url: urlData,
 			},
 			include: {
 				label: true,
@@ -132,16 +169,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			},
 		});
 
-		console.log('Task berhasil dibuat:', newTask);
-
 		return json({ task: newTask }, { status: 201 });
 	} catch (error: any) {
 		if (error instanceof z.ZodError) {
-			console.error('ZodError:', error.errors);
-			return json({ error: error.errors }, { status: 400 });
+			return json({ error: 'Invalid task data: ' + error.errors[0]?.message }, { status: 400 });
 		}
-		console.error('Error:', error.message);
-		return json({ error: error.message }, { status: 500 });
+		return json({ error: 'Failed to create task: ' + error.message }, { status: 500 });
 	}
 };
 
@@ -153,28 +186,43 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 
 		const data = await request.json();
 		const { id } = data;
+		
+		console.log('Mencoba menghapus task dengan ID:', id);
 
 		// Cek apakah task ada dan dimiliki oleh user
 		const task = await prisma.task.findUnique({
 			where: {
 				id,
 				createdById: locals.user.id
+			},
+			include: {
+				project: {
+					select: { id: true }
+				}
 			}
 		});
 
 		if (!task) {
 			return json({ error: 'Task tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
 		}
+		
+		const projectId = task.project?.id;
 
 		// Hapus task
 		await prisma.task.delete({
 			where: { id }
 		});
-
-		return json({ message: 'Task berhasil dihapus' }, { status: 200 });
+		
+		console.log('Task berhasil dihapus');
+		
+		return json({ 
+			message: 'Task berhasil dihapus',
+			projectId // Kembalikan projectId agar frontend bisa me-refresh data
+		}, { status: 200 });
 
 	} catch (error: any) {
-		return json({ error: error.message }, { status: 500 });
+		console.error('Error menghapus task:', error);
+		return json({ error: 'Gagal menghapus task: ' + error.message }, { status: 500 });
 	}
 };
 

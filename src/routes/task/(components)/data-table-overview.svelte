@@ -27,6 +27,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { projectsStore } from '$lib/stores/projects';
+	import { browser } from '$app/environment';
 
 	export let projectId: string;
 	export let activeTab: string;
@@ -34,6 +35,8 @@
 	let isLoading = false;
 
 	async function refreshTableData() {
+		if (!browser) return; // Jangan jalankan di server
+		
 		isLoading = true;
 		try {
 			const response = await fetch(`/api/tasks?projectId=${projectId}`);
@@ -47,24 +50,12 @@
 		}
 	}
 
-	// Pindahkan subscribe ke dalam onMount
+	// Pindahkan fetch ke dalam onMount
 	onMount(() => {
 		// Panggil refreshTableData pertama kali
 		if (projectId) {
 			refreshTableData();
 		}
-
-		// Subscribe ke perubahan store
-		const unsubscribe = tasksStore.subscribe(() => {
-			if (projectId) {
-				refreshTableData();
-			}
-		});
-
-		// Cleanup subscription saat komponen dihapus
-		return () => {
-			unsubscribe();
-		};
 	});
 
 	const allTasks = derived(tasksStore, $tasks => $tasks);

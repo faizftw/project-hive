@@ -27,39 +27,63 @@
 	import { toast } from 'svelte-sonner';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import { refreshTableData as fetchTableData } from '$lib/utils/table-utils';
 
 	export let projectId: string;
 
-	let isLoading = false;
+	let isLoading = true;
+	let errorMessage = '';
 
+	// Fungsi untuk mengambil data dari server
 	async function refreshTableData() {
+		if (!browser) return;
+		
 		isLoading = true;
+		errorMessage = '';
+		
 		try {
-			const response = await fetch(`/api/tasks?projectId=${projectId}`);
-			const tasks = await response.json();
-			tasksStore.set(tasks);
-		} catch (error) {
-			console.error('Error refreshing data:', error);
-			toast.error('Gagal memperbarui data');
+			console.log('DataTable refreshing data untuk projectId:', projectId);
+			
+			// Gunakan fungsi refreshTableData dari utils
+			const tasks = await fetchTableData(projectId);
+			
+			if (!tasks || tasks.length === 0) {
+				console.log('Tidak ada task yang dikembalikan, tetapi tidak error');
+			}
+			
+		} catch (error: any) {
+			console.error('Error refreshing data di komponen:', error);
+			errorMessage = error.message || 'Gagal memperbarui data';
+			toast.error(errorMessage);
 		} finally {
 			isLoading = false;
 		}
 	}
 
-	// Subscribe ke event taskAdded dan taskUpdated
-	const unsubscribe = tasksStore.subscribe(() => {
-		refreshTableData();
+	let unsubscribe: () => void;
+	
+	onMount(async () => {
+		console.log('DataTable mounted with projectId:', projectId);
+		
+		// Jalankan fetch data saat component di-mount
+		await refreshTableData();
+		
+		// Aktifkan subscription untuk memantau perubahan store tasks
+		unsubscribe = tasksStore.subscribe(tasks => {
+			console.log(`Tasks store updated: ${tasks.length} items`);
+			isLoading = false; // Pastikan loading selesai saat data diupdate
+		});
 	});
-
+	
 	onDestroy(() => {
-		unsubscribe();
+		if (unsubscribe) unsubscribe();
 	});
 
 	// Buat derived store untuk memfilter task berdasarkan projectId
-	const filteredTasks = derived(tasksStore, $tasks => 
-		$tasks.filter(task => task.projectId === projectId)
-	);
-
+	const filteredTasks = derived(tasksStore, $tasks => {
+		const filtered = $tasks.filter(task => task.projectId === projectId);
+		return filtered;
+	});
 
 	// Gunakan filteredTasks untuk tabel
 	const table = createTable(filteredTasks, {
@@ -67,14 +91,19 @@
 		sort: addSortBy({
 			toggleOrder: ['asc', 'desc']
 		}),
-		page: addPagination(),
+		page: addPagination({
+			initialPageSize: 10
+		}),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => {
+				if (value === null || value === undefined) return false;
 				return String(value).toLowerCase().includes(String(filterValue).toLowerCase());
 			}
 		}),
 		colFilter: addColumnFilters(),
-		hide: addHiddenColumns()
+		hide: addHiddenColumns({
+			initialHiddenColumnIds: ['createdAt']
+		})
 	});
 
 	const columns = table.createColumns([
@@ -100,14 +129,13 @@
 			id: 'title',
 			cell: ({ value, row }) => {
 				if (row.isData()) {
-					
+					const labelValue = row.original.label;
 					return createRender(DataTableTitleCell, {
-						labelValue: row.original.label,
+						labelValue,
 						value
 					});
 				}
 				return value;
-
 			},
 		}),
 		table.column({
@@ -180,13 +208,15 @@
 				return createRender(DataTableDeadline, { deadline: value });
 			}
 		}),
+		
 		table.display({
 			id: 'actions',
 			header: () => '',
 			cell: ({ row }) => {
 				if (row.isData() && row.original) {
 					return createRender(DataTableRowActions, {
-						row: row.original
+						row: row.original,
+						projectId
 					});
 				}
 				return '';
@@ -209,6 +239,17 @@
 				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
 			</div>
 		{/each}
+	</div>
+{:else if errorMessage}
+	<div class="p-8 text-center">
+		<div class="text-red-500 font-semibold mb-2">Error:</div>
+		<div>{errorMessage}</div>
+		<button 
+			class="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md"
+			on:click={refreshTableData}
+		>
+			Try Again
+		</button>
 	</div>
 {:else}
 	<div class="space-y-4">
@@ -254,7 +295,11 @@
 					{:else}
 						<Table.Row>
 							<Table.Cell colspan={columns.length} class="h-24 text-center">
-								No Task found
+								{#if $filteredTasks.length === 0}
+									No tasks for this project
+								{:else}
+									No tasks match the current filters
+								{/if}
 							</Table.Cell>
 						</Table.Row>
 					{/if}

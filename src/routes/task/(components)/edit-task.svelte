@@ -128,7 +128,7 @@
 			
 			// Validasi deadline
 			if (!dateValue || !timeValue) {
-				throw new Error('Deadline task (date and time) is required');
+				throw new Error('Task deadline (date and time) is required');
 			}
 
 			// Validasi deadline project
@@ -159,24 +159,30 @@
 				}
 			}
 
-			const response = await fetch(`/api/tasks/${task.id}`, {
+			const updatedTask = {
+				title,
+				description,
+				priority,
+				status,
+				deadline: formattedDateTime,
+				label: finalLabel,
+				newLabel: newLabel.trim(),
+				url: url ? {
+					url: url,
+					alias: urlAlias || null
+				} : null
+			};
+			
+			// Tambahkan timestamp untuk mencegah caching
+			const timestamp = Date.now();
+			const response = await fetch(`/api/tasks/${task.id}?_ts=${timestamp}`, {
 				method: 'PUT',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					'Pragma': 'no-cache'
 				},
-				body: JSON.stringify({
-					title,
-					description,
-					priority,
-					status,
-					deadline: formattedDateTime,
-					label: finalLabel,
-					newLabel: newLabel.trim(),
-					url: url ? {
-						url: url,
-						alias: urlAlias || null
-					} : null
-				})
+				body: JSON.stringify(updatedTask)
 			});
 
 			const result = await response.json();
@@ -185,11 +191,10 @@
 				throw new Error(result.error || 'Failed to update task');
 			}
 
-			tasksStore.updateTask(result.task);
 			await refreshTableData(task.projectId);
 			dispatch('taskUpdated', result.task);
 			open = false;
-			toast.success('Task updated');
+			toast.success('Task updated successfully');
 		} catch (error: any) {
 			console.error('Error updating task:', error);
 			toast.error(error.message || 'Failed to update task');
