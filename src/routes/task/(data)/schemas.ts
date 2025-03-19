@@ -12,7 +12,7 @@ export const taskSchema = z.object({
 	id: z.string(),
 	title: z.string(),
 	description: z.string().nullable(),
-	status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled']),
+	status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled', 'Overdue']),
 	label: z.union([
 		labelSchema,           // Label sebagai objek
 		z.string(),            // Label sebagai string
@@ -42,7 +42,7 @@ export const taskSchema = z.object({
 export const taskCreateSchema = z.object({
 	title: z.string(),
 	description: z.string().nullable(),
-	status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled']),
+	status: z.enum(['Backlog', 'Pending', 'Todo', 'In Progress', 'Completed', 'Canceled', 'Overdue']),
 	label: z.union([
 		labelSchema,           // Label sebagai objek
 		z.string(),            // Label sebagai string

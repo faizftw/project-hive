@@ -19,7 +19,7 @@
 	let { row, projectId }: Props = $props();
 	
 	// Normalisasi task dengan hati-hati
-	let task: Task;
+	let task: Task = $state(row);
 	try {
 		// Clone objek row untuk menghindari referensi
 		let normalizedRow = JSON.parse(JSON.stringify(row));

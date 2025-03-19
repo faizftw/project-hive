@@ -8,23 +8,49 @@
   import * as Sidebar from "$lib/components/ui/sidebar/index.js";
   import AppSidebar from "./(components)/app-sidebar.svelte";
   import type { Project } from '$lib/types';
+  import AddTask from './(components)/add-task.svelte';
+  import { page } from '$app/stores';
+  import EditTask from './(components)/edit-task.svelte';
 
   let { data }: { data: PageData } = $props();
 
+  let projectTitle = $derived(data?.project?.name || 'Tasks');
+  let projectId = $derived(data?.project?.id || '');
+  let tasks = $derived(data?.tasks || []);
+
+  // Tambahkan task data ke store
+  $effect(() => {
+    if (tasks?.length > 0) {
+      tasksStore.set(tasks);
+    }
+  });
+
   onMount(() => {
-      tasksStore.set(data.tasks);
-      if (data.project) {
-          const project: Project = {
-              ...data.project,
-              createdBy: data.project.createdBy || {
-                  id: data.project.createdById,
-                  name: 'Unknown',
-                  email: ''
-              },
-              dueDate: data.project.dueDate ? data.project.dueDate.toString() : null
-          };
-          projectsStore.addProject(project);
-      }
+    tasksStore.set(data.tasks);
+    if (data.project) {
+      const project: Project = {
+        ...data.project,
+        createdBy: data.project.createdBy || {
+          id: data.project.createdById,
+          name: 'Unknown',
+          email: ''
+        },
+        dueDate: data.project.dueDate ? data.project.dueDate.toString() : null
+      };
+      projectsStore.addProject(project);
+    }
+
+    // Periksa task yang melewati deadline
+    tasksStore.checkOverdue();
+    
+    // Set interval untuk memeriksa status overdue secara berkala (setiap 1 jam)
+    const interval = setInterval(() => {
+      tasksStore.checkOverdue();
+    }, 60 * 60 * 1000);
+    
+    return () => {
+      clearInterval(interval);
+    };
   });
 </script>
 

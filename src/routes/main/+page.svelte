@@ -11,6 +11,7 @@
 	import { projectsStore } from '$lib/stores/projects';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { fade } from 'svelte/transition';
+	import { onMount } from 'svelte';
 
 	// 1. Tambahkan data prop dari server
 	let { data } = $props<{
@@ -36,6 +37,11 @@
 		if (data?.tasks) {
 			tasksStore.set(data.tasks);
 			console.log('Tasks loaded into store:', data.tasks);
+			
+			// Periksa task yang melewati deadline
+			setTimeout(() => {
+				tasksStore.checkOverdue();
+			}, 500);
 		}
 	});
 
@@ -90,6 +96,18 @@
 
 	// Derived tasks data
 	let taskData = $derived($tasksStore);
+
+	// Jalankan pengecekan overdue tasks saat komponen dimuat
+	onMount(() => {
+		// Set interval untuk memeriksa status overdue secara berkala (setiap 1 jam)
+		const interval = setInterval(() => {
+			tasksStore.checkOverdue();
+		}, 60 * 60 * 1000);
+		
+		return () => {
+			clearInterval(interval);
+		};
+	});
 </script>
 
 	<div class="flex-0 space-y-4 p-8 pt-6">

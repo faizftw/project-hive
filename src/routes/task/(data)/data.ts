@@ -1,4 +1,4 @@
-import {ArrowDown, ArrowRight, ArrowUp, CheckCircled, Circle, CrossCircled, QuestionMarkCircled, Stopwatch, Pause } from 'svelte-radix';
+import {ArrowDown, ArrowRight, ArrowUp, CheckCircled, Circle, CrossCircled, QuestionMarkCircled, Stopwatch, Pause, CounterClockwiseClock } from 'svelte-radix';
 
 
 
@@ -41,6 +41,11 @@ export const statuses = [
 		value: 'In Progress',
 		label: 'In Progress',
 		icon: Stopwatch
+	},
+	{
+		value: 'Overdue',
+		label: 'Overdue',
+		icon: CounterClockwiseClock
 	},
 	{
 		value: 'Completed',

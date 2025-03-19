@@ -24,7 +24,7 @@ export interface Task {
 	title: string;
 	description: string | null;
 	priority: 'Low' | 'Medium' | 'High';
-	status: 'Backlog' | 'Pending' | 'Todo' | 'In Progress' | 'Completed' | 'Canceled';
+	status: 'Backlog' | 'Pending' | 'Todo' | 'In Progress' | 'Completed' | 'Canceled' | 'Overdue';
 	label: Label | null;
 	deadline: string | null;
 	url: {

@@ -10,14 +10,6 @@
 	const { pluginStates, flatColumns } = tableModel;
 	const { hiddenColumnIds } = pluginStates.hide;
 
-	onMount(() => {
-		hiddenColumnIds.update((ids: string[]) => {
-			if (!ids.includes('createdAt')) {
-				return [...ids, 'createdAt'];
-			}
-			return ids;
-		});
-	});
 
 	function handleHide(id: string) {
 		hiddenColumnIds.update((ids: string[]) => {
@@ -28,7 +20,7 @@
 		});
 	}
 
-	const hidableCols = ['title', 'description', 'status', 'priority', 'deadline'];
+	const hidableCols = ['title', 'description', 'status', 'priority', 'deadline', 'createdAt'];
 </script>
 
 <DropdownMenu.Root>

@@ -93,6 +93,39 @@ function normalizeTask(task: any): TaskWithMetadata {
 	}
 }
 
+// Fungsi untuk memeriksa dan mengubah status task yang melewati deadline
+function checkOverdueTasks(tasks: TaskWithMetadata[]): TaskWithMetadata[] {
+	const now = new Date();
+	
+	return tasks.map(task => {
+		// Skip jika task sudah selesai atau dibatalkan
+		if (task.status === 'Completed' || task.status === 'Canceled' || task.status === 'Overdue') {
+			return task;
+		}
+		
+		// Skip jika tidak ada deadline
+		if (!task.deadline) {
+			return task;
+		}
+		
+		try {
+			const deadlineDate = new Date(task.deadline);
+			
+			// Jika deadline sudah lewat, ubah status menjadi Overdue
+			if (deadlineDate < now) {
+				return {
+					...task,
+					status: 'Overdue'
+				};
+			}
+		} catch (e) {
+			// Jika ada error dalam parsing tanggal, biarkan task seperti semula
+		}
+		
+		return task;
+	});
+}
+
 function createTaskStore() {
 	const { subscribe, set, update } = writable<TaskWithMetadata[]>([]);
 
@@ -124,7 +157,10 @@ function createTaskStore() {
 						}
 					});
 					
-					set(validTasks);
+					// Cek tasks yang melewati deadline dan ubah statusnya
+					const checkedTasks = checkOverdueTasks(validTasks);
+					
+					set(checkedTasks);
 				} catch (error) {
 					// Set empty array sebagai fallback
 					set([]);
@@ -173,7 +209,9 @@ function createTaskStore() {
 					
 					const newTasks = [...tasks];
 					newTasks[index] = normalizedTask;
-					return newTasks;
+					
+					// Periksa kembali status overdue setelah update
+					return checkOverdueTasks(newTasks);
 				});
 			} catch (error) {
 				// Silent error
@@ -185,6 +223,9 @@ function createTaskStore() {
 			}
 			
 			update(tasks => tasks.filter(t => t.id !== taskId));
+		},
+		checkOverdue: () => {
+			update(tasks => checkOverdueTasks(tasks));
 		},
 		update,
 		// Helper untuk debugging

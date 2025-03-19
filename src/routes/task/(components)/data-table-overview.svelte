@@ -201,15 +201,30 @@
 				}
 			}
 		}),
-		table.column({
-			accessor: activeTab === 'Upcoming' ? 'deadline' : 'createdAt',
-			header: activeTab === 'Upcoming' ? 'Due' : 'Created At',
-			id: activeTab === 'Upcoming' ? 'deadline' : 'createdAt',
-			cell: ({ value }) => {
-				if (activeTab === 'Upcoming') {
+	]);
+
+	// Tambahkan kolom deadline untuk tab Upcoming
+	if (activeTab === 'Upcoming') {
+		columns.push(
+			table.column({
+				accessor: 'deadline',
+				header: 'Due',
+				id: 'deadline',
+				cell: ({ value }) => {
 					return createRender(DataTableDeadline, { deadline: value });
-				} else {
-					const date = new Date(value);
+				}
+			})
+		);
+	} 
+	// Tambahkan kolom createdAt untuk tab Recent
+	else if (activeTab === 'Recent') {
+		columns.push(
+			table.column({
+				accessor: 'createdAt',
+				header: 'Created At',
+				id: 'createdAt',
+				cell: ({ value }) => {
+					const date = new Date(value || '');
 					return date.toLocaleDateString('id-ID', {
 						year: 'numeric',
 						month: 'short',
@@ -218,9 +233,9 @@
 						minute: '2-digit'
 					});
 				}
-			}
-		}),
-	]);
+			})
+		);
+	}
 
 	const tableModel = table.createViewModel(columns);
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
@@ -230,11 +245,11 @@
 <div class="space-y-4">
 	<OverviewToolbar {tableModel} data={$allTasks} />
 	<div class="rounded-md border">
-		<Table.Root {...$tableAttrs}>
-			<Table.Header>
+		<Table.Root {...$tableAttrs} class="w-full">
+			<Table.Header class="bg-muted/50">
 				{#each $headerRows as headerRow}
 					<Subscribe rowAttrs={headerRow.attrs()}>
-						<Table.Row>
+						<Table.Row class="hover:bg-muted/50">
 							{#each headerRow.cells as cell (cell.id)}
 								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
 									<Table.Head {...attrs}>
@@ -252,11 +267,11 @@
 					</Subscribe>
 				{/each}
 			</Table.Header>
-			<Table.Body {...$tableBodyAttrs}>
+			<Table.Body {...$tableBodyAttrs} class="divide-y divide-border">
 				{#if $pageRows.length}
 					{#each $pageRows as row (row.id)}
 						<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-							<Table.Row {...rowAttrs}>
+							<Table.Row {...rowAttrs} class="hover:bg-muted/50">
 								{#each row.cells as cell (cell.id)}
 									<Subscribe attrs={cell.attrs()} let:attrs>
 										<Table.Cell {...attrs}>
@@ -268,7 +283,7 @@
 						</Subscribe>
 					{/each}
 				{:else}
-					<Table.Row>
+					<Table.Row class="hover:bg-muted/50">
 						<Table.Cell colspan={columns.length} class="h-24 text-center">
 							Tidak ada hasil.
 						</Table.Cell>
@@ -277,5 +292,4 @@
 			</Table.Body>
 		</Table.Root>
 	</div>
-	<DataTablePagination {tableModel} />
 </div>
