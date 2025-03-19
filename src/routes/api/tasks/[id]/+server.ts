@@ -13,7 +13,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 
 		// Validasi data
 		if (!data.title?.trim()) {
-			return json({ error: 'Judul task tidak boleh kosong' }, { status: 400 });
+			return json({ error: 'Title cannot be empty' }, { status: 400 });
 		}
 
 		// Cek kepemilikan task
@@ -28,7 +28,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		});
 
 		if (!existingTask) {
-			return json({ error: 'Task tidak ditemukan' }, { status: 404 });
+			return json({ error: 'Task not found' }, { status: 404 });
 		}
 
 		// Validasi deadline task tidak melebihi deadline project
@@ -37,7 +37,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			const projectDeadline = new Date(existingTask.project.dueDate);
 
 			if (taskDeadline > projectDeadline) {
-				return json({ error: 'Deadline task tidak boleh melebihi deadline project' }, { status: 400 });
+				return json({ error: 'Task deadline cannot exceed project deadline' }, { status: 400 });
 			}
 		}
 

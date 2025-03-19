@@ -1,6 +1,6 @@
 <script lang="ts">
 	import DotsHorizontal from 'svelte-radix/DotsHorizontal.svelte';
-	import { labels } from '../(data)/data.js';
+	import { statuses } from '../(data)/data.js';
 	import { type Task, taskSchema } from '../(data)/schemas.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
@@ -19,7 +19,7 @@
 	let { row, projectId }: Props = $props();
 	const task = taskSchema.parse({
   	...row,
-  	url: typeof row.url === 'string' ? { url: row.url, alias: null } : row.url
+  	url: typeof row.url === 'string' ? JSON.parse(row.url) : row.url
 	});
 	let isDeleteDialogOpen = $state(false);
 	let isEditDialogOpen = $state(false);
@@ -49,10 +49,10 @@
 					await refreshTableData(projectId);
 				}, 500);
 				setIsDeleteDialogOpen(false);
-				toast.success('Task berhasil dihapus');
+				toast.success('Task Deleted');
 			} else {
 				const data = await response.json();
-				throw new Error(data.error || 'Gagal menghapus task');
+				throw new Error(data.error || 'Failed to delete task');
 			}
 		} catch (error: any) {
 			console.error('Error deleting task:', error);
@@ -75,16 +75,67 @@
 				const result = await response.json();
 				tasksStore.updateTask(result.task);
 				setIsEditDialogOpen(false);
-				toast.success('Task berhasil diperbarui');
+				toast.success('Task Updated');
 			} else {
 				const data = await response.json();
-				throw new Error(data.error || 'Gagal memperbarui task');
+				throw new Error(data.error || 'Failed to update task');
 			}
 		} catch (error: any) {
 			console.error('Error updating task:', error);
 			toast.error(error.message);
 		}
 	}
+
+	const handleSetStatus = async (status: string) => {
+		try {
+			// Mengambil nilai status yang diterima
+			const statusValue = statuses.find(s => s.value === status)?.value || status;
+			
+			// Pastikan kita punya semua data task yang dibutuhkan
+			const taskUpdate = {
+				title: task.title,
+				description: task.description,
+				priority: task.priority,
+				status: statusValue,
+				deadline: task.deadline,
+				projectId: task.projectId,
+				label: task.label,
+				url: task.url && typeof task.url === 'object' ? {
+					url: task.url.url,
+					alias: task.url.alias
+				} : null
+			};
+			
+			const response = await fetch(`/api/tasks/${task.id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(taskUpdate)
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				
+				// Perbarui task di store dengan hasil dari server
+				tasksStore.updateTask(result.task);
+				
+				// Refresh table data
+				setTimeout(async () => {
+					await refreshTableData(projectId);
+				}, 500);
+				
+				toast.success('Status berhasil diperbarui');
+			} else {
+				const data = await response.json();
+				throw new Error(data.error || 'Gagal memperbarui status');
+			}
+		} catch (error: any) {
+			console.error('Error setting status:', error);
+			toast.error(error.message);
+		}
+	} 
+	
 </script>
 
 <DropdownMenu.Root>
@@ -104,12 +155,12 @@
 		<DropdownMenu.Item onclick={() => setIsEditDialogOpen(true)} class="cursor-default" inset={false}>Edit</DropdownMenu.Item>
 		<DropdownMenu.Separator class="my-1" />
 		<DropdownMenu.Sub>
-			<DropdownMenu.SubTrigger class="cursor-default" inset={false}>Labels</DropdownMenu.SubTrigger>
+			<DropdownMenu.SubTrigger class="cursor-default" inset={false}>Set Status</DropdownMenu.SubTrigger>
 			<DropdownMenu.SubContent class="p-1" portalProps={{}}>
-				<DropdownMenu.RadioGroup value={task.label?.value || ''}>
-					{#each labels as label}
-						<DropdownMenu.RadioItem value={label.value} class="cursor-default">
-							{label.label}
+				<DropdownMenu.RadioGroup value={task.status || ''} onValueChange={handleSetStatus}>
+					{#each statuses as status}
+						<DropdownMenu.RadioItem value={status.value} class="cursor-default">
+							{status.label}
 						</DropdownMenu.RadioItem>
 					{/each}
 				</DropdownMenu.RadioGroup>

@@ -38,7 +38,7 @@ export const statuses = [
 		icon: Circle
 	},
 	{
-		value: 'In progress',
+		value: 'In Progress',
 		label: 'In Progress',
 		icon: Stopwatch
 	},
@@ -48,8 +48,8 @@ export const statuses = [
 		icon: CheckCircled
 	},
 	{
-		value: 'Cancelled',
-		label: 'Cancelled',
+		value: 'Canceled',
+		label: 'Canceled',
 		icon: CrossCircled
 	}
 ];

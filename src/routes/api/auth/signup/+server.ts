@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		// Validasi format email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			return json({ error: 'Format email tidak valid' }, { status: 400 });
+			return json({ error: 'Email format is invalid' }, { status: 400 });
 		}
 
 		// Cek apakah pengguna sudah ada
@@ -25,7 +25,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (existingUser) {
-			return json({ error: 'Pengguna dengan email ini sudah ada' }, { status: 409 });
+			return json({ error: 'User with this email already exists' }, { status: 409 });
 		}
 
 		// Hash password
@@ -62,7 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return new Response(
 			JSON.stringify({
-				message: 'Signup berhasil',
+				message: 'Signup successful',
 				user: {
 					id: user.id,
 					email: user.email,

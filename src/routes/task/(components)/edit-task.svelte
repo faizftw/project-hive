@@ -71,8 +71,25 @@
 				timeValue = '';
 			}
 
-			url = task.url?.url || '';
-			urlAlias = task.url?.alias || '';
+			// Proses URL dengan benar
+			if (task.url) {
+				// Jika URL adalah string JSON, parse terlebih dahulu
+				let urlObj = task.url;
+				if (typeof task.url === 'string') {
+					try {
+						urlObj = JSON.parse(task.url);
+					} catch (e) {
+						console.error('Error parsing URL:', e);
+						urlObj = { url: task.url, alias: null };
+					}
+				}
+				
+				url = urlObj.url || '';
+				urlAlias = urlObj.alias || '';
+			} else {
+				url = '';
+				urlAlias = '';
+			}
 		}
 	}
 
@@ -122,7 +139,7 @@
 					const projectDeadline = new Date(project.dueDate);
 
 					if (taskDeadline > projectDeadline) {
-						toast.error('Deadline task tidak boleh melebihi deadline project');
+						toast.error('Task deadline cannot exceed project deadline');
 						isSubmitting = false;
 						return;
 					}
@@ -165,17 +182,17 @@
 			const result = await response.json();
 
 			if (!response.ok) {
-				throw new Error(result.error || 'Gagal mengupdate task');
+				throw new Error(result.error || 'Failed to update task');
 			}
 
 			tasksStore.updateTask(result.task);
 			await refreshTableData(task.projectId);
 			dispatch('taskUpdated', result.task);
 			open = false;
-			toast.success('Task berhasil diperbarui');
+			toast.success('Task updated');
 		} catch (error: any) {
 			console.error('Error updating task:', error);
-			toast.error(error.message || 'Gagal mengupdate task');
+			toast.error(error.message || 'Failed to update task');
 		} finally {
 			isSubmitting = false;
 		}
