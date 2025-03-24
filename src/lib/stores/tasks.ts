@@ -99,7 +99,23 @@ function checkOverdueTasks(tasks: TaskWithMetadata[]): TaskWithMetadata[] {
 	
 	return tasks.map(task => {
 		// Skip jika task sudah selesai atau dibatalkan
-		if (task.status === 'Completed' || task.status === 'Canceled' || task.status === 'Overdue') {
+		if (task.status === 'Completed' || task.status === 'Canceled') {
+			return task;
+		}
+		
+		// Jika status Overdue dan deadline diperpanjang, ubah status menjadi In Progress
+		if ((task.status as string) === 'Overdue' && task.deadline) {
+			try {
+				const deadlineDate = new Date(task.deadline);
+				if (deadlineDate > now) {
+					return {
+						...task,
+						status: 'In Progress'
+					};
+				}
+			} catch (e) {
+				// Jika ada error dalam parsing tanggal, biarkan task seperti semula
+			}
 			return task;
 		}
 		

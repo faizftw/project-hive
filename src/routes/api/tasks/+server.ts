@@ -213,16 +213,16 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 			where: { id }
 		});
 		
-		console.log('Task berhasil dihapus');
+		console.log('Task deleted successfully');
 		
 		return json({ 
-			message: 'Task berhasil dihapus',
+			message: 'Task deleted successfully',
 			projectId // Kembalikan projectId agar frontend bisa me-refresh data
 		}, { status: 200 });
 
 	} catch (error: any) {
-		console.error('Error menghapus task:', error);
-		return json({ error: 'Gagal menghapus task: ' + error.message }, { status: 500 });
+		console.error('Error deleting task:', error);
+		return json({ error: 'Failed to delete task: ' + error.message }, { status: 500 });
 	}
 };
 
@@ -244,7 +244,7 @@ export const PUT: RequestHandler = async ({ request, locals, params }) => {
 		});
 
 		if (!existingTask) {
-			return json({ error: 'Task tidak ditemukan atau tidak dimiliki oleh pengguna.' }, { status: 404 });
+			return json({ error: 'Task not found or not owned by the user.' }, { status: 404 });
 		}
 
 		let labelConnect = undefined;
@@ -253,6 +253,30 @@ export const PUT: RequestHandler = async ({ request, locals, params }) => {
 				labelConnect = { connect: { value: data.label } };
 			} else {
 				labelConnect = { connect: { value: data.label.value } };
+			}
+		}
+
+		// Persiapkan URL dengan benar
+		let urlData = null;
+		if (data.url) {
+			if (typeof data.url === 'string') {
+				try {
+					// Jika URL sudah berupa string JSON, gunakan langsung
+					JSON.parse(data.url);
+					urlData = data.url;
+				} catch {
+					// Jika bukan JSON valid, buat objek JSON baru
+					urlData = JSON.stringify({
+						url: data.url,
+						alias: null
+					});
+				}
+			} else {
+				// Jika URL berupa objek
+				urlData = JSON.stringify({
+					url: data.url.url,
+					alias: data.url.alias || null
+				});
 			}
 		}
 
@@ -265,6 +289,7 @@ export const PUT: RequestHandler = async ({ request, locals, params }) => {
 				status: data.status,
 				deadline: data.deadline ? new Date(data.deadline) : null,
 				label: labelConnect,
+				url: urlData,
 			},
 			include: {
 				label: true,

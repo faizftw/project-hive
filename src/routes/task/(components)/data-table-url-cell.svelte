@@ -2,7 +2,20 @@
 	export let url: string | { url: string; alias: string | null } | null;
 	
 	// Parse URL jika dalam bentuk string
-	const parsedUrl = typeof url === 'string' ? JSON.parse(url) : url;
+	let parsedUrl: { url: string; alias: string | null } | null = null;
+	
+	if (url) {
+		if (typeof url === 'string') {
+			try {
+				parsedUrl = JSON.parse(url);
+			} catch (e) {
+				console.error('Error parsing URL:', e);
+				parsedUrl = { url: url, alias: null };
+			}
+		} else {
+			parsedUrl = url;
+		}
+	}
 </script>
 
 <div class="flex space-x-2">

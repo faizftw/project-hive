@@ -62,10 +62,25 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 		// Persiapkan URL dengan benar
 		let urlData = null;
 		if (data.url) {
-			urlData = JSON.stringify({
-				url: data.url.url || data.url,
-				alias: data.url.alias || null
-			});
+			if (typeof data.url === 'string') {
+				try {
+					// Jika URL sudah berupa string JSON, gunakan langsung
+					JSON.parse(data.url);
+					urlData = data.url;
+				} catch {
+					// Jika bukan JSON valid, buat objek JSON baru
+					urlData = JSON.stringify({
+						url: data.url,
+						alias: null
+					});
+				}
+			} else {
+				// Jika URL berupa objek
+				urlData = JSON.stringify({
+					url: data.url.url,
+					alias: data.url.alias || null
+				});
+			}
 		}
 
 		// Update task

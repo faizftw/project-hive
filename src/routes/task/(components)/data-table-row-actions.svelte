@@ -81,19 +81,19 @@
 			const result = await response.json();
 			
 			if (response.ok) {
-				console.log('Task berhasil dihapus, hasil:', result);
+				console.log('Task deleted successfully, result:', result);
 				
 				// Refresh data berdasarkan projectId yang dikembalikan atau gunakan projectId saat ini
 				const refreshProjectId = result.projectId || projectId;
 				await refreshTableData(refreshProjectId);
 				
 				setIsDeleteDialogOpen(false);
-				toast.success('Task berhasil dihapus');
+				toast.success('Task deleted successfully');
 			} else {
-				throw new Error(result.error || 'Gagal menghapus task');
+				throw new Error(result.error || 'Failed to delete task');
 			}
 		} catch (error: any) {
-			console.error('Error menghapus task:', error);
+			console.error('Error deleting task:', error);
 			toast.error(error.message);
 		} finally {
 			isSubmitting = false;
@@ -125,10 +125,10 @@
 				// Refresh data dari server
 				await refreshTableData(projectId);
 				setIsEditDialogOpen(false);
-				toast.success('Task berhasil diperbarui');
+				toast.success('Task updated successfully');
 			} else {
 				const data = await response.json();
-				throw new Error(data.error || 'Gagal memperbarui task');
+				throw new Error(data.error || 'Failed to update task');
 			}
 		} catch (error: any) {
 			console.error('Error updating task:', error);
@@ -247,7 +247,7 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer class="flex justify-end space-x-2">
 		  <AlertDialog.Cancel class="mt-2">Cancel</AlertDialog.Cancel>
-		  <AlertDialog.Action class="mt-2" onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
+		  <AlertDialog.Action class="bg-red-500" onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	  </AlertDialog.Content>
 </AlertDialog.Root>
