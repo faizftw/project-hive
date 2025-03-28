@@ -40,8 +40,9 @@
 			class="absolute inset-0 bg-cover"
 			style="
 				background-image:
-					url('/lib/docs/bg/v882-kul-40-a.jpg?auto=format&fit=crop&w=1376&q=80');"
+					url('/images/v882-kul-40-a.jpg?auto=format&fit=crop&w=1376&q=80');"
 		></div>
+		<div class="absolute inset-0 bg-black/50"></div>
 		<div class="relative z-20 flex items-center text-lg font-medium">
 			<!-- <Command class="mr-2 h-6 w-6" /> -->
 			Project Hive
