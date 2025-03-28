@@ -40,7 +40,7 @@
 			class="absolute inset-0 bg-cover"
 			style="
 				background-image:
-					url(https://img.freepik.com/free-vector/3d-abstract-wave-pattern-background-vector_53876-171403.jpg?t=st=1742117591~exp=1742121191~hmac=b4589786ebaa74ff81785c5655b5fe80ee23486b0fa1fd15124262b81327366a&auto=format&fit=crop&w=1376&q=80);"
+					url('/lib/docs/bg/v882-kul-40-a.jpg?auto=format&fit=crop&w=1376&q=80');"
 		></div>
 		<div class="relative z-20 flex items-center text-lg font-medium">
 			<!-- <Command class="mr-2 h-6 w-6" /> -->
