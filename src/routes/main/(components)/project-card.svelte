@@ -294,10 +294,6 @@
 				<ExternalLink class="mr-2 h-4 w-4" />
 				Open Project
 			</Button>
-			<Button variant="outline" size="icon" class="shrink-0" onclick={() => isEditDialogOpen = true}>
-				<Edit class="h-4 w-4" />
-				<span class="sr-only">Edit</span>
-			</Button>
 		</Card.Footer>
 	</Card.Root>
 {/if}

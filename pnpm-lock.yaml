@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@vercel/speed-insights':
+        specifier: ^1.2.0
+        version: 1.2.0(@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2)))(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2)))(svelte@5.19.9)
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -972,6 +975,29 @@ packages:
     resolution: {integrity: sha512-A/Si4mrTkQqJ6EXJKv5EYCDQ3NL6nJXxG8VGXePsaiQigsomHYQC9xSpX8qGk7AEZk4b1ssbYIqJ0ISQQ7bfcA==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@vercel/speed-insights@1.2.0':
+    resolution: {integrity: sha512-y9GVzrUJ2xmgtQlzFP2KhVRoCglwfRQgjyfY607aU0hh0Un6d0OUyrJkjuAlsV18qR4zfoFPs/BiIj9YDS6Wzw==}
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19 || ^19.0.0-rc
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
 
   '@vinejs/compiler@2.5.0':
     resolution: {integrity: sha512-hg4ekaB5Y2zh+IWzBiC/WCDWrIfpVnKu/ubUvelKlidc/VbulsexoFRw5kJGHZenPVI5YzNnDeTdYSALkTV7jQ==}
@@ -2982,6 +3008,11 @@ snapshots:
       - encoding
       - rollup
       - supports-color
+
+  '@vercel/speed-insights@1.2.0(@sveltejs/kit@2.7.2(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2)))(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2)))(svelte@5.19.9)':
+    optionalDependencies:
+      '@sveltejs/kit': 2.7.2(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2)))(svelte@5.19.9)(vite@5.4.9(lightningcss@1.29.2))
+      svelte: 5.19.9
 
   '@vinejs/compiler@2.5.0':
     optional: true
