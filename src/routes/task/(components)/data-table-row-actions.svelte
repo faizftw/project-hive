@@ -180,10 +180,10 @@
 			if (response.ok) {
 				// Refresh data dari server 
 				await refreshTableData(projectId);
-				toast.success('Status berhasil diperbarui');
+				toast.success('Status updated successfully');
 			} else {
 				const data = await response.json();
-				throw new Error(data.error || 'Gagal memperbarui status');
+				throw new Error(data.error || 'Failed to update status');
 			}
 		} catch (error: any) {
 			console.error('Error setting status:', error);

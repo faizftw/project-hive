@@ -71,7 +71,7 @@
 		// Validasi nama project
 		const projectName = formData.get('name') as string;
 		if (!projectName || !projectName.trim()) {
-			toast.error('Nama project wajib diisi');
+			toast.error('Project name is required');
 			isSubmitting = false;
 			return;
 		}
@@ -148,14 +148,14 @@
 				dateValue = null;
 				timeValue = '';
 				open = false;
-				toast.success('Project berhasil dibuat');
+				toast.success('Project created successfully');
 			} else {
-				throw new Error(result.error || 'Gagal membuat project');
+				throw new Error(result.error || 'Failed to create project');
 			}
 		})
 		.catch((err) => {
 			console.error('Error creating project:', err);
-			alert(err.message);
+			toast.error(`Project creation failed: ${err.message}`);
 		})
 		.finally(() => {
 			isSubmitting = false;

@@ -13,6 +13,7 @@
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';
   import * as Select from "$lib/components/ui/select/index.js";
+  import { toast } from 'svelte-sonner';
 
   interface Props {
     project: Project;
@@ -63,7 +64,7 @@
 
     // Validasi nama project
     if (!name.trim()) {
-      alert('Project name is required');
+      toast.error('Project name is required');
       isSubmitting = false;
       return;
     }
@@ -82,14 +83,14 @@
         selectedDateTime = null;
       }
     } else {
-      alert('Deadline project (date and time) is required');
+      toast.error('Project deadline (date and time) is required');
       isSubmitting = false;
       return;
     }
 
     // Validasi apakah deadline tidak di masa lalu
     if (selectedDateTime && selectedDateTime < new Date()) {
-      alert('Deadline tidak boleh berada di masa lalu.');
+      toast.error('Deadline cannot be in the past');
       isSubmitting = false;
       return;
     }
@@ -129,19 +130,20 @@
         };
 
         if (!updatedProject.id || !updatedProject.name) {
-          throw new Error('Data project tidak valid dari server');
+          throw new Error('Invalid project data received from server');
         }
 
         projectsStore.updateProject(updatedProject);
         project = updatedProject;
         dispatch('projectUpdated', { project: updatedProject });
+        toast.success('Project updated successfully');
         open = false;
       } else {
-        throw new Error(result.error || 'Gagal mengupdate project');
+        throw new Error(result.error || 'Failed to update project');
       }
     } catch (err) {
       console.error('Error updating project:', err);
-      alert('Gagal mengupdate project. Silakan coba lagi.');
+      toast.error(`Failed to update project: ${err.message}`);
     } finally {
       isSubmitting = false;
     }
