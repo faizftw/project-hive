@@ -212,21 +212,6 @@
         </div>
 
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label class="text-right">Status</Label>
-          <Select.Root type="single" bind:value={status}>
-            <Select.Trigger class="col-span-3 p-2 border rounded"   >
-              {status}
-            </Select.Trigger>
-            <Select.Content class="overflow-y-auto max-h-60" portalProps={{}}>
-              <Select.Item class="cursor-pointer" value="active" label="Active">Active</Select.Item>
-              <Select.Item class="cursor-pointer" value="completed" label="Completed">Completed</Select.Item>
-              <Select.Item class="cursor-pointer" value="cancelled" label="Cancelled">Cancelled</Select.Item>
-              <Select.Item class="cursor-pointer" value="on-hold" label="On Hold">On Hold</Select.Item>
-            </Select.Content>
-          </Select.Root>
-        </div>
-
-        <div class="grid grid-cols-4 items-center gap-4">
           <Label class="text-right">Due Date</Label>
           <div class="col-span-3 flex gap-2">
             <Popover.Root>
