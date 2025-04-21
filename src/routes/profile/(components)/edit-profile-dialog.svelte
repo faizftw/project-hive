@@ -56,6 +56,11 @@
     newErrors.name = "Name cannot be empty";
   }
 
+  // Validasi jika confirmPassword diisi tetapi newPassword kosong
+  if (!formData.newPassword && formData.confirmPassword) {
+    newErrors.newPassword = "Please enter new password";
+  }
+
   // Only validate password fields if the user is trying to change password
   if (formData.newPassword) {
     if (!formData.currentPassword) {

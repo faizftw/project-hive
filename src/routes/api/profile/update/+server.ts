@@ -23,6 +23,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       name
     };
 
+    if (!newPassword && data.confirmPassword) {
+      return json({ error: 'New password is required when confirmation is provided' }, { status: 400 });
+    }
+
     // Jika ada permintaan untuk mengubah password
     if (newPassword) {
       if (!currentPassword) {
