@@ -3,6 +3,9 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
+  import { CrossCircled } from 'svelte-radix';
+  import * as Alert from '$lib/components/ui/alert/index.js';
+  import { createEventDispatcher } from 'svelte';
 
   // Props using runes
   const { user, onUpdate, open = false } = $props();
@@ -14,7 +17,8 @@
   let confirmPassword = $state('');
   let isSubmitting = $state(false);
   let errors = $state({});
-
+  let serverError = $state('');
+  const dispatch = createEventDispatcher(); 
   // Update name when user prop changes
   $effect(() => {
     if (user && user.name) {
@@ -46,68 +50,73 @@
   }
 
   function validateForm() {
-    const newErrors = {};
+  const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    // Only validate password fields if the user is trying to change password
-    if (formData.newPassword) {
-      if (!formData.currentPassword) {
-        newErrors.currentPassword = "Current password is required";
-      }
-
-      if (formData.newPassword.length < 8) {
-        newErrors.newPassword = "Password must be at least 8 characters";
-      }
-
-      if (formData.newPassword !== formData.confirmPassword) {
-        newErrors.confirmPassword = "Passwords do not match";
-      }
-    }
-
-    errors = newErrors;
-    return Object.keys(newErrors).length === 0;
+  if (!formData.name.trim()) {
+    newErrors.name = "Name cannot be empty";
   }
+
+  // Only validate password fields if the user is trying to change password
+  if (formData.newPassword) {
+    if (!formData.currentPassword) {
+      newErrors.currentPassword = "Current password is required";
+    }
+
+    if (formData.newPassword.length < 8) {
+      newErrors.newPassword = "New password must be at least 8 characters";
+    }
+
+    if (formData.newPassword !== formData.confirmPassword) {
+      newErrors.confirmPassword = "New password and confirmation do not match";
+    }
+  }
+
+  errors = newErrors;
+  return Object.keys(newErrors).length === 0;
+}
 
   async function handleSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
-
-    // Collect data to be sent
-    const updatedData = {
-      name: formData.name
-    };
-
-    // Add password data if filled
-    if (formData.newPassword) {
-      updatedData.currentPassword = formData.currentPassword;
-      updatedData.newPassword = formData.newPassword;
-    }
-
-    isSubmitting = true;
-    try {
-      // Call the update function passed from parent component
-      await onUpdate(updatedData);
-      
-      // Reset password fields
-      currentPassword = "";
-      newPassword = "";
-      confirmPassword = "";
-      
-      // Close dialog
-      const event = new CustomEvent('update:open', { detail: false });
-      dispatchEvent(event);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    } finally {
-      isSubmitting = false;
-    }
+  if (!validateForm()) {
+    return;
   }
+
+  // Reset server error
+  serverError = '';
+
+  // Collect data to be sent
+  const updatedData = {
+    name: formData.name
+  };
+
+  // Add password data if filled
+  if (formData.newPassword) {
+    updatedData.currentPassword = formData.currentPassword;
+    updatedData.newPassword = formData.newPassword;
+    updatedData.confirmPassword = formData.confirmPassword; // Kirim untuk validasi di server
+  }
+
+  isSubmitting = true;
+  try {
+    // Call the update function passed from parent component
+    await onUpdate(updatedData);
+    
+    // Reset password fields
+    currentPassword = "";
+    newPassword = "";
+    confirmPassword = "";
+    
+    // Close dialog
+    const event = new CustomEvent('update:open', { detail: false });
+    dispatchEvent(event);
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    serverError = error.message || "Failed to update profile";
+  } finally {
+    isSubmitting = false;
+  }
+}
 
   // Handle dialog state change
   function handleDialogChange(isOpen) {
@@ -117,8 +126,7 @@
       confirmPassword = "";
       errors = {};
     }
-    const event = new CustomEvent('update:open', { detail: isOpen });
-    dispatchEvent(event);
+    dispatch('update:open', isOpen);
   }
 </script>
 
@@ -127,6 +135,13 @@
     <DialogHeader>
       <DialogTitle>Edit Profile</DialogTitle>
     </DialogHeader>
+    {#if serverError}
+      <Alert.Root variant="destructive">
+        <CrossCircled class="h-4 w-4" />
+        <Alert.Title>Error</Alert.Title>
+        <Alert.Description>{serverError}</Alert.Description>
+      </Alert.Root>
+    {/if}
     <form onsubmit={handleSubmit} class="space-y-4 py-4">
       <div class="space-y-2">
         <Label for="name" class="font-medium">Username</Label>

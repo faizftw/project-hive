@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Validasi input
     if (!name || name.trim() === '') {
-      return json({ error: 'Nama tidak boleh kosong' }, { status: 400 });
+      return json({ error: 'Name cannot be empty' }, { status: 400 });
     }
 
     // Siapkan data yang akan diupdate
@@ -26,9 +26,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Jika ada permintaan untuk mengubah password
     if (newPassword) {
       if (!currentPassword) {
-        return json({ error: 'Password saat ini diperlukan untuk mengubah password' }, { status: 400 });
+        return json({ error: 'Current password is required to change password' }, { status: 400 });
       }
-
+      
+      // Validasi kekuatan password baru
+      if (newPassword.length < 8) {
+        return json({ error: 'New password must be at least 8 characters' }, { status: 400 });
+      }
+      
+      // Validasi konfirmasi password jika dikirim dari client
+      if (data.confirmPassword && data.confirmPassword !== newPassword) {
+        return json({ error: 'New password and confirmation do not match' }, { status: 400 });
+      }
+    
       // Ambil user untuk verifikasi password
       const user = await prisma.user.findUnique({
         where: { id: locals.user.id },
@@ -36,21 +46,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
 
       if (!user) {
-        return json({ error: 'User tidak ditemukan' }, { status: 404 });
-      }
+			return json({ error: 'User not found' }, { status: 404 });
+		}
 
-      // Verifikasi password saat ini
-      const validPassword = await bcrypt.compare(currentPassword, user.password);
-      if (!validPassword) {
-        return json({ error: 'Password saat ini tidak valid' }, { status: 400 });
-      }
+		// Verify current password
+		const validPassword = await bcrypt.compare(currentPassword, user.password);
+		if (!validPassword) {
+        return json({ error: 'Current password is invalid' }, { status: 400 });
+		}
 
-      // Enkripsi password baru
+		// Check if new password is the same as old password
+		const isSameAsOld = await bcrypt.compare(newPassword, user.password);
+		if (isSameAsOld) {
+        return json({ error: 'New password cannot be the same as old password' }, { status: 400 });
+      }
+    
+      // Encrypt new password
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       updateData.password = hashedPassword;
     }
 
-    // Update data pengguna
+    // Update user data
     const updatedUser = await prisma.user.update({
       where: { id: locals.user.id },
       data: updateData,
@@ -76,11 +92,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const { createdAt, ...userResponse } = formattedUser;
 
     return json({
-      message: 'Profil berhasil diperbarui',
+      message: 'Profile updated successfully',
       user: userResponse
     });
   } catch (error) {
-    console.error('Error updating profile:', error);
-    return json({ error: 'Gagal memperbarui profil' }, { status: 500 });
-  }
+		console.error('Error updating profile:', error);
+		return json({ error: 'Failed to update profile' }, { status: 500 });
+	}
 }; 

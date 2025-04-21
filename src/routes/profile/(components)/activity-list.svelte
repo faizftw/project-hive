@@ -44,14 +44,41 @@
 
   // Create description based on activity type
   function getDescription(activity) {
-    if (activity.type === 'task') {
-      return `Created new task "${activity.title}"`;
-    } else if (activity.type === 'project') {
-      return `Created new project "${activity.title}"`;
+  if (activity.type === 'task') {
+    // Gunakan status untuk menentukan jenis aktivitas
+    switch(activity.status) {
+      case 'Completed':
+        return `Completed task "${activity.title}"`;
+      case 'In Progress':
+        return `Started working on task "${activity.title}"`;
+      case 'Todo':
+        return `Added task "${activity.title}" to todo list`;
+      case 'Backlog':
+        return `Moved task "${activity.title}" to backlog`;
+      case 'Canceled':
+        return `Canceled task "${activity.title}"`;
+      case 'Pending':
+        return `Set task "${activity.title}" as pending`;
+      default:
+        return `Created task "${activity.title}"`;
     }
-    return activity.title;
+  } else if (activity.type === 'project') {
+    // Gunakan status untuk menentukan jenis aktivitas
+    switch(activity.status) {
+      case 'active':
+        return `Started project "${activity.title}"`;
+      case 'completed':
+        return `Completed project "${activity.title}"`;
+      case 'cancelled':
+        return `Cancelled project "${activity.title}"`;
+      case 'on-hold':
+        return `Put project "${activity.title}" on hold`;
+      default:
+        return `Created project "${activity.title}"`;
+    }
   }
-  const Component = $derived(getIcon(activities));
+  return activity.title;
+}
 </script>
 
 <Card class="p-6">
@@ -61,9 +88,10 @@
       <p class="text-muted-foreground">No recent activity</p>
     {:else}
       {#each activities as activity}
+        {@const Icon = getIcon(activity)}
         <div class="flex items-start gap-4">
           <div class="mt-0.5 bg-muted rounded-full p-2">
-            <Component class="h-4 w-4 text-muted-foreground" />
+            <Icon class="h-4 w-4 text-muted-foreground" />
           </div>
           <div class="flex-1">
             <p class="text-sm font-medium">{getDescription(activity)}</p>

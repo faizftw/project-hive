@@ -8,6 +8,7 @@
   import MetricCards from "./metric-cards.svelte";
   import { CalendarDays, Mail, User } from "lucide-svelte";
   import { page } from '$app/stores';
+  import { toast } from 'svelte-sonner';
 
   // Get data from page store using runes
   const userData = $state(($page.data.user || {
@@ -20,18 +21,10 @@
   // Task data
   const tasksCount = $derived($page.data.tasksCount || 0);
   const completedTasksCount = $derived($page.data.completedTasksCount || 0);
-  const inProgressTasksCount = $derived($page.data.inProgressTasksCount || 0);
-  const todoTasksCount = $derived($page.data.todoTasksCount || 0);
-  const backlogTasksCount = $derived($page.data.backlogTasksCount || 0);
-  const canceledTasksCount = $derived($page.data.canceledTasksCount || 0);
-  const pendingTasksCount = $derived($page.data.pendingTasksCount || 0);
   
   // Project data
   const projectsCount = $derived($page.data.projectsCount || 0);
-  const activeProjectsCount = $derived($page.data.activeProjectsCount || 0);
   const completedProjectsCount = $derived($page.data.completedProjectsCount || 0);
-  const cancelledProjectsCount = $derived($page.data.cancelledProjectsCount || 0);
-  const onHoldProjectsCount = $derived($page.data.onHoldProjectsCount || 0);
   
   // Activities data
   const recentActivities = $derived($page.data.recentActivities || []);
@@ -39,30 +32,34 @@
   let isEditDialogOpen = $state(false);
 
   async function handleProfileUpdate(updatedData) {
-    try {
-      // Call API to update profile
-      const response = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData)
-      });
+  try {
+    // Call API to update profile
+    const response = await fetch('/api/profile/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedData)
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const result = await response.json();
-      
-      // Update local data
-      Object.assign(userData, result.user);
-      isEditDialogOpen = false;
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
+    const result = await response.json();
+    
+    if (!response.ok) {
+      // Tampilkan error spesifik dari server
+      throw new Error(result.error || 'Failed to update profile');
     }
+    
+    // Update local data
+    Object.assign(userData, result.user);
+    isEditDialogOpen = false;
+    
+    // Tampilkan notifikasi sukses
+    toast.success(result.message || 'Profile updated successfully');
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    toast.error(error.message || 'Failed to update profile. Please try again.');
   }
+}
 
   function setIsEditDialogOpen(value) {
     isEditDialogOpen = value;
@@ -89,10 +86,6 @@
             <Mail class="h-4 w-4" />
             <span>{userData.email}</span>
           </div>
-          <div class="flex items-center gap-1">
-            <CalendarDays class="h-4 w-4" />
-            <span>Joined {userData.joinDate}</span>
-          </div>
         </div>
       </div>
 
@@ -103,16 +96,8 @@
   <MetricCards 
     tasksCount={tasksCount} 
     completedTasksCount={completedTasksCount}
-    inProgressTasksCount={inProgressTasksCount}
-    todoTasksCount={todoTasksCount}
-    backlogTasksCount={backlogTasksCount}
-    canceledTasksCount={canceledTasksCount}
-    pendingTasksCount={pendingTasksCount}
     projectsCount={projectsCount} 
-    activeProjectsCount={activeProjectsCount}
     completedProjectsCount={completedProjectsCount}
-    cancelledProjectsCount={cancelledProjectsCount}
-    onHoldProjectsCount={onHoldProjectsCount}
   />
 
   <Tabs value="activity" class="w-full">
@@ -127,7 +112,7 @@
       <Card class="p-6">
         <div class="space-y-4">
           <div>
-            <h3 class="text-sm font-medium text-muted-foreground">Full Name</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">Username</h3>
             <p class="text-base">{userData.name}</p>
           </div>
           <div>
@@ -144,9 +129,9 @@
   </Tabs>
 
   <EditProfileDialog
-    bind:open={isEditDialogOpen}
-    onOpenChange={setIsEditDialogOpen}
-    user={userData}
-    onUpdate={handleProfileUpdate}
-  />
+  bind:open={isEditDialogOpen}
+  on:update:open={(e) => isEditDialogOpen = e.detail}
+  user={userData}
+  onUpdate={handleProfileUpdate}
+/>
 </div> 

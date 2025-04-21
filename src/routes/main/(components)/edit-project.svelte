@@ -12,7 +12,6 @@
   import { createEventDispatcher } from 'svelte';
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';
-  import * as Select from "$lib/components/ui/select/index.js";
   import { toast } from 'svelte-sonner';
 
   interface Props {

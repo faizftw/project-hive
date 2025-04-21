@@ -137,7 +137,7 @@ export const load: PageServerLoad = async ({ locals }) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        joinDate: user.createdAt.toLocaleDateString('id-ID', {
+        joinDate: user.createdAt.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
