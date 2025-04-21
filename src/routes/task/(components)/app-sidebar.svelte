@@ -25,7 +25,8 @@
 			inProgress: 0,
 			completed: 0,
 			cancelled: 0,
-			pending: 0
+			pending: 0,
+			overdue: 0
 		};
 
 		$tasks
@@ -49,6 +50,9 @@
 						break;
 					case 'Pending':
 						counts.pending++;
+						break;
+					case 'Overdue':
+						counts.overdue++;
 						break;
 				}
 			});
@@ -182,19 +186,13 @@
 			<div>
 				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Task Status</h4>
 				<div class="flex flex-wrap gap-2">
-						<Badge variant="outline">Backlog {$taskCounts.backlog}</Badge>
-					
-						<Badge variant="outline">Todo {$taskCounts.todo}</Badge>
-					
-					
-						<Badge variant="outline">In Progress {$taskCounts.inProgress}</Badge>
-					
-					
-						<Badge variant="outline">Completed {$taskCounts.completed}</Badge>
-		
-					
-						<Badge variant="outline">Cancelled {$taskCounts.cancelled}</Badge>
-						<Badge variant="outline">Pending {$taskCounts.pending}</Badge>
+						<Badge href="#" class="badge" variant="outline">Backlog {$taskCounts.backlog}</Badge>
+						<Badge href="#" class="badge" variant="outline">Todo {$taskCounts.todo}</Badge>
+						<Badge href="#" class="badge" variant="outline">In Progress {$taskCounts.inProgress}</Badge>
+						<Badge href="#" class="badge" variant="outline">Completed {$taskCounts.completed}</Badge>
+						<Badge href="#" class="badge" variant="outline">Cancelled {$taskCounts.cancelled}</Badge>
+						<Badge href="#" class="badge" variant="outline">Pending {$taskCounts.pending}</Badge>
+						<Badge href="#" class="badge" variant="outline">Overdue {$taskCounts.overdue}</Badge>
 					
 				</div>
 			</div>
