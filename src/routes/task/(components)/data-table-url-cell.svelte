@@ -19,7 +19,7 @@
 </script>
 
 <div class="flex space-x-2">
-  <span class="max-w-[500px] truncate font-medium">
+  <span class="max-w-[250px] truncate font-medium">
 	{#if parsedUrl?.url}
 		<a 
 			href={parsedUrl.url} 
