@@ -71,7 +71,7 @@
 		// Validasi nama project
 		const projectName = formData.get('name') as string;
 		if (!projectName || !projectName.trim()) {
-			toast.error('Project name is required');
+			toast.error('Nama proyek harus diisi');
 			isSubmitting = false;
 			return;
 		}
@@ -90,14 +90,14 @@
 				selectedDateTime = null;
 			}
 		} else {
-			toast.error('Deadline project (date and time) is required');
+			toast.error('Tanggal dan waktu deadline proyek wajib diisi');
 			isSubmitting = false;
 			return;
 		}
 
 		// Validasi apakah deadline tidak di masa lalu
 		if (selectedDateTime && selectedDateTime < new Date()) {
-			toast.error('Deadline must be in the future');
+			toast.error('Deadline tidak boleh di masa lalu');
 			isSubmitting = false;
 			return;
 		}
@@ -148,14 +148,14 @@
 				dateValue = null;
 				timeValue = '';
 				open = false;
-				toast.success('Project created successfully');
+				toast.success('Proyek berhasil dibuat');
 			} else {
-				throw new Error(result.error || 'Failed to create project');
+				throw new Error(result.error || 'Gagal membuat proyek');
 			}
 		})
 		.catch((err) => {
 			console.error('Error creating project:', err);
-			toast.error(`Project creation failed: ${err.message}`);
+			toast.error(`Gagal membuat proyek: ${err.message}`);
 		})
 		.finally(() => {
 			isSubmitting = false;
@@ -167,17 +167,17 @@
 	<DialogTrigger>
 		{#snippet child({ props })}
 		<Button class=''
-			aria-label="Add Project"
+			aria-label="Buat Proyek"
 			{...props}
 		>
 			<Add class="mr-2 h-4 w-4" />
-			Add Project
+			Buat Proyek
 		</Button>
 		{/snippet}
 	</DialogTrigger>
 	<DialogContent class="w-full max-w-lg" portalProps={{}}>
 		<DialogHeader class="space-y-2">
-			<DialogTitle class="text-xl font-semibold">Create New Project</DialogTitle>
+			<DialogTitle class="text-xl font-semibold">Buat Proyek Baru</DialogTitle>
 		</DialogHeader>
 		<form 
 			method="POST"
@@ -185,16 +185,16 @@
 		>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="name" class="text-right">Name</Label>
-					<Input name="name" id="name" type="text" placeholder="Project name" class="col-span-3" required />
+					<Label for="name" class="text-right">Nama</Label>
+					<Input name="name" id="name" type="text" placeholder="Nama Proyek" class="col-span-3" required />
 				</div>
 				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="description" class="text-right">Description</Label>
+					<Label for="description" class="text-right">Deskripsi</Label>
 					<Input
 						name="description"
 						id="description"
 						type="text"
-						placeholder="Project description"
+						placeholder="Deskripsi Proyek"
 						class="col-span-3"
 					/>
 				</div>
@@ -218,7 +218,7 @@
 											dateValue.toDate(getLocalTimeZone())
 										)}
 									{:else}
-										<span>Select date</span>
+										<span>Pilih Tanggal</span>
 									{/if}
 								</Button>
 								{/snippet}
@@ -249,7 +249,7 @@
 									{#if timeValue}
 										{timeValue}
 									{:else}
-										<span>Select time</span>
+										<span>Pilih Waktu</span>
 									{/if}
 								</Button>
 								{/snippet}
@@ -276,9 +276,9 @@
 			<DialogFooter class="flex justify-end space-x-2">
 				<Button type="submit" disabled={isSubmitting} class=''>
 					{#if isSubmitting}
-						Creating...
+						Membuat...
 					{:else}
-						Create Project
+						Buat Proyek
 					{/if}
 				</Button>
 			</DialogFooter>

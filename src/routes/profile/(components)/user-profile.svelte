@@ -46,7 +46,7 @@
     
     if (!response.ok) {
       // Tampilkan error spesifik dari server
-      throw new Error(result.error || 'Failed to update profile');
+      throw new Error(result.error || 'Gagal memperbarui profil');
     }
     
     // Update local data
@@ -54,10 +54,10 @@
     isEditDialogOpen = false;
     
     // Tampilkan notifikasi sukses
-    toast.success(result.message || 'Profile updated successfully');
+    toast.success(result.message || 'Profil berhasil diperbarui');
   } catch (error) {
     console.error('Error updating profile:', error);
-    toast.error(error.message || 'Failed to update profile. Please try again.');
+    toast.error(error.message || 'Gagal memperbarui profil. Silahkan coba lagi.');
   }
 }
 
@@ -89,7 +89,7 @@
         </div>
       </div>
 
-      <Button onclick={() => isEditDialogOpen = true}>Edit Profile</Button>
+      <Button onclick={() => isEditDialogOpen = true}>Edit Profil</Button>
     </div>
   </Card>
 
@@ -102,8 +102,8 @@
 
   <Tabs value="activity" class="w-full">
     <TabsList class="grid w-full grid-cols-2 mb-6">
-      <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-      <TabsTrigger value="details">Account Details</TabsTrigger>
+      <TabsTrigger value="activity">Aktivitas Terkini</TabsTrigger>
+      <TabsTrigger value="details">Detail Akun</TabsTrigger>
     </TabsList>
     <TabsContent value="activity">
       <ActivityList activities={recentActivities} />
@@ -120,7 +120,7 @@
             <p class="text-base">{userData.email}</p>
           </div>
           <div>
-            <h3 class="text-sm font-medium text-muted-foreground">Joined Date</h3>
+            <h3 class="text-sm font-medium text-muted-foreground">Tanggal Bergabung</h3>
             <p class="text-base">{userData.joinDate}</p>
           </div>
         </div>

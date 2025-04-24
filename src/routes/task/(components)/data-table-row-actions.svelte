@@ -240,9 +240,9 @@
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 	<AlertDialog.Content class="sm:max-w-[425px]" portalProps={{}}>
 		<AlertDialog.Header class="space-y-2">
-		  <AlertDialog.Title class="text-xl font-semibold">This task will be deleted</AlertDialog.Title>
+		  <AlertDialog.Title class="text-xl font-semibold">Tugas akan dihapus</AlertDialog.Title>
 		  <AlertDialog.Description class="text-sm text-muted-foreground">
-			This action cannot be undone. This will permanently delete the task.
+			Aksi ini tidak dapat diulang. Ini akan menghapus tugas.
 		  </AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer class="flex justify-end space-x-2">

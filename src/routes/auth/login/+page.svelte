@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 
 	function handlesignup() {
-		goto('/auth/signup'); // Navigate to the '/auth/login' route
+		goto('/auth/signup'); 
 	}
 </script>
 
@@ -50,11 +50,11 @@
 		<div class="relative z-20 mt-auto">
 			<blockquote class="space-y-2">
 				<p class="text-lg">
-					Project Hive is a powerful project management platform focused on helping individuals
-					plan, track, and complete projects with ease. Featuring intuitive task organization,
-					customizable workflows, and real-time progress tracking, Project Hive provides a
-					streamlined approach to project management, keeping users on top of deadlines and
-					priorities to achieve their goals efficiently.
+					Project Hive adalah platform manajemen proyek yang kuat yang berfokus membantu individu
+					merencanakan, melacak, dan menyelesaikan proyek dengan mudah. Dengan fitur pengorganisasian
+					tugas yang intuitif, alur kerja yang dapat disesuaikan, dan pelacakan kemajuan secara real-time,
+					Project Hive menawarkan pendekatan yang terstruktur untuk manajemen proyek, menjaga pengguna
+					agar selalu tepat waktu dan fokus pada prioritas untuk mencapai tujuan secara efisien.
 				</p>
 			</blockquote>
 		</div>
@@ -63,7 +63,7 @@
 		<div class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 			<div class="flex flex-col space-y-2 text-center">
 				<h1 class="text-2xl font-semibold tracking-tight">Login</h1>
-				<p class="text-muted-foreground text-sm">Enter your email and password below to login</p>
+				<p class="text-muted-foreground text-sm">Masukkan email dan password Anda untuk login</p>
 			</div>
 			<UserLoginForm />
 		</div>

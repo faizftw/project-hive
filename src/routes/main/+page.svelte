@@ -123,52 +123,52 @@
 		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">Projects</Card.Title>
+					<Card.Title class="text-sm font-medium">Proyek</Card.Title>
 					<FolderOpen class="text-muted-foreground h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{totalProjects}</div>
-					<p class=" text-xs">Total Projects</p>
+					<p class=" text-xs">Total Proyek</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">Completed</Card.Title>
+					<Card.Title class="text-sm font-medium">Selesai</Card.Title>
 					<FolderCheck class="text-green-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{completedProjects}</div>
-					<p class="text-muted-foreground text-xs">Completed Projects</p>
+					<p class="text-muted-foreground text-xs">Proyek Selesai</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">In Progress</Card.Title>
+					<Card.Title class="text-sm font-medium">Aktif</Card.Title>
 					<FolderClock class="text-blue-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{inProgressProjects}</div>
-					<p class="text-muted-foreground text-xs">Active Projects</p>
+					<p class="text-muted-foreground text-xs">Proyek Aktif</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">Overdue</Card.Title>
+					<Card.Title class="text-sm font-medium">Terlambat</Card.Title>
 					<CalendarClock class="h-4 w-4 text-red-500" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{overdueProjects}</div>
-					<p class="text-muted-foreground text-xs">Overdue Projects</p>
+					<p class="text-muted-foreground text-xs">Proyek Terlambat</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">Archived</Card.Title>
+					<Card.Title class="text-sm font-medium">Arsip</Card.Title>
 					<Archive class="text-slate-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{cancelledProjects}</div>
-					<p class="text-muted-foreground text-xs">Archived Projects</p>
+					<p class="text-muted-foreground text-xs">Proyek Arsip</p>
 				</Card.Content>
 			</Card.Root>
 			<Card.Root>
@@ -178,7 +178,7 @@
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{onHoldProjects}</div>
-					<p class="text-muted-foreground text-xs">On Hold Projects</p>
+					<p class="text-muted-foreground text-xs">Proyek On Hold</p>
 				</Card.Content>
 			</Card.Root>
 		</div>

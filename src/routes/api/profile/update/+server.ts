@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Validasi input
     if (!name || name.trim() === '') {
-      return json({ error: 'Name cannot be empty' }, { status: 400 });
+      return json({ error: 'Nama wajib diisi' }, { status: 400 });
     }
 
     // Siapkan data yang akan diupdate
@@ -24,23 +24,23 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     };
 
     if (!newPassword && data.confirmPassword) {
-      return json({ error: 'New password is required when confirmation is provided' }, { status: 400 });
+      return json({ error: 'Password baru wajib diisi ketika konfirmasi diberikan' }, { status: 400 });
     }
 
     // Jika ada permintaan untuk mengubah password
     if (newPassword) {
       if (!currentPassword) {
-        return json({ error: 'Current password is required to change password' }, { status: 400 });
+        return json({ error: 'Password saat ini wajib diisi untuk mengubah password' }, { status: 400 });
       }
       
       // Validasi kekuatan password baru
       if (newPassword.length < 8) {
-        return json({ error: 'New password must be at least 8 characters' }, { status: 400 });
+        return json({ error: 'Password baru harus memiliki minimal 8 karakter' }, { status: 400 });
       }
       
       // Validasi konfirmasi password jika dikirim dari client
       if (data.confirmPassword && data.confirmPassword !== newPassword) {
-        return json({ error: 'New password and confirmation do not match' }, { status: 400 });
+        return json({ error: 'Password baru dan konfirmasi tidak sesuai' }, { status: 400 });
       }
     
       // Ambil user untuk verifikasi password
@@ -50,19 +50,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       });
 
       if (!user) {
-			return json({ error: 'User not found' }, { status: 404 });
+			return json({ error: 'User tidak ditemukan' }, { status: 404 });
 		}
 
 		// Verify current password
 		const validPassword = await bcrypt.compare(currentPassword, user.password);
 		if (!validPassword) {
-        return json({ error: 'Current password is invalid' }, { status: 400 });
+        return json({ error: 'Password saat ini tidak valid' }, { status: 400 });
 		}
 
 		// Check if new password is the same as old password
 		const isSameAsOld = await bcrypt.compare(newPassword, user.password);
 		if (isSameAsOld) {
-        return json({ error: 'New password cannot be the same as old password' }, { status: 400 });
+        return json({ error: 'Password baru tidak boleh sama dengan password sebelumnya' }, { status: 400 });
       }
     
       // Encrypt new password
@@ -96,11 +96,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const { createdAt, ...userResponse } = formattedUser;
 
     return json({
-      message: 'Profile updated successfully',
+      message: 'Profil berhasil diperbarui',
       user: userResponse
     });
   } catch (error) {
 		console.error('Error updating profile:', error);
-		return json({ error: 'Failed to update profile' }, { status: 500 });
+		return json({ error: 'Gagal memperbarui profil' }, { status: 500 });
 	}
 }; 

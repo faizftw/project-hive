@@ -125,7 +125,7 @@
 		}),
 		table.column({
 			accessor: 'title',
-			header: 'Title',
+			header: 'Judul',
 			id: 'title',
 			cell: ({ value, row }) => {
 				if (row.isData()) {
@@ -140,7 +140,7 @@
 		}),
 		table.column({
 			accessor: 'description',
-			header: 'Description',
+			header: 'Deskripsi',
 			id: 'description',
 			cell: ({ value }) => {
 				return createRender(DataTableDescCell, { description: value });
@@ -180,7 +180,7 @@
 		table.column({
 			accessor: 'priority',
 			id: 'priority',
-			header: 'Priority',
+			header: 'Prioritas',
 			cell: ({ value }) => {
 				return createRender(DataTablePriorityCell, {
 					value
@@ -202,7 +202,7 @@
 		}),
 		table.column({
 			accessor: 'deadline',
-			header: 'Due',
+			header: 'Deadline',
 			id: 'deadline',
 			cell: ({ value }) => {
 				return createRender(DataTableDeadline, { deadline: value });

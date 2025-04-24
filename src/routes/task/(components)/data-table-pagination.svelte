@@ -13,9 +13,6 @@
 	const { pageRows, pluginStates, rows } = tableModel;
 
 	const { hasNextPage, hasPreviousPage, pageIndex, pageCount } = pluginStates.page;
-
-	const { selectedDataIds } = pluginStates.select;
-
 	// Gunakan state untuk page size
 	let currentPageSize = $state(10);
 
@@ -27,10 +24,7 @@
 </script>
 
 <div class="flex items-center justify-between px-2">
-	<div class="text-muted-foreground flex-1 text-sm">
-		{Object.keys($selectedDataIds).length} of {$rows.length} row(s) selected.
-	</div>
-	<div class="flex items-center space-x-6 lg:space-x-8">
+	<div class="flex items-center space-x-6 lg:space-x-8 ms-auto">
 		<div class="flex items-center space-x-2">
 			<p class="text-sm font-medium">Rows per page</p>
 			<Select.Root

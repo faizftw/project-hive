@@ -3,7 +3,7 @@
   import { Button } from "$lib/components/ui/button/index.js";
   import { Input } from "$lib/components/ui/input/index.js";
   import { Label } from "$lib/components/ui/label/index.js";
-  import { CrossCircled } from 'svelte-radix';
+  import { CrossCircled, EyeOpen, EyeNone } from 'svelte-radix';
   import * as Alert from '$lib/components/ui/alert/index.js';
   import { createEventDispatcher } from 'svelte';
 
@@ -19,6 +19,11 @@
   let errors = $state({});
   let serverError = $state('');
   const dispatch = createEventDispatcher(); 
+
+  let showCurrentPassword = $state(false);
+  let showNewPassword = $state(false);
+  let showConfirmPassword = $state(false);
+  
   // Update name when user prop changes
   $effect(() => {
     if (user && user.name) {
@@ -50,78 +55,77 @@
   }
 
   function validateForm() {
-  const newErrors = {};
+    const newErrors = {};
 
-  if (!formData.name.trim()) {
-    newErrors.name = "Name cannot be empty";
-  }
-
-  // Validasi jika confirmPassword diisi tetapi newPassword kosong
-  if (!formData.newPassword && formData.confirmPassword) {
-    newErrors.newPassword = "Please enter new password";
-  }
-
-  // Only validate password fields if the user is trying to change password
-  if (formData.newPassword) {
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = "Current password is required";
+    if (!formData.name.trim()) {
+      newErrors.name = "Nama tidak boleh kosong";
     }
 
-    if (formData.newPassword.length < 8) {
-      newErrors.newPassword = "New password must be at least 8 characters";
+    // Validasi jika confirmPassword diisi tetapi newPassword kosong
+    if (!formData.newPassword && formData.confirmPassword) {
+      newErrors.newPassword = "Password baru tidak boleh kosong";
     }
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "New password and confirmation do not match";
+    // Only validate password fields if the user is trying to change password
+    if (formData.newPassword) {
+      if (!formData.currentPassword) {
+        newErrors.currentPassword = "Password saat ini tidak boleh kosong";
+      }
+
+      if (formData.newPassword.length < 8) {
+        newErrors.newPassword = "Password baru harus memiliki minimal 8 karakter";
+      }
+
+      if (formData.newPassword !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Password baru dan konfirmasi tidak sesuai";
+      }
     }
+
+    errors = newErrors;
+    return Object.keys(newErrors).length === 0;
   }
-
-  errors = newErrors;
-  return Object.keys(newErrors).length === 0;
-}
 
   async function handleSubmit(e) {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateForm()) {
-    return;
+    if (!validateForm()) {
+      return;
+    }
+
+    // Reset server error
+    serverError = '';
+
+    // Collect data to be sent
+    const updatedData = {
+      name: formData.name
+    };
+
+    // Add password data if filled
+    if (formData.newPassword) {
+      updatedData.currentPassword = formData.currentPassword;
+      updatedData.newPassword = formData.newPassword;
+      updatedData.confirmPassword = formData.confirmPassword; // Kirim untuk validasi di server
+    }
+
+    isSubmitting = true;
+    try {
+      // Call the update function passed from parent component
+      await onUpdate(updatedData);
+      
+      // Reset password fields
+      currentPassword = "";
+      newPassword = "";
+      confirmPassword = "";
+      
+      // Close dialog
+      dispatch('update:open', false);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      serverError = error.message || "Failed to update profile";
+    } finally {
+      isSubmitting = false;
+    }
   }
-
-  // Reset server error
-  serverError = '';
-
-  // Collect data to be sent
-  const updatedData = {
-    name: formData.name
-  };
-
-  // Add password data if filled
-  if (formData.newPassword) {
-    updatedData.currentPassword = formData.currentPassword;
-    updatedData.newPassword = formData.newPassword;
-    updatedData.confirmPassword = formData.confirmPassword; // Kirim untuk validasi di server
-  }
-
-  isSubmitting = true;
-  try {
-    // Call the update function passed from parent component
-    await onUpdate(updatedData);
-    
-    // Reset password fields
-    currentPassword = "";
-    newPassword = "";
-    confirmPassword = "";
-    
-    // Close dialog
-    const event = new CustomEvent('update:open', { detail: false });
-    dispatchEvent(event);
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    serverError = error.message || "Failed to update profile";
-  } finally {
-    isSubmitting = false;
-  }
-}
 
   // Handle dialog state change
   function handleDialogChange(isOpen) {
@@ -130,6 +134,9 @@
       newPassword = "";
       confirmPassword = "";
       errors = {};
+      showCurrentPassword = false;
+      showNewPassword = false;
+      showConfirmPassword = false;
     }
     dispatch('update:open', isOpen);
   }
@@ -157,18 +164,31 @@
       </div>
 
       <div class="pt-4 border-t">
-        <h4 class="text-sm font-medium mb-4">Change Password</h4>
+        <h4 class="text-sm font-medium mb-4">Ubah Password</h4>
 
         <div class="space-y-2">
           <Label for="currentPassword" class="font-medium">Current Password</Label>
-          <Input
-            id="currentPassword"
-            name="currentPassword"
-            type="password"
-            value={currentPassword}
-            oninput={handleChange}
-            class="w-full"
-          />
+          <div class="relative">
+            <Input
+              id="currentPassword"
+              name="currentPassword"
+              type={showCurrentPassword ? "text" : "password"}
+              value={currentPassword}
+              oninput={handleChange}
+              class="w-full"
+            />
+            <button 
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2"
+              onclick={() => showCurrentPassword = !showCurrentPassword}
+            >
+              {#if showCurrentPassword}
+                <EyeNone class="h-4 w-4 text-muted-foreground" />
+              {:else}
+                <EyeOpen class="h-4 w-4 text-muted-foreground" />
+              {/if}
+            </button>
+          </div>
           {#if errors.currentPassword}
             <p class="text-sm text-destructive">{errors.currentPassword}</p>
           {/if}
@@ -176,29 +196,55 @@
 
         <div class="space-y-2 mt-2">
           <Label for="newPassword" class="font-medium">New Password</Label>
-          <Input
-            id="newPassword"
-            name="newPassword"
-            type="password"
-            value={newPassword}
-            oninput={handleChange}
-            class="w-full"
-          />
+          <div class="relative">
+            <Input
+              id="newPassword"
+              name="newPassword"
+              type={showNewPassword ? "text" : "password"}
+              value={newPassword}
+              oninput={handleChange}
+              class="w-full"
+            />
+            <button 
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2"
+              onclick={() => showNewPassword = !showNewPassword}
+            >
+              {#if showNewPassword}
+                <EyeNone class="h-4 w-4 text-muted-foreground" />
+              {:else}
+                <EyeOpen class="h-4 w-4 text-muted-foreground" />
+              {/if}
+            </button>
+          </div>
           {#if errors.newPassword}
             <p class="text-sm text-destructive">{errors.newPassword}</p>
           {/if}
         </div>
 
         <div class="space-y-2 mt-2">
-          <Label for="confirmPassword" class="font-medium">Confirm New Password</Label>
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            value={confirmPassword}
-            oninput={handleChange}
-            class="w-full"
-          />
+          <Label for="confirmPassword" class="font-medium">Confirm Password</Label>
+          <div class="relative">
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              oninput={handleChange}
+              class="w-full"
+            />
+            <button 
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2"
+              onclick={() => showConfirmPassword = !showConfirmPassword}
+            >
+              {#if showConfirmPassword}
+                <EyeNone class="h-4 w-4 text-muted-foreground" />
+              {:else}
+                <EyeOpen class="h-4 w-4 text-muted-foreground" />
+              {/if}
+            </button>
+          </div>
           {#if errors.confirmPassword}
             <p class="text-sm text-destructive">{errors.confirmPassword}</p>
           {/if}
@@ -212,4 +258,4 @@
       </DialogFooter>
     </form>
   </DialogContent>
-</Dialog> 
+</Dialog>

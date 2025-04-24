@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		// Validasi input
 		if (!email || !password) {
-			return json({ error: 'Email and password are required' }, { status: 400 });
+			return json({ error: 'Email dan password wajib diisi' }, { status: 400 });
 		}
 
 		// Cari pengguna berdasarkan email
@@ -25,13 +25,13 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 
 		if (!user) {
-			return json({ error: 'Invalid email or password' }, { status: 401 });
+			return json({ error: 'Email atau password salah' }, { status: 401 });
 		}
 
 		// Verifikasi password
 		const validPassword = await bcrypt.compare(password, user.password);
 		if (!validPassword) {
-			return json({ error: 'Invalid email or password' }, { status: 401 });
+			return json({ error: 'Email atau password salah' }, { status: 401 });
 		}
 
 		// Buat cookie sesi
@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		return new Response(
 			JSON.stringify({
-				message: 'Login successful',
+				message: 'Login berhasil',
 				user: {
 					id: user.id,
 					email: user.email,

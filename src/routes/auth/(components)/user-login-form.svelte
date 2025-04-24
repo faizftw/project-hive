@@ -24,7 +24,7 @@
 
 		// Validasi input
 		if (!email || !password) {
-			errorMessage = 'Email and password are required';
+			errorMessage = 'Email dan password wajib diisi';
 			showAlert = true;
 			return;
 		}
@@ -42,7 +42,7 @@
 			if (response.ok) {
 				goto('/');
 			} else {
-				errorMessage = data.error || 'Invalid email or password';
+				errorMessage = data.error || 'Email atau password salah';
 				showAlert = true;
 			}
 		} catch (error) {

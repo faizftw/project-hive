@@ -28,31 +28,31 @@
 		</h1>
 
 		<p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-			Your complete project management solution. Simple, powerful, and effective.
+			Solusi manajemen proyek Anda. Sederhana, kuat, dan efektif.
 		</p>
 
 		<div class="grid md:grid-cols-3 gap-8 py-8">
 			<div class="flex flex-col items-center p-4">
 				<Code class="h-10 w-10 text-primary mb-4" />
-				<h3 class="text-lg font-semibold mb-2">Task Management</h3>
-				<p class="text-muted-foreground text-sm">Manage all your tasks in one organized workspace</p>
+				<h3 class="text-lg font-semibold mb-2">Manajemen Tugas</h3>
+				<p class="text-muted-foreground text-sm">Kelola semua tugas Anda dalam satu ruang kerja yang terorganisir</p>
 			</div>
 			<div class="flex flex-col items-center p-4">
 				<Workflow class="h-10 w-10 text-primary mb-4" />
-				<h3 class="text-lg font-semibold mb-2">Project Tracking</h3>
-				<p class="text-muted-foreground text-sm">Track progress and keep projects on schedule</p>
+				<h3 class="text-lg font-semibold mb-2">Pengawasan Proyek</h3>
+				<p class="text-muted-foreground text-sm">Pantau kemajuan dan jaga proyek tetap sesuai jadwal</p>
 			</div>
 			<div class="flex flex-col items-center p-4">
 				<ListOrdered class="h-10 w-10 text-primary mb-4" />
-				<h3 class="text-lg font-semibold mb-2">Priority Planning</h3>
-				<p class="text-muted-foreground text-sm">Focus on what matters most with clear priorities</p>
+				<h3 class="text-lg font-semibold mb-2">Penyusunan Prioritas</h3>
+				<p class="text-muted-foreground text-sm">Fokus pada hal yang paling penting dengan prioritas yang jelas</p>
 			</div>
 		</div>
 
 		<div class="pt-4">
 			<a href="/auth/login">
 				<Button size="lg" class="group px-6 py-6 text-lg transition-all duration-300 hover:translate-y-[-2px]">
-					Get Started
+					Mulai
 					<ArrowRight class="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
 				</Button>
 			</a>

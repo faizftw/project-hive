@@ -69,14 +69,14 @@
 
 		// Validasi judul task
 		if (!state.title.trim()) {
-			toast.error('Title is required');
+			toast.error('Judul tugas harus diisi');
 			state.isSubmitting = false;
 			return;
 		}
 
 		// Validasi deadline
 		if (!state.dateValue || !state.timeValue) {
-			toast.error('Task deadline (date and time) is required');
+			toast.error('Deadline tugas (tanggal dan waktu) harus diisi');
 			state.isSubmitting = false;
 			return;
 		}
@@ -94,7 +94,7 @@
 		}
 
 		if (state.formattedDateTime && new Date(state.formattedDateTime) < new Date()) {
-			toast.error('Deadline must be in the future');
+			toast.error('Deadline tugas harus di masa depan');
 			state.isSubmitting = false;
 			return;
 		}
@@ -105,7 +105,7 @@
 			const projectDeadline = new Date(project.dueDate);
 
 			if (taskDeadline > projectDeadline) {
-				toast.error('Task deadline cannot exceed project deadline');
+				toast.error('Deadline tugas tidak boleh melebihi deadline proyek');
 				state.isSubmitting = false;
 				return;
 			}
@@ -146,12 +146,12 @@
 				await refreshTableData(projectId);
 				
 				dispatch('taskAdded', result.task);
-				toast.success('Task added successfully');
+				toast.success('Tugas berhasil ditambahkan');
 				resetForm();
 			} else {
 				const errorMessage = Array.isArray(result.error) 
 					? result.error.map((e: any) => e.message).join(', ') 
-					: result.error || 'Failed to add task';
+					: result.error || 'Gagal menambahkan tugas';
 				throw new Error(errorMessage);
 			}
 		} catch (error: any) {
@@ -191,46 +191,46 @@
 		{#snippet child({ props })}
 			<Button class="py-0 ml-auto me-2" size="sm" {...props}>
 				<CirclePlus class="mr-2 h-4 w-4" />
-				Add Task
+				Buat Tugas
 			</Button>
 		{/snippet}
 	</Dialog.Trigger>
 	
 	<Dialog.Content class="inline-block" portalProps={{}}>
 		<Dialog.Header class="space-y-2">
-			<Dialog.Title class="text-xl font-semibold">Add New Task</Dialog.Title>
-			<Dialog.Description class="text-sm text-muted-foreground">Fill in the details of the task you want to add.</Dialog.Description>
+			<Dialog.Title class="text-xl font-semibold">Buat Tugas Baru</Dialog.Title>
+			<Dialog.Description class="text-sm text-muted-foreground">Isi detail tugas yang ingin Anda tambahkan.</Dialog.Description>
 		</Dialog.Header>
 		
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="title" class="text-right">
-						Title
+						Judul
 					</LabelComponent>
 					<Input 
 						id="title" 
 						type="text"
 						bind:value={state.title}
-						placeholder="Task Name" 
+						placeholder="Judul Tugas" 
 						class="col-span-3" 
 						required 
 					/>
 				</div>
 				
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="description" class="text-right">Description</LabelComponent>
+					<LabelComponent for="description" class="text-right">Deskripsi</LabelComponent>
 					<Input 
 						id="description" 
 						type="text"
 						bind:value={state.description}
-						placeholder="Description" 
+						placeholder="Deskripsi" 
 						class="col-span-3" 
 					/>
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="priority" class="text-right">Priority</LabelComponent>
+					<LabelComponent for="priority" class="text-right">Prioritas</LabelComponent>
 					<Select.Root type="single" bind:value={state.priority}>
 						<Select.Trigger class="mt-1 w-full col-span-3">
 							{state.priority}
@@ -277,7 +277,7 @@
 				
 				{#if state.showNewLabelInput}
 					<div class="grid grid-cols-4 items-center gap-4">
-						<LabelComponent for="newLabel" class="text-right">New Label</LabelComponent>
+						<LabelComponent for="newLabel" class="text-right">Label Baru</LabelComponent>
 						<Input 
 							type="text"
 							class="col-span-3" 
@@ -311,7 +311,7 @@
 											state.dateValue.toDate(getLocalTimeZone())
 										)}
 									{:else}
-										<span>Select date</span>
+										<span>Pilih tanggal</span>
 									{/if}
 								</Button>
 								{/snippet}
@@ -343,7 +343,7 @@
 									{#if state.timeValue}
 										{state.timeValue}
 									{:else}
-										<span>Select time</span>
+										<span>Pilih waktu</span>
 									{/if}
 								</Button>
 								{/snippet}
@@ -383,7 +383,7 @@
 						id="urlAlias" 
 						type="text"
 						bind:value={state.urlAlias}
-						placeholder="Display name for URL" 
+						placeholder="Nama tampilan untuk URL" 
 						class="col-span-3"
 					/>
 				</div>

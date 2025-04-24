@@ -123,12 +123,12 @@
 		try {
 			// Validasi input
 			if (!title.trim()) {
-				throw new Error('Title is required');
+				throw new Error('Judul diperlukan');
 			}
 			
 			// Validasi deadline
 			if (!dateValue || !timeValue) {
-				throw new Error('Task deadline (date and time) is required');
+				throw new Error('Tugas deadline (tanggal dan waktu) diperlukan');
 			}
 
 			// Validasi deadline project
@@ -139,7 +139,7 @@
 					const projectDeadline = new Date(project.dueDate);
 
 					if (taskDeadline > projectDeadline) {
-						toast.error('Task deadline cannot exceed project deadline');
+						toast.error('Tugas deadline tidak boleh melebihi deadline proyek');
 						isSubmitting = false;
 						return;
 					}
@@ -188,16 +188,16 @@
 			const result = await response.json();
 
 			if (!response.ok) {
-				throw new Error(result.error || 'Failed to update task');
+				throw new Error(result.error || 'Gagal memperbarui tugas');
 			}
 
 			await refreshTableData(task.projectId);
 			dispatch('taskUpdated', result.task);
 			open = false;
-			toast.success('Task updated successfully');
+			toast.success('Tugas berhasil diperbarui');
 		} catch (error: any) {
 			console.error('Error updating task:', error);
-			toast.error(error.message || 'Failed to update task');
+			toast.error(error.message || 'Gagal memperbarui tugas');
 		} finally {
 			isSubmitting = false;
 		}
@@ -207,39 +207,39 @@
 <Dialog.Root bind:open>
 	<Dialog.Content class="inline-block" portalProps={{}}>
 		<Dialog.Header class="space-y-2">
-			<Dialog.Title class="text-xl font-semibold">Edit Task</Dialog.Title>
-			<Dialog.Description class="text-sm text-muted-foreground">Fill in the details of the task you want to edit.</Dialog.Description>
+			<Dialog.Title class="text-xl font-semibold">Edit Tugas</Dialog.Title>
+			<Dialog.Description class="text-sm text-muted-foreground">Edit detail tugas yang ingin Anda ubah.</Dialog.Description>
 		</Dialog.Header>
 		
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-4 py-4">
 				<div class="grid grid-cols-4 items-center gap-4">
 					<LabelComponent for="title" class="text-right">
-						Title
+						Judul
 					</LabelComponent>
 					<Input 
 						id="title" 
 						type="text"
 						bind:value={title}
-						placeholder="Task Name" 
+						placeholder="Judul tugas" 
 						class="col-span-3" 
 						required 
 					/>
 				</div>
 				
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="description" class="text-right">Description</LabelComponent>
+					<LabelComponent for="description" class="text-right">Deskripsi</LabelComponent>
 					<Input 
 						id="description" 
 						type="text"
 						bind:value={description}
-						placeholder="Description" 
+						placeholder="Deskripsi" 
 						class="col-span-3" 
 					/>
 				</div>
 
 				<div class="grid grid-cols-4 items-center gap-4">
-					<LabelComponent for="priority" class="text-right">Priority</LabelComponent>
+					<LabelComponent for="priority" class="text-right">Prioritas</LabelComponent>
 					<Select.Root type="single" bind:value={priority}>
 						<Select.Trigger class="mt-1 w-full col-span-3">
 							{priority}
@@ -286,7 +286,7 @@
 
 				{#if showNewLabelInput}
 					<div class="grid grid-cols-4 items-center gap-4">
-						<LabelComponent for="newLabel" class="text-right">New Label</LabelComponent>
+						<LabelComponent for="newLabel" class="text-right">Label Baru</LabelComponent>
 						<Input 
 							id="newLabel" 
 							type="text"
@@ -320,7 +320,7 @@
 											dateValue.toDate(getLocalTimeZone())
 										)}
 									{:else}
-										<span>Pick a date</span>
+										<span>Pilih tanggal</span>
 									{/if}
 								</Button>
 								{/snippet}

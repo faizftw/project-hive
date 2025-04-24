@@ -63,7 +63,7 @@
 
     // Validasi nama project
     if (!name.trim()) {
-      toast.error('Project name is required');
+      toast.error('Nama proyek harus diisi');
       isSubmitting = false;
       return;
     }
@@ -82,14 +82,14 @@
         selectedDateTime = null;
       }
     } else {
-      toast.error('Project deadline (date and time) is required');
+      toast.error('Tanggal dan waktu deadline proyek wajib diisi');
       isSubmitting = false;
       return;
     }
 
     // Validasi apakah deadline tidak di masa lalu
     if (selectedDateTime && selectedDateTime < new Date()) {
-      toast.error('Deadline cannot be in the past');
+      toast.error('Deadline tidak boleh di masa lalu');
       isSubmitting = false;
       return;
     }
@@ -135,14 +135,14 @@
         projectsStore.updateProject(updatedProject);
         project = updatedProject;
         dispatch('projectUpdated', { project: updatedProject });
-        toast.success('Project updated successfully');
+        toast.success('Proyek berhasil diperbarui');
         open = false;
       } else {
-        throw new Error(result.error || 'Failed to update project');
+        throw new Error(result.error || 'Gagal memperbarui proyek');
       }
     } catch (err) {
       console.error('Error updating project:', err);
-      toast.error(`Failed to update project: ${err.message}`);
+      toast.error(`Gagal memperbarui proyek: ${err.message}`);
     } finally {
       isSubmitting = false;
     }
@@ -179,39 +179,39 @@
   
   <Dialog.Content class="inline-block" portalProps={{}}>
     <Dialog.Header class="space-y-2">
-      <Dialog.Title class="text-xl font-semibold">Edit Project</Dialog.Title>
+      <Dialog.Title class="text-xl font-semibold">Edit Proyek</Dialog.Title>
       <Dialog.Description class="text-sm text-muted-foreground">
-        Edit project details here. Click save after finishing.
+        Edit detail proyek di sini. Klik save setelah selesai.
       </Dialog.Description>
     </Dialog.Header>
 
     <form onsubmit={handleSubmit}>
       <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="name" class="text-right">Name</Label>
+          <Label for="name" class="text-right">Nama</Label>
           <Input 
             id="name" 
             type="text"
             bind:value={name}
-            placeholder="Project Name" 
+            placeholder="Nama Proyek" 
             class="col-span-3" 
             required 
           />
         </div>
         
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="description" class="text-right">Description</Label>
+          <Label for="description" class="text-right">Deskripsi</Label>
           <Input 
             id="description" 
             type="text"
             bind:value={description}
-            placeholder="Project Description" 
+            placeholder="Deskripsi Proyek" 
             class="col-span-3" 
           />
         </div>
 
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label class="text-right">Due Date</Label>
+          <Label class="text-right">Deadline</Label>
           <div class="col-span-3 flex gap-2">
             <Popover.Root>
               <Popover.Trigger>
@@ -221,7 +221,7 @@
                   {#if dateValue}
                     {new DateFormatter('id-ID', { dateStyle: 'long' }).format(dateValue.toDate(getLocalTimeZone()))}
                   {:else}
-                    Choose a date
+                    Pilih tanggal
                   {/if}
                 </Button>
                 {/snippet}

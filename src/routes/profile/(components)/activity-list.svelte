@@ -14,16 +14,16 @@
     
     // If today
     if (date.toDateString() === now.toDateString()) {
-      return `Today at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+      return `Hari ini pukul ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
     }
     
     // If yesterday
     if (date.toDateString() === yesterday.toDateString()) {
-      return `Yesterday at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+      return `Kemarin pukul ${date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}`;
     }
     
     // If earlier
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString('id-ID', { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric', 
@@ -48,33 +48,33 @@
     // Gunakan status untuk menentukan jenis aktivitas
     switch(activity.status) {
       case 'Completed':
-        return `Completed task "${activity.title}"`;
+        return `Tugas "${activity.title}" selesai`;
       case 'In Progress':
-        return `Started working on task "${activity.title}"`;
+        return `Memulai pekerjaan pada tugas "${activity.title}"`;
       case 'Todo':
-        return `Added task "${activity.title}" to todo list`;
+        return `Menambahkan tugas "${activity.title}" ke daftar todo`;
       case 'Backlog':
-        return `Moved task "${activity.title}" to backlog`;
+        return `Memindahkan tugas "${activity.title}" ke backlog`;
       case 'Canceled':
-        return `Canceled task "${activity.title}"`;
+        return `Membatalkan tugas "${activity.title}"`;
       case 'Pending':
-        return `Set task "${activity.title}" as pending`;
+        return `Menandai tugas "${activity.title}" sebagai tertunda`;
       default:
-        return `Created task "${activity.title}"`;
+        return `Membuat tugas "${activity.title}"`;
     }
   } else if (activity.type === 'project') {
     // Gunakan status untuk menentukan jenis aktivitas
     switch(activity.status) {
       case 'active':
-        return `Started project "${activity.title}"`;
+        return `Memulai proyek "${activity.title}"`;
       case 'completed':
-        return `Completed project "${activity.title}"`;
+        return `Proyek "${activity.title}" selesai`;
       case 'cancelled':
-        return `Cancelled project "${activity.title}"`;
+        return `Membatalkan proyek "${activity.title}"`;
       case 'on-hold':
-        return `Put project "${activity.title}" on hold`;
+        return `Menangguhkan proyek "${activity.title}"`;
       default:
-        return `Created project "${activity.title}"`;
+        return `Membuat proyek "${activity.title}"`;
     }
   }
   return activity.title;
@@ -82,10 +82,10 @@
 </script>
 
 <Card class="p-6">
-  <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+  <h2 class="text-xl font-semibold mb-4">Aktivitas Terbaru</h2>
   <div class="space-y-4">
     {#if !activities || activities.length === 0}
-      <p class="text-muted-foreground">No recent activity</p>
+      <p class="text-muted-foreground">Tidak ada aktivitas terbaru</p>
     {:else}
       {#each activities as activity}
         {@const Icon = getIcon(activity)}

@@ -162,18 +162,18 @@
 
 <Sidebar.Root variant="floating" {...restProps}>
 	<Sidebar.Header class="p-4">
-		<h2 class="text-2xl font-bold tracking-tight">Project Details</h2>
+		<h2 class="text-2xl font-bold tracking-tight">Detail Proyek</h2>
 	</Sidebar.Header>
 	
 	<Sidebar.Content class="p-4">
 		<Sidebar.Group>
 			<h3 class="text-xl font-bold tracking-tight">{title}</h3>
-			<p class="text-sm text-muted-foreground">{project?.description || 'No description'}</p>
+			<p class="text-sm text-muted-foreground">{project?.description || 'Tidak ada deskripsi'}</p>
 		</Sidebar.Group>
 		<Sidebar.Group>
 		<div class="space-y-4">
 			<div>
-				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Project Deadline</h4>
+				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Deadline Proyek</h4>
 				<RangeCalendar 
 					bind:value 
 					class="rounded-md border" 
@@ -184,8 +184,8 @@
 			</div>
 			
 			<div>
-				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Task Status</h4>
-				<div class="flex flex-wrap gap-2">
+				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Status Tugas</h4>
+				<div class="flex flex-wrap gap-1">
 						<Badge href="#" class="badge" variant="outline">Backlog {$taskCounts.backlog}</Badge>
 						<Badge href="#" class="badge" variant="outline">Todo {$taskCounts.todo}</Badge>
 						<Badge href="#" class="badge" variant="outline">In Progress {$taskCounts.inProgress}</Badge>

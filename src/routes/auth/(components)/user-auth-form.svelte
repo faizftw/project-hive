@@ -5,7 +5,7 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { cn } from '$lib/utils.js';
 	import { goto } from '$app/navigation';
-	import { CrossCircled} from 'svelte-radix';
+	import { CrossCircled, EyeOpen, EyeNone } from 'svelte-radix';
 	import * as Alert from '$lib/components/ui/alert/index.js';
 
 	let className: string | undefined | null = undefined;
@@ -18,6 +18,8 @@
 	let errorMessage = '';
 	let showAlert = false;
 	let isLoading = false;
+	let showPassword = false;
+	let showConfirmPassword = false;
 
 	async function onSubmit() {
 		showAlert = false;
@@ -25,7 +27,7 @@
 
 		// Validasi input
 		if (!email || !password || !name) {
-			errorMessage = 'All fields are required';
+			errorMessage = 'Semua field wajib diisi';
 			showAlert = true;
 			return;
 		}
@@ -33,21 +35,21 @@
 		// Validasi email format
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			errorMessage = 'Please enter a valid email address';
+			errorMessage = 'Format email tidak valid';
 			showAlert = true;
 			return;
 		}
 
 		// Validasi password
-		if (password.length < 6) {
-			errorMessage = 'Password must be at least 6 characters long';
+		if (password.length < 8) {
+			errorMessage = 'Password harus memiliki minimal 8 karakter';
 			showAlert = true;
 			return;
 		}
 
 		// Cek password match
 		if (password !== confirmPassword) {
-			errorMessage = 'Passwords do not match';
+			errorMessage = 'Password tidak sesuai';
 			showAlert = true;
 			return;
 		}
@@ -116,32 +118,58 @@
 					required
 				/>
 			</div>
-			<div class="grid gap-1">
+			<div class="grid gap-1 relative">
 				<Label for="password">Password</Label>
-				<Input
-					id="password"
-					placeholder="password"
-					type="password"
-					bind:value={password}
-					autocapitalize="none"
-					autocomplete="new-password"
-					autocorrect="off"
-					disabled={isLoading}
-					required
-				/>
+				<div class="relative">
+					<Input
+						id="password"
+						placeholder="password"
+						type={showPassword ? "text" : "password"}
+						bind:value={password}
+						autocapitalize="none"
+						autocomplete="new-password"
+						autocorrect="off"
+						disabled={isLoading}
+						required
+					/>
+					<button 
+						type="button"
+						class="absolute right-3 top-1/2 -translate-y-1/2"
+						onclick={() => showPassword = !showPassword}
+					>
+						{#if showPassword}
+							<EyeNone class="h-4 w-4 text-muted-foreground" />
+						{:else}
+							<EyeOpen class="h-4 w-4 text-muted-foreground" />
+						{/if}
+					</button>
+				</div>
 			</div>
-			<div class="grid gap-1">
+			<div class="grid gap-1 relative">
 				<Label for="confirm-password">Confirm Password</Label>
-				<Input
-					id="confirm-password"
-					placeholder="confirm password"
-					bind:value={confirmPassword}
-					type="password"
-					autocapitalize="none"
-					autocorrect="off"
-					disabled={isLoading}
-					required
-				/>
+				<div class="relative">
+					<Input
+						id="confirm-password"
+						placeholder="confirm password"
+						bind:value={confirmPassword}
+						type={showConfirmPassword ? "text" : "password"}
+						autocapitalize="none"
+						autocorrect="off"
+						disabled={isLoading}
+						required
+					/>
+					<button 
+						type="button"
+						class="absolute right-3 top-1/2 -translate-y-1/2"
+						onclick={() => showConfirmPassword = !showConfirmPassword}
+					>
+						{#if showConfirmPassword}
+							<EyeNone class="h-4 w-4 text-muted-foreground" />
+						{:else}
+							<EyeOpen class="h-4 w-4 text-muted-foreground" />
+						{/if}
+					</button>
+				</div>
 			</div>
 			<Button type="submit" disabled={isLoading} class=''>
 				{#if isLoading}

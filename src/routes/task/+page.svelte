@@ -74,8 +74,8 @@
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </div>
-          <h2 class="text-2xl font-bold tracking-tight">Project {data.project?.name}</h2>
-          <p class="text-muted-foreground"> Here are the tasks for this project</p>
+          <h2 class="text-2xl font-bold tracking-tight">Proyek {data.project?.name}</h2>
+          <p class="text-muted-foreground"> Daftar tugas untuk proyek ini</p>
       </div>
   </div>
   <DataTable projectId={data.project?.id ?? ''} />

@@ -5,7 +5,7 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import type { Project } from '$lib/types';
 	import { DotsHorizontal } from 'svelte-radix';
-	import { Calendar, Clock, Edit, ExternalLink, ClockAlert, SquarePen, CircleCheck, AlertTriangle } from 'lucide-svelte';
+	import { Calendar, Clock, Edit, ExternalLink, Trash, CircleCheck } from 'lucide-svelte';
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
@@ -245,6 +245,7 @@
 									Edit
 								</DropdownMenu.Item>
 								<DropdownMenu.Item class="cursor-pointer" inset={false} onclick={() => isDeleteDialogOpen = true}>
+									<Trash class="mr-2 h-4 w-4" />
 									Delete
 								</DropdownMenu.Item>
 							</DropdownMenu.Group>
@@ -255,11 +256,11 @@
 		</Card.Header>
 		
 		<Card.Content class="space-y-4">
-			<p class="text-sm text-muted-foreground line-clamp-2">{project.description || 'No description'}</p>
+			<p class="text-sm text-muted-foreground line-clamp-2">{project.description || 'Tidak ada deskripsi'}</p>
 			
 			<div class="space-y-1">
 				<div class="flex justify-between text-xs text-muted-foreground">
-					<span>Progress</span>
+					<span>Progres</span>
 					<span>{progressPercentage}%</span>
 				</div>
 				<Progress value={progressPercentage} max={100} class="h-2" />
@@ -276,7 +277,7 @@
 						Due: {formatDate(project.dueDate)}
 						{#if daysRemaining && daysRemaining > 0 && project.status !== 'completed'}
 							<span class="ml-1 text-xs font-medium text-amber-600">
-								({daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} left)
+								({daysRemaining} {daysRemaining === 1 ? 'hari' : 'hari'} left)
 							</span>
 						{/if}
 					</span>
@@ -284,7 +285,7 @@
 			</div>
 			
 			<div class="text-muted-foreground text-xs flex items-center gap-1">
-				{completedTasks}/{totalTasks} tasks completed
+				{completedTasks}/{totalTasks} tugas selesai
 				<CircleCheck class="h-3 w-3 text-success" />
 			</div>
 		</Card.Content>
@@ -292,7 +293,7 @@
 		<Card.Footer class="flex justify-between gap-2 pt-2">
 			<Button class="w-full" onclick={handleCardClick}>
 				<ExternalLink class="mr-2 h-4 w-4" />
-				Open Project
+				Buka Proyek
 			</Button>
 		</Card.Footer>
 	</Card.Root>
@@ -301,9 +302,9 @@
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={(value) => isDeleteDialogOpen = value}>
 	<AlertDialog.Content class="max-w-md" portalProps={{}}>
 		<AlertDialog.Header class="space-y-2">
-		  <AlertDialog.Title class="text-xl font-semibold">Delete Project</AlertDialog.Title>
+		  <AlertDialog.Title class="text-xl font-semibold">Hapus Proyek</AlertDialog.Title>
 		  <AlertDialog.Description class="text-muted-foreground">
-			This action cannot be undone. This will permanently delete the project and all associated tasks.
+			Aksi ini tidak dapat diulang. Ini akan menghapus proyek dan semua tugas yang terkait.
 		  </AlertDialog.Description>
 		</AlertDialog.Header>
 		<AlertDialog.Footer class="flex justify-end gap-2">
