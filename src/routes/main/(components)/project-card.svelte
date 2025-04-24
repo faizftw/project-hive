@@ -277,7 +277,7 @@
 						Due: {formatDate(project.dueDate)}
 						{#if daysRemaining && daysRemaining > 0 && project.status !== 'completed'}
 							<span class="ml-1 text-xs font-medium text-amber-600">
-								({daysRemaining} {daysRemaining === 1 ? 'hari' : 'hari'} left)
+								({daysRemaining} {daysRemaining === 1 ? 'hari' : 'hari'} lagi)
 							</span>
 						{/if}
 					</span>
