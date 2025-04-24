@@ -88,7 +88,7 @@
 				await refreshTableData(refreshProjectId);
 				
 				setIsDeleteDialogOpen(false);
-				toast.success('Task deleted successfully');
+				toast.success('Tugas berhasil dihapus');
 			} else {
 				throw new Error(result.error || 'Failed to delete task');
 			}

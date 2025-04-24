@@ -167,7 +167,7 @@ export const actions = {
 			const dueDate = formData.get('dueDate')?.toString();
 
 			if (!name) {
-				return { type: 'error', error: 'Nama project harus diisi' };
+				return { type: 'error', error: 'Nama proyek harus diisi' };
 			}
 
 			const project = await prisma.project.create({
@@ -237,7 +237,7 @@ export const actions = {
 			return {
 				type: 'success',
 				status: 200,
-				message: 'Project berhasil dihapus'
+				message: 'Proyek berhasil dihapus'
 			};
 
 		} catch (error) {
@@ -275,7 +275,7 @@ export const actions = {
 			});
 
 			if (!existingProject) {
-				return { type: 'error', error: 'Project tidak ditemukan' };
+				return { type: 'error', error: 'Proyek tidak ditemukan' };
 			}
 
 			// Update project
