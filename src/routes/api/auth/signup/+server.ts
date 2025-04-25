@@ -45,21 +45,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			}
 		});
 
-		// Buat cookie sesi
-		const sessionId = user.id; // Anda dapat menggunakan penyimpanan sesi yang lebih aman
-
-		const headers = new Headers();
-		headers.append(
-			'Set-Cookie',
-			serialize('session', sessionId, {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'strict',
-				secure: process.env.NODE_ENV === 'production',
-				maxAge: 60 * 60 * 24 * 7 // 1 minggu
-			})
-		);
-
+		// No longer setting session cookie on signup
+		// Users must log in after registration
+		
 		return new Response(
 			JSON.stringify({
 				message: 'Signup berhasil',
@@ -70,8 +58,7 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 			}),
 			{
-				status: 201,
-				headers
+				status: 201
 			}
 		);
 	} catch (error) {
