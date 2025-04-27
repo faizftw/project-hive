@@ -110,6 +110,7 @@
     </TabsContent>
     <TabsContent value="details">
       <Card class="p-6">
+        <h2 class="text-xl font-semibold mb-4">Detail Akun</h2>
         <div class="space-y-4">
           <div>
             <h3 class="text-sm font-medium text-muted-foreground">Username</h3>

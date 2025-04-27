@@ -37,7 +37,7 @@ export const PUT: RequestHandler = async ({ params, request, locals }) => {
 			const projectDeadline = new Date(existingTask.project.dueDate);
 
 			if (taskDeadline > projectDeadline) {
-				return json({ error: 'Task deadline cannot exceed project deadline' }, { status: 400 });
+				return json({ error: 'Tugas tidak dapat melebihi deadline proyek' }, { status: 400 });
 			}
 		}
 

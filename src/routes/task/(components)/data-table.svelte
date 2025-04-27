@@ -296,9 +296,9 @@
 						<Table.Row>
 							<Table.Cell colspan={columns.length} class="h-24 text-center">
 								{#if $filteredTasks.length === 0}
-									No tasks for this project
+									Belum ada tugas di proyek ini
 								{:else}
-									No tasks match the current filters
+									Tidak ada tugas yang sesuai dengan filter
 								{/if}
 							</Table.Cell>
 						</Table.Row>

@@ -216,8 +216,8 @@ export const DELETE: RequestHandler = async ({ request, locals }) => {
 		console.log('Task deleted successfully');
 		
 		return json({ 
-			message: 'Task deleted successfully',
-			projectId // Kembalikan projectId agar frontend bisa me-refresh data
+			message: 'Tugas berhasil dihapus',
+			projectId 
 		}, { status: 200 });
 
 	} catch (error: any) {

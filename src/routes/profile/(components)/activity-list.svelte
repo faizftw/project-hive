@@ -82,7 +82,7 @@
 </script>
 
 <Card class="p-6">
-  <h2 class="text-xl font-semibold mb-4">Aktivitas Terbaru</h2>
+  <h2 class="text-xl font-semibold mb-4">Aktivitas Terkini</h2>
   <div class="space-y-4">
     {#if !activities || activities.length === 0}
       <p class="text-muted-foreground">Tidak ada aktivitas terbaru</p>

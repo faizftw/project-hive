@@ -125,7 +125,7 @@
 				// Refresh data dari server
 				await refreshTableData(projectId);
 				setIsEditDialogOpen(false);
-				toast.success('Task updated successfully');
+				toast.success('Tugas berhasil diperbarui');
 			} else {
 				const data = await response.json();
 				throw new Error(data.error || 'Failed to update task');

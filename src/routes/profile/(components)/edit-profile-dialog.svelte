@@ -145,7 +145,7 @@
 <Dialog {open} onOpenChange={handleDialogChange}>
   <DialogContent class="sm:max-w-[425px]">
     <DialogHeader>
-      <DialogTitle>Edit Profile</DialogTitle>
+      <DialogTitle>Edit Profil</DialogTitle>
     </DialogHeader>
     {#if serverError}
       <Alert.Root variant="destructive">
