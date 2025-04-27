@@ -100,3 +100,9 @@ test('menekan tab “Aktivitas Terkini”', async ({ page }) => {
   await page.getByRole('tab', { name: 'Aktivitas Terkini' }).click();
   await expect(page.getByRole('heading', { name: 'Aktivitas Terkini' })).toBeVisible();
 });
+
+test('menekan tombol home pada breadcrumb', async ({ page }) => {
+  await login({ page });
+  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByText('Dashboard').isVisible();
+});
