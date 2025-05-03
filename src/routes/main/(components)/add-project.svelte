@@ -166,12 +166,13 @@
 <Dialog bind:open>
 	<DialogTrigger>
 		{#snippet child({ props })}
-		<Button class=''
+		<Button 
+			class="flex items-center"
 			aria-label="Buat Proyek"
 			{...props}
 		>
-			<Add class="mr-2 h-4 w-4" />
-			Buat Proyek
+			<Add class="h-4 w-4" />
+			<span class="ml-2 hidden sm:inline">Buat Proyek</span>
 		</Button>
 		{/snippet}
 	</DialogTrigger>

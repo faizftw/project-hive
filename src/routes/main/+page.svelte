@@ -173,12 +173,12 @@
 			</Card.Root>
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-					<Card.Title class="text-sm font-medium">On Hold</Card.Title>
+					<Card.Title class="text-sm font-medium">Tertunda</Card.Title>
 					<CirclePause class="text-amber-500 h-4 w-4" />
 				</Card.Header>
 				<Card.Content>
 					<div class="text-2xl font-bold">{onHoldProjects}</div>
-					<p class="text-muted-foreground text-xs">Proyek On Hold</p>
+					<p class="text-muted-foreground text-xs">Proyek Tertunda</p>
 				</Card.Content>
 			</Card.Root>
 		</div>
@@ -212,7 +212,7 @@
 		<Separator class='' />
 		<h2 class="text-2xl font-bold tracking-tight">Projects</h2>
 		
-		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+		<div class="grid gap-4 grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-4">
 			{#each filteredProjects as project (project.id)}
 				<div transition:fade>
 					<ProjectCard project={project as Project} />

@@ -5,7 +5,7 @@
 	import { priorities, statuses } from '../(data)/data.js';
 	import type { Task } from '../(data)/schemas.js';
 	import { DataTableFacetedFilter, DataTableViewOptions } from './index.js';
-	import {Button} from '$lib/components/ui/button/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
 	export let tableModel: TableViewModel<Task>;
@@ -45,15 +45,19 @@
 	$: showReset = Object.values({ ...$filterValues, $filterValue }).some((v) => v.length > 0);
 </script>
 
-<div class="flex items-center justify-between">
-	<div class="flex flex-1 items-center space-x-2">
+<div class="w-full flex flex-col space-y-2 md:space-y-0 md:flex-row md:items-center md:justify-between">
+	<!-- Search input -->
+	<div class="w-full md:w-auto">
 		<Input
 			placeholder="Filter tasks..."
-			class="h-8 w-[150px] lg:w-[250px]"
+			class="h-8 w-full md:w-[150px] lg:w-[250px]"
 			type="search"
 			bind:value={$filterValue}
 		/>
-
+	</div>
+	
+	<!-- Filters container -->
+	<div class="flex flex-wrap items-center gap-2">
 		<DataTableFacetedFilter
 			bind:filterValues={$filterValues.status}
 			title="Status"
@@ -80,6 +84,8 @@
 				<Cross2 class="ml-2 h-4 w-4" />
 			</Button>
 		{/if}
+		<div class="ml-auto">
+			<DataTableViewOptions {tableModel} />
+		</div>
 	</div>
-	<DataTableViewOptions {tableModel} />
 </div>
