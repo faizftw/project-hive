@@ -17,10 +17,18 @@
 	let open = false;
 
 	function handleSelect(currentValue: string) {
+		// Ensure currentValue is valid
+		if (!currentValue) {
+			console.error('Selected value is undefined');
+			return;
+		}
+		
 		if (Array.isArray(filterValues) && filterValues.includes(currentValue)) {
 			filterValues = filterValues.filter((v) => v !== currentValue);
+			console.log('Filter values after removing:', filterValues);
 		} else {
 			filterValues = [...(Array.isArray(filterValues) ? filterValues : []), currentValue];
+			console.log('Filter values after adding:', filterValues);
 		}
 	}
 </script>
@@ -63,8 +71,9 @@
 						{@const Icon = option.icon}
 						<Command.Item
 							value={option.value}
-							onSelect={(currentValue) => {
-								handleSelect(currentValue);
+							onSelect={() => {
+								// Pass the option.value directly instead of relying on currentValue
+								handleSelect(option.value);
 							}}
 						>
 							<div
