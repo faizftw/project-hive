@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readable, get, derived } from 'svelte/store';
+	import { readable, get, derived, writable } from 'svelte/store';
 	import { Render, Subscribe, createRender, createTable } from 'svelte-headless-table';
 	import {
 		addColumnFilters,
@@ -23,85 +23,133 @@
 		DataTableUrlCell
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
-	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { projectsStore } from '$lib/stores/projects';
 	import { browser } from '$app/environment';
+	import { tasksOverviewStore } from '$lib/stores/tasks-overview';
 
-	export let projectId: string;
 	export let activeTab: string;
 
 	let isLoading = false;
 
 	async function refreshTableData() {
 		if (!browser) return; // Jangan jalankan di server
-		
+
 		isLoading = true;
 		try {
+			// Reset store terlebih dahulu untuk mencegah data lama tercampur
+			tasksOverviewStore.reset();
+			
 			// Ambil semua tugas tanpa filter projectId
 			const response = await fetch(`/api/tasks`);
 			const tasks = await response.json();
-			tasksStore.set(tasks);
+			// console.log(`Berhasil mengambil ${tasks.length} tasks dari API`);
+			
+			// Set data baru ke store
+			tasksOverviewStore.set(tasks);
 		} catch (error) {
-			console.error('Error refreshing data:', error);
+			// console.error('Error refreshing data:', error);
 			toast.error('Gagal memperbarui data');
 		} finally {
 			isLoading = false;
 		}
 	}
 
-	// Pindahkan fetch ke dalam onMount
+	// Buat writable store dari activeTab prop
+	const activeTabStore = writable(activeTab);
+
+	// Pindahkan fetch ke dalam onMount dan tambahkan efek untuk memantau perubahan tab
 	onMount(() => {
 		refreshTableData();
-	});	
+		
+		// Tambahkan efek untuk memantau perubahan activeTab
+		const unsubscribe = activeTabStore.subscribe((currentTab) => {
+			// console.log(`Tab berubah menjadi: ${currentTab}`);
+			// Refresh data saat tab berubah untuk memastikan data selalu konsisten
+			refreshTableData();
+		});
+		
+		return () => {
+			unsubscribe();
+		};
+	});
 
-	const allTasks = derived(tasksStore, $tasks => $tasks);
+	// Update activeTabStore saat prop activeTab berubah
+	$: activeTabStore.set(activeTab);
+
+	// Tambahkan onDestroy untuk membersihkan store saat navigasi halaman
+	onDestroy(() => {
+		// Reset store untuk mencegah data tertukar saat navigasi
+		tasksOverviewStore.reset();
+		// console.log('tasksOverviewStore direset saat navigasi halaman');
+	});
+
+	const allTasks = derived(tasksOverviewStore, $tasks => $tasks);
 
 	// Derived store untuk task yang difilter berdasarkan tab
 	const filteredAndSortedTasks = derived(
-		[tasksStore, projectsStore], 
-		([$tasks, $projects]) => {
+		[tasksOverviewStore, projectsStore, activeTabStore], 
+		([$tasks, $projects, currentTab]) => {
+			// console.log(`Memfilter tasks untuk tab: ${currentTab}, jumlah tasks: ${$tasks.length}`);
+			
 			// Filter task yang projectnya masih ada
-			const validTasks = $tasks.filter(task => {
-				const projectIds = new Set($projects.map(p => p.id));
+			const validTasks = $tasks.filter((task: any) => {
+				const projectIds = new Set($projects.map((p: any) => p.id));
 				return projectIds.has(task.projectId);
 			});
 
-			if (activeTab === 'Upcoming') {
+			if (currentTab === 'Upcoming') {
 				// Filter task yang belum selesai dan urutkan berdasarkan deadline terdekat
-				return validTasks
-					.filter(task => 
+				const filteredTasks = validTasks
+					.filter((task: any) => 
 						task.status !== 'Completed' && 
 						task.status !== 'Canceled' && 
 						task.deadline
 					)
-					.sort((a, b) => 
+					.sort((a: any, b: any) => 
 						new Date(a.deadline || '').getTime() - new Date(b.deadline || '').getTime()
 					)
 					.slice(0, 5); // Ambil 5 task terdekat
+				
+				// console.log(`Tab Upcoming: ${filteredTasks.length} tasks setelah filter`);
+				return filteredTasks;
 			} else {
 				// Urutkan berdasarkan createdAt terbaru
-				return validTasks
-					.sort((a, b) => 
+				const filteredTasks = validTasks
+					.sort((a: any, b: any) => 
 						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 					)
 					.slice(0, 5); // Ambil 5 task terbaru
+				
+				// console.log(`Tab Recent: ${filteredTasks.length} tasks setelah filter`);
+				return filteredTasks;
 			}
 		}
 	);
 
-	// Gunakan filteredAndSortedTasks untuk tabel
-	const table = createTable(filteredAndSortedTasks, {
+	// Pastikan filteredAndSortedTasks mengembalikan array yang valid untuk createTable
+	const typedFilteredTasks = derived(filteredAndSortedTasks, ($tasks): any[] => {
+		return Array.isArray($tasks) ? $tasks : [];
+	});
+
+	// Gunakan typedFilteredTasks untuk tabel dengan konfigurasi yang lebih stabil
+	// Buat tabel dengan derived store untuk memastikan tabel selalu diperbarui dengan data terbaru
+	const table = createTable(typedFilteredTasks, {
 		select: addSelectedRows(),
 		sort: addSortBy({
 			toggleOrder: ['asc', 'desc']
 		}),
-		page: addPagination(),
+		page: addPagination({
+			initialPageIndex: 0, // Selalu mulai dari halaman pertama
+			initialPageSize: 5 // Sesuaikan dengan jumlah item yang ditampilkan
+		}),
 		filter: addTableFilter({
 			fn: ({ filterValue, value }) => {
+				if (typeof value !== 'string') return true;
 				return value.toLowerCase().includes(filterValue.toLowerCase());
-			}
+			},
+			initialFilterValue: ''
 		}),
 		colFilter: addColumnFilters(),
 		hide: addHiddenColumns()
