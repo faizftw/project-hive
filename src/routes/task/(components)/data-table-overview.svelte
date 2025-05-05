@@ -39,7 +39,8 @@
 		
 		isLoading = true;
 		try {
-			const response = await fetch(`/api/tasks?projectId=${projectId}`);
+			// Ambil semua tugas tanpa filter projectId
+			const response = await fetch(`/api/tasks`);
 			const tasks = await response.json();
 			tasksStore.set(tasks);
 		} catch (error) {
@@ -52,11 +53,8 @@
 
 	// Pindahkan fetch ke dalam onMount
 	onMount(() => {
-		// Panggil refreshTableData pertama kali
-		if (projectId) {
-			refreshTableData();
-		}
-	});
+		refreshTableData();
+	});	
 
 	const allTasks = derived(tasksStore, $tasks => $tasks);
 
@@ -164,9 +162,7 @@
 					fn: ({ filterValue, value }) => {
 						if (filterValue.length === 0) return true;
 						if (!Array.isArray(filterValue) || typeof value !== 'string') return true;
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
+						return filterValue.includes(value);
 					},
 					initialFilterValue: [],
 					render: ({ filterValue }) => {
@@ -189,10 +185,7 @@
 					fn: ({ filterValue, value }) => {
 						if (filterValue.length === 0) return true;
 						if (!Array.isArray(filterValue) || typeof value !== 'string') return true;
-
-						return filterValue.some((filter) => {
-							return value.includes(filter);
-						});
+						return filterValue.includes(value);
 					},
 					initialFilterValue: [],
 					render: ({ filterValue }) => {
