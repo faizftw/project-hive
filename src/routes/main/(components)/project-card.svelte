@@ -139,7 +139,7 @@
 				return 'Not set';
 			}
 
-			return new Intl.DateTimeFormat('en-US', {
+			return new Intl.DateTimeFormat('id-ID', {
 				month: 'short',
 				day: 'numeric',
 				year: 'numeric',
@@ -173,7 +173,7 @@
 				tasksStore.deleteTask(project.id);
 				
 				isDeleteDialogOpen = false;
-				toast.success('Project berhasil dihapus');
+				toast.success('Proyek berhasil dihapus');
 			} else {
 				// Jika server mengembalikan error
 				throw new Error(result.error || 'Gagal menghapus project');
@@ -269,12 +269,12 @@
 			<div class="grid grid-cols-2 gap-2 text-xs">
 				<div class="flex items-center gap-1 text-muted-foreground">
 					<Calendar class="h-3 w-3" />
-					<span>Created: {formatDate(project.createdAt)}</span>
+					<span>: {formatDate(project.createdAt)}</span>
 				</div>
 				<div class="flex items-center gap-1 text-muted-foreground">
-					<Clock class="h-3 w-3" />
+					<Clock class="h-4 w-4" />
 					<span>
-						Due: {formatDate(project.dueDate)}
+						: {formatDate(project.dueDate)}
 						{#if daysRemaining && daysRemaining > 0 && project.status !== 'completed'}
 							<span class="ml-1 text-xs font-medium text-amber-600">
 								({daysRemaining} {daysRemaining === 1 ? 'hari' : 'hari'} lagi)
