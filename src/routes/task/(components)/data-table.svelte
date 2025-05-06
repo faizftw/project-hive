@@ -31,6 +31,7 @@
 	import { refreshTableData as fetchTableData } from '$lib/utils/table-utils';
 	import { format } from "date-fns";
 	import { id } from "date-fns/locale/id";
+	import {Link} from 'lucide-svelte';
 
 	export let projectId: string;
 
@@ -413,7 +414,37 @@
 										{/if}
 									</div>
 								</Card.Content>
-								<Card.Footer class="flex justify-end">
+								<Card.Footer class="flex justify-between items-center">
+									<!-- URL alias di awal footer -->
+									{#if row.original.url}
+										<div class="text-sm">
+											<a 
+												href={typeof row.original.url === 'object' && row.original.url !== null 
+													? row.original.url.url 
+													: typeof row.original.url === 'string' 
+														? row.original.url 
+														: '#'} 
+												target="_blank" 
+												rel="noopener noreferrer"
+												class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors group"
+											>
+												<Link size={16} class="text-primary group-hover:scale-110 transition-transform" />
+												<span class="truncate max-w-[150px] font-medium">
+													{typeof row.original.url === 'object' && row.original.url !== null 
+														? row.original.url.alias || row.original.url.url 
+														: typeof row.original.url === 'string' 
+															? row.original.url 
+															: ''}
+												</span>
+											</a>
+										</div>
+									{:else}
+										<span class="text-sm text-muted-foreground flex items-center gap-1.5 px-2 py-1">
+											<Link size={16} class="text-muted-foreground opacity-50" />
+											<span>No URL</span>
+										</span>
+									{/if}
+									
 									<!-- Tombol aksi -->
 									<DataTableRowActions row={row.original} {projectId} />
 								</Card.Footer>

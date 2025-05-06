@@ -2,6 +2,7 @@
 	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { FolderCheck, FolderClock, CalendarClock, Archive, CirclePause, FolderOpen } from 'lucide-svelte';
+	import { Badge } from '$lib/components/ui/badge/index.js';
 	import DataTableOverview from '../task/(components)/data-table-overview.svelte';
 	import type { Task } from '../task/(data)/schemas.js';
 	import * as Tabs from '$lib/components/ui/tabs/index.js';
@@ -111,16 +112,17 @@
 </script>
 
 	<div class="flex-0 space-y-4 p-8 pt-6">
-		<div class="flex items-center justify-between space-y-2">
+		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-2">
 			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-			<div class="flex items-center space-x-2">
+			<div class="flex flex-row items-center gap-2">
 				<Avatar/>
 				<DarkMode />
 				<AddProject on:projectAdded={handleProjectAdded} />
 				<Search on:search={handleSearch} />
 			</div>
 		</div>
-		<div class="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+		<!-- Desktop view: cards, Mobile view: badges -->
+		<div class="hidden sm:grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 			<Card.Root>
 				<Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
 					<Card.Title class="text-sm font-medium">Proyek</Card.Title>
@@ -182,6 +184,40 @@
 				</Card.Content>
 			</Card.Root>
 		</div>
+
+		
+		<div class="flex flex-wrap  gap-2 sm:hidden">
+			<div class="flex items-center gap-1.5 bg-secondary/80 rounded-full px-3 py-1.5">
+				<FolderOpen class="text-muted-foreground h-4 w-4" />
+				<span class="font-semibold">{totalProjects}</span>
+				<span class="text-xs text-muted-foreground">Proyek</span>
+			</div>
+			<div class="flex items-center gap-1.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full px-3 py-1.5">
+				<FolderCheck class="h-4 w-4" />
+				<span class="font-semibold">{completedProjects}</span>
+				<span class="text-xs">Selesai</span>
+			</div>
+			<div class="flex items-center gap-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full px-3 py-1.5">
+				<FolderClock class="h-4 w-4" />
+				<span class="font-semibold">{inProgressProjects}</span>
+				<span class="text-xs">Aktif</span>
+			</div>
+			<div class="flex items-center gap-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full px-3 py-1.5">
+				<CalendarClock class="h-4 w-4" />
+				<span class="font-semibold">{overdueProjects}</span>
+				<span class="text-xs">Terlambat</span>
+			</div>
+			<div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/30 text-slate-600 dark:text-slate-400 rounded-full px-3 py-1.5">
+				<Archive class="h-4 w-4" />
+				<span class="font-semibold">{cancelledProjects}</span>
+				<span class="text-xs">Arsip</span>
+			</div>
+			<div class="flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full px-3 py-1.5">
+				<CirclePause class="h-4 w-4" />
+				<span class="font-semibold">{onHoldProjects}</span>
+				<span class="text-xs">Tertunda</span>
+			</div>
+		</div>
 		<div class="grid gap-4 grid-cols-7">
 			<Card.Root class="col-span-7">
 				<Card.Header>
@@ -212,7 +248,7 @@
 		<Separator class='' />
 		<h2 class="text-2xl font-bold tracking-tight">Projects</h2>
 		
-		<div class="grid gap-4 grid-cols-1 md:grid-cols-3 sm:grid-cols-2 lg:grid-cols-4">
+		<div class="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 			{#each filteredProjects as project (project.id)}
 				<div transition:fade>
 					<ProjectCard project={project as Project} />
