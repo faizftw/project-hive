@@ -94,56 +94,39 @@
 		}
 	}
 
-	const project = $projectsStore.find(p => p.id === projectId);
-	let title = project?.name;
-	
-	// Menggunakan onMount untuk inisialisasi pertama
-	onMount(() => {
-		if (!projectId) return;
-		
-		const findProject = () => {
-			console.log("Mencari project dengan ID:", projectId);
-			const project = $projectsStore.find(p => p.id === projectId);
-			console.log("Project yang ditemukan:", project);
-			
-			if (project?.dueDate) {
-				try {
-					console.log("Project dueDate:", project.dueDate);
-					const date = new Date(project.dueDate);
-					const dateStr = date.toISOString().split('T')[0];
-					console.log("Due date string:", dateStr);
-					
-					const parsedDate = parseDate(dateStr);
-					console.log("End date parsed:", parsedDate);
-					
-					updateEndDate(parsedDate);
-				} catch (error) {
-					console.error('Error memproses project deadline:', error);
-				}
-			} else {
-				console.log("Project tidak memiliki due date");
-			}
-		};
-		
-		// Coba cari project setelah komponen di-mount
-		findProject();
-		
-		// Coba lagi setelah beberapa saat jika project store belum diisi
-		setTimeout(findProject, 500);
+	// Gunakan derived store untuk mendapatkan project dan title secara reaktif
+	const currentProject = derived(projectsStore, ($projects) => {
+		console.log("Mencari project dengan ID:", projectId, "dari", $projects.length, "projects");
+		return $projects.find(p => p.id === projectId) || null;
 	});
 	
-	// Mencari project dan mengupdate end date saat projectId berubah
+	// Title akan otomatis diperbarui saat project berubah
+	let title = $state('');
+	
+	// Gunakan $effect untuk memperbarui title saat project berubah
 	$effect(() => {
-		if (initializing || !projectId) return;
+		title = $currentProject?.name || '';
+	});
+	
+	// Menggunakan $effect untuk memperbarui tanggal deadline proyek secara reaktif
+	$effect(() => {
+		const project = $currentProject;
+		if (!project) {
+			console.log("Tidak ada project yang ditemukan");
+			return;
+		}
 		
-		console.log("Project ID berubah:", projectId);
-		const project = $projectsStore.find(p => p.id === projectId);
+		console.log("Project ditemukan:", project);
 		
-		if (project?.dueDate) {
+		if (project.dueDate) {
 			try {
+				console.log("Project dueDate:", project.dueDate);
 				const date = new Date(project.dueDate);
 				const dateStr = date.toISOString().split('T')[0];
+				console.log("Due date string:", dateStr);
+				
 				const parsedDate = parseDate(dateStr);
+				console.log("End date parsed:", parsedDate);
 				
 				// Update hanya jika tanggal berubah (bukan string comparison)
 				if (!endDate || 
@@ -156,8 +139,16 @@
 			} catch (error) {
 				console.error('Error memproses project deadline:', error);
 			}
+		} else {
+			console.log("Project tidak memiliki due date");
 		}
 	});
+	
+	// Tetap gunakan onMount untuk memastikan inisialisasi awal
+	onMount(() => {
+		console.log("Component mounted, projectId:", projectId);
+		// Tidak perlu lagi mencari project secara manual karena sudah ditangani oleh derived store
+	})
 </script>
 
 <Sidebar.Root variant="floating" {...restProps}>
@@ -166,26 +157,26 @@
 	</Sidebar.Header>
 	
 	<Sidebar.Content class="p-4">
-		<Sidebar.Group>
-			<h3 class="text-xl font-bold tracking-tight">{title}</h3>
-			<p class="text-sm text-muted-foreground">{project?.description || 'Tidak ada deskripsi'}</p>
+		<Sidebar.Group class="mb-4">
+			<h3 class="text-xl font-bold tracking-tight">{title || 'Tidak ada judul'}</h3>
+			<p class="text-sm text-muted-foreground">{$currentProject?.description || 'Tidak ada deskripsi'}</p>
 		</Sidebar.Group>
-		<Sidebar.Group>
-		<div class="space-y-4">
-			<div>
-				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Deadline Proyek</h4>
-				<RangeCalendar 
-					bind:value 
-					class="rounded-md border" 
-					readonly={true}
-					disabled={true}
-					locale="en"
-				/>
-			</div>
-			
-			<div>
-				<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Status Tugas</h4>
-				<div class="flex flex-wrap gap-1">
+		<Sidebar.Group class="mb-4">
+			<div class="space-y-4">
+				<div class="justify-items-center">
+					<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Deadline Proyek</h4>
+					<RangeCalendar 
+						bind:value 
+						class="rounded-md border inline-block" 
+						readonly={true}
+						disabled={true}
+						locale="en"
+					/>
+				</div>
+				
+				<div>
+					<h4 class="text-lg text-center font-bold text-muted-foreground mb-2">Status Tugas</h4>
+					<div class="flex flex-wrap gap-1">
 						<Badge href="#" class="badge" variant="outline">Backlog {$taskCounts.backlog}</Badge>
 						<Badge href="#" class="badge" variant="outline">Todo {$taskCounts.todo}</Badge>
 						<Badge href="#" class="badge" variant="outline">In Progress {$taskCounts.inProgress}</Badge>
@@ -193,10 +184,9 @@
 						<Badge href="#" class="badge" variant="outline">Cancelled {$taskCounts.cancelled}</Badge>
 						<Badge href="#" class="badge" variant="outline">Pending {$taskCounts.pending}</Badge>
 						<Badge href="#" class="badge" variant="outline">Overdue {$taskCounts.overdue}</Badge>
-					
+					</div>
 				</div>
 			</div>
-		</div>
-	</Sidebar.Group>
+		</Sidebar.Group>
 	</Sidebar.Content>
 </Sidebar.Root>
