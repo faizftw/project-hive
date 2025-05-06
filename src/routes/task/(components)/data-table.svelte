@@ -22,12 +22,15 @@
 		DataTableUrlCell
 	} from './index.js';
 	import * as Table from '$lib/components/ui/table/index.js';
+	import * as Card from '$lib/components/ui/card/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { refreshTableData as fetchTableData } from '$lib/utils/table-utils';
+	import { format } from "date-fns";
+	import { id } from "date-fns/locale/id";
 
 	export let projectId: string;
 
@@ -227,16 +230,57 @@
 	const tableModel = table.createViewModel(columns);
 
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = tableModel;
+	
+	// Helper function to get status classes
+	function getStatusClasses(status) {
+		switch(status) {
+			case 'In Progress':
+				return 'bg-yellow-50 text-yellow-800 ring-1 ring-inset ring-yellow-600/20';
+			case 'Completed':
+				return 'bg-green-50 text-green-800 ring-1 ring-inset ring-green-600/20';
+			case 'Overdue':
+				return 'bg-red-50 text-red-800 ring-1 ring-inset ring-red-600/20';
+			case 'Todo':
+			case 'Backlog':
+				return 'bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20';
+			case 'Canceled':
+				return 'bg-gray-100 text-gray-800 ring-1 ring-inset ring-gray-600/20';
+			default:
+				return 'bg-gray-50 text-gray-800 ring-1 ring-inset ring-gray-600/20';
+		}
+	}
+	
+	// Helper function to get priority classes
+	function getPriorityClasses(priority) {
+		switch(priority) {
+			case 'Low':
+				return 'text-green-600';
+			case 'Medium':
+				return 'text-yellow-600';
+			case 'High':
+				return 'text-red-600';
+			default:
+				return '';
+		}
+	}
 </script>
 
 {#if isLoading}
 	<div class="w-full space-y-3">
 		{#each Array(5) as _}
-			<div class="flex items-center space-x-4 rounded-md border p-4">
+			<div class="hidden md:flex items-center space-x-4 rounded-md border p-4">
 				<div class="h-6 w-[30%] animate-pulse rounded-md bg-muted"></div>
 				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
 				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
 				<div class="h-6 w-[15%] animate-pulse rounded-md bg-muted"></div>
+			</div>
+			<div class="md:hidden flex flex-col space-y-2 rounded-md border p-4">
+				<div class="h-6 w-[80%] animate-pulse rounded-md bg-muted"></div>
+				<div class="h-6 w-[60%] animate-pulse rounded-md bg-muted"></div>
+				<div class="flex justify-between mt-2">
+					<div class="h-6 w-[30%] animate-pulse rounded-md bg-muted"></div>
+					<div class="h-6 w-[30%] animate-pulse rounded-md bg-muted"></div>
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -254,7 +298,9 @@
 {:else}
 	<div class="space-y-4">
 		<DataTableToolbar {tableModel} {projectId} data={$filteredTasks} />
-		<div class="rounded-md border">
+		
+		<!-- Tampilan tabel untuk desktop -->
+		<div class="rounded-md border hidden md:block">
 			<Table.Root {...$tableAttrs}>
 				<Table.Header>
 					{#each $headerRows as headerRow}
@@ -306,6 +352,89 @@
 				</Table.Body>
 			</Table.Root>
 		</div>
-		<DataTablePagination {tableModel} />
+		
+		<!-- Tampilan kartu untuk mobile -->
+		<div class="md:hidden space-y-4">
+			{#if $pageRows.length}
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						{#if row.original}
+							<Card.Root class="overflow-hidden">
+								<Card.Header>
+									<div class="flex items-start justify-between">
+										<div class="space-y-1.5">
+											<!-- Judul Task -->
+											<Card.Title>{row.original.title}</Card.Title>
+											<!-- Label jika ada -->
+											{#if row.original.label}
+												<div class="flex mt-1">
+													<span class="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
+														{typeof row.original.label === 'object' && row.original.label !== null 
+															? row.original.label.label || row.original.label.value 
+															: row.original.label}
+													</span>
+												</div>
+											{/if}
+										</div>
+										<!-- Status Task -->
+										<div>
+											<span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium {getStatusClasses(row.original.status)}">
+												{row.original.status}
+											</span>
+										</div>
+									</div>
+								</Card.Header>
+								<Card.Content>
+									<!-- Deskripsi Task -->
+									{#if row.original.description}
+										<p class="text-sm text-muted-foreground line-clamp-2 mb-3">
+											{row.original.description}
+										</p>
+									{/if}
+									
+									<!-- Informasi tambahan -->
+									<div class="grid grid-cols-2 gap-2 text-sm">
+										<!-- Prioritas -->
+										<div class="flex flex-col">
+											<span class="text-muted-foreground">Prioritas</span>
+											<span class="font-medium {getPriorityClasses(row.original.priority)}">
+												{row.original.priority}
+											</span>
+										</div>
+										
+										<!-- Deadline -->
+										{#if row.original.deadline}
+											<div class="flex flex-col">
+												<span class="text-muted-foreground">Deadline</span>
+												<span class="font-medium">
+													{format(new Date(row.original.deadline), 'dd MMM yyyy', { locale: id })}
+												</span>
+											</div>
+										{/if}
+									</div>
+								</Card.Content>
+								<Card.Footer class="flex justify-end">
+									<!-- Tombol aksi -->
+									<DataTableRowActions row={row.original} {projectId} />
+								</Card.Footer>
+							</Card.Root>
+						{/if}
+					</Subscribe>
+				{/each}
+			{:else}
+				<Card.Root>
+					<Card.Content class="text-center py-6">
+						{#if $filteredTasks.length === 0}
+							Belum ada tugas di proyek ini
+						{:else}
+							Tidak ada tugas yang sesuai dengan filter
+						{/if}
+					</Card.Content>
+				</Card.Root>
+			{/if}
+		</div>
+		<div class="hidden md:block">
+		<DataTablePagination {tableModel}/>
+	</div>
 	</div>
 {/if}
