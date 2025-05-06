@@ -13,6 +13,7 @@
 	import EditProject from './edit-project.svelte';
 	import { Progress } from "$lib/components/ui/progress/index.js";
 	import { tasksStore } from '$lib/stores/tasks';
+import { tasksOverviewStore } from '$lib/stores/tasks-overview';
 	import { derived } from 'svelte/store';
 	import { Badge } from "$lib/components/ui/badge/index.js";
 	import { toast } from "svelte-sonner";
@@ -170,7 +171,9 @@
 				projectsStore.deleteProject(project.id);
 				
 				// Hapus semua task yang terkait dengan project yang dihapus
-				tasksStore.deleteTask(project.id);
+				tasksStore.deleteTasksByProject(project.id);
+				// Juga hapus dari tasksOverviewStore untuk mencegah data teracak
+				tasksOverviewStore.deleteTasksByProject(project.id);
 				
 				isDeleteDialogOpen = false;
 				toast.success('Proyek berhasil dihapus');

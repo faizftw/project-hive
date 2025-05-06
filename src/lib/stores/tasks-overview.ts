@@ -238,6 +238,13 @@ function createTasksOverviewStore() {
             
             update(tasks => tasks.filter(t => t.id !== id));
         },
+        deleteTasksByProject: (projectId: string) => {
+            if (!projectId) {
+                return;
+            }
+            
+            update(tasks => tasks.filter(t => t.projectId !== projectId));
+        },
         reset: () => {
             set([]);
         }

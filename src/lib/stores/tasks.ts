@@ -240,6 +240,13 @@ function createTaskStore() {
 			
 			update(tasks => tasks.filter(t => t.id !== taskId));
 		},
+		deleteTasksByProject: (projectId: string) => {
+			if (!projectId) {
+				return;
+			}
+			
+			update(tasks => tasks.filter(t => t.projectId !== projectId));
+		},
 		checkOverdue: () => {
 			update(tasks => checkOverdueTasks(tasks));
 		},

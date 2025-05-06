@@ -59,19 +59,27 @@
 	// Buat writable store dari activeTab prop
 	const activeTabStore = writable(activeTab);
 
-	// Pindahkan fetch ke dalam onMount dan tambahkan efek untuk memantau perubahan tab
+	// Pindahkan fetch ke dalam onMount dan tambahkan efek untuk memantau perubahan tab dan projects
 	onMount(() => {
 		refreshTableData();
 		
 		// Tambahkan efek untuk memantau perubahan activeTab
-		const unsubscribe = activeTabStore.subscribe((currentTab) => {
+		const unsubscribeTab = activeTabStore.subscribe((currentTab) => {
 			// console.log(`Tab berubah menjadi: ${currentTab}`);
 			// Refresh data saat tab berubah untuk memastikan data selalu konsisten
 			refreshTableData();
 		});
 		
+		// Tambahkan efek untuk memantau perubahan projectsStore
+		// Ini akan mendeteksi saat project dihapus dari dashboard
+		const unsubscribeProjects = projectsStore.subscribe(() => {
+			// console.log('Projects store berubah, refresh data tabel overview');
+			refreshTableData();
+		});
+		
 		return () => {
-			unsubscribe();
+			unsubscribeTab();
+			unsubscribeProjects();
 		};
 	});
 
