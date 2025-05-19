@@ -40,7 +40,7 @@ test('tidak mengisi field Deskripsi dan URL atau salah satunya pada formulir dan
   await page.getByPlaceholder('Judul Tugas').fill('testtugas');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
   await page.locator('[data-bits-calendar-next-button]').click();
-  await page.getByLabel('Saturday, May 24,').click();
+  await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:20');
   await page.getByRole('button', { name: 'Save' }).click();
@@ -55,7 +55,7 @@ test('mengisi field URL alias tetapi tidak mengisi field URL dan menekan tombol 
   await page.getByPlaceholder('Judul Tugas').fill('testtugas2');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
   await page.locator('[data-bits-calendar-next-button]').click();
-  await page.getByLabel('Saturday, May 24,').click();
+  await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:20');
   await page.getByPlaceholder('Nama tampilan untuk URL').click();
@@ -82,7 +82,7 @@ test('mengisi field tanggal dan waktu pada masa lampau pada formulir dan menekan
   await page.getByPlaceholder('Judul Tugas').fill('testtugas4');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
   await page.locator('[data-bits-calendar-prev-button]').click();
-  await page.getByLabel('Friday, March 28,').click();
+  await page.getByLabel('Event April').getByLabel('Monday, April 28,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:20');
   await page.getByRole('button', { name: 'Save' }).click();
@@ -99,7 +99,7 @@ test('mengisi formulir dengan data valid dan menekan tombol save', async ({ page
   await page.getByPlaceholder('Deskripsi').fill('deskripsi testtugas5');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
   await page.locator('[data-bits-calendar-next-button]').click();
-  await page.getByLabel('Saturday, May 24,').click();
+  await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:20');
   await page.getByRole('button', { name: 'Save' }).click();
@@ -195,9 +195,11 @@ test('menekan salah satu header kolom tabel tugas', async ({ page }) => {
 
 test('menekan salah satu opsi pengurutan', async ({ page }) => {
   await login({ page });
-  await page.getByRole('button', { name: 'Prioritas caret sort,' }).click();
-  await page.getByRole('menuitem', { name: 'arrow up, Asc' }).click();
-  await page.getByRole('button', { name: 'Prioritas arrow up,' }).isVisible();
+  await page.getByRole('button', { name: 'Status caret sort,' }).click();
+  await page.getByRole('button', { name: 'Status caret sort,' }).click();
+  // await page.getByRole('menuitem', { name: 'arrow up, Asc' }).click();
+  await page.getByRole('menuitem', { name: 'arrow down, Desc' }).click();
+  await page.getByRole('button', { name: 'Status arrow down,' }).isVisible();
 });
 
 test('menekan tombol home pada breadcrumb', async ({ page }) => {

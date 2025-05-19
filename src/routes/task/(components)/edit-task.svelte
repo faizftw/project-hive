@@ -24,19 +24,21 @@
 	}>();
 
 	let isSubmitting = false;
-	let title = '';
-	let description = '';
-	let priority = 'Low';
-	let status = 'Pending';
-	let label: string = 'general'; 
-	let newLabel = '';
-	let showNewLabelInput = false;
-	let dateValue: DateValue | null = null;
-	let timeValue = '';
-	let formattedDateTime: string | null = null;
-	let minDate = today(getLocalTimeZone());
-	let url = '';
-	let urlAlias = '';
+let title = '';
+let description = '';
+let priority = 'Low';
+let status = 'Pending';
+let label: string = 'general'; 
+let newLabel = '';
+let showNewLabelInput = false;
+let dateValue: DateValue | null = null;
+let timeValue = '';
+let formattedDateTime: string | null = null;
+let minDate = today(getLocalTimeZone());
+let url = '';
+let urlAlias = '';
+let errorMessage = '';
+let showAlert = false;
 
 	function resetForm() {
 		if (task) {

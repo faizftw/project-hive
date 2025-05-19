@@ -13,6 +13,8 @@
   import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
   import { DateFormatter } from '@internationalized/date';
   import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 
   interface Props {
     project: Project;
@@ -26,12 +28,14 @@
   }>();
   
   let isSubmitting = $state(false);
-  let dateValue: DateValue | null = $state(null);
-  let timeValue = $state('');
-  let name = $state('');
-  let description = $state('');
-  let status = $state('');
-  let formattedDateTime: string | null = $state(null);
+let dateValue: DateValue | null = $state(null);
+let timeValue = $state('');
+let name = $state('');
+let description = $state('');
+let status = $state('');
+let formattedDateTime: string | null = $state(null);
+let errorMessage = $state('');
+let showAlert = $state(false);
 
 
 
@@ -63,7 +67,8 @@
 
     // Validasi nama project
     if (!name.trim()) {
-      toast.error('Nama proyek harus diisi');
+      errorMessage = 'Nama proyek harus diisi';
+      showAlert = true;
       isSubmitting = false;
       return;
     }
@@ -82,14 +87,16 @@
         selectedDateTime = null;
       }
     } else {
-      toast.error('Tanggal dan waktu deadline proyek wajib diisi');
+      errorMessage = 'Tanggal dan waktu deadline proyek wajib diisi';
+      showAlert = true;
       isSubmitting = false;
       return;
     }
 
     // Validasi apakah deadline tidak di masa lalu
     if (selectedDateTime && selectedDateTime < new Date()) {
-      toast.error('Deadline tidak boleh di masa lalu');
+      errorMessage = 'Deadline tidak boleh di masa lalu';
+      showAlert = true;
       isSubmitting = false;
       return;
     }
@@ -142,7 +149,8 @@
       }
     } catch (err) {
       console.error('Error updating project:', err);
-      toast.error(`Gagal memperbarui proyek: ${err.message}`);
+      errorMessage = `Gagal memperbarui proyek: ${err.message}`;
+      showAlert = true;
     } finally {
       isSubmitting = false;
     }
@@ -184,6 +192,14 @@
         Edit detail proyek di sini. Klik save setelah selesai.
       </Dialog.Description>
     </Dialog.Header>
+    
+    {#if showAlert}
+      <Alert.Root variant="destructive">
+        <CrossCircled class="h-4 w-4" />
+        <Alert.Title>Error</Alert.Title>
+        <Alert.Description>{errorMessage}</Alert.Description>
+      </Alert.Root>
+    {/if}
 
     <form onsubmit={handleSubmit}>
       <div class="grid gap-4 py-4">

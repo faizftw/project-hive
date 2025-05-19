@@ -7,6 +7,8 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 	import { refreshTableData } from '$lib/utils/table-utils';
 	import EditTask from './edit-task.svelte';
 	import { projectsStore } from '$lib/stores/projects';
@@ -49,8 +51,10 @@
 	}
 	
 	let isDeleteDialogOpen = $state(false);
-	let isEditDialogOpen = $state(false);
-	let isSubmitting = $state(false);
+let isEditDialogOpen = $state(false);
+let isSubmitting = $state(false);
+let errorMessage = $state('');
+let showAlert = $state(false);
 
 	const setIsDeleteDialogOpen = (value: boolean) => {
 		isDeleteDialogOpen = value;
@@ -94,7 +98,8 @@
 			}
 		} catch (error: any) {
 			console.error('Error deleting task:', error);
-			toast.error(error.message);
+errorMessage = error.message;
+showAlert = true;
 		} finally {
 			isSubmitting = false;
 		}
@@ -132,7 +137,8 @@
 			}
 		} catch (error: any) {
 			console.error('Error updating task:', error);
-			toast.error(error.message);
+errorMessage = error.message;
+showAlert = true;
 		} finally {
 			isSubmitting = false;
 		}
@@ -187,7 +193,8 @@
 			}
 		} catch (error: any) {
 			console.error('Error setting status:', error);
-			toast.error(error.message);
+errorMessage = error.message;
+showAlert = true;
 		} finally {
 			isSubmitting = false;
 		}
@@ -239,12 +246,19 @@
 
 <AlertDialog.Root open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
 	<AlertDialog.Content class="sm:max-w-[425px]" portalProps={{}}>
-		<AlertDialog.Header class="space-y-2">
-		  <AlertDialog.Title class="text-xl font-semibold">Tugas akan dihapus</AlertDialog.Title>
-		  <AlertDialog.Description class="text-sm text-muted-foreground">
-			Aksi ini tidak dapat diulang. Ini akan menghapus tugas.
-		  </AlertDialog.Description>
-		</AlertDialog.Header>
+	<AlertDialog.Header class="space-y-2">
+	  <AlertDialog.Title class="text-xl font-semibold">Tugas akan dihapus</AlertDialog.Title>
+	  <AlertDialog.Description class="text-sm text-muted-foreground">
+		Aksi ini tidak dapat diulang. Ini akan menghapus tugas.
+	  </AlertDialog.Description>
+	</AlertDialog.Header>
+	{#if showAlert}
+		<Alert.Root variant="destructive">
+			<CrossCircled class="h-4 w-4" />
+			<Alert.Title>Error</Alert.Title>
+			<Alert.Description>{errorMessage}</Alert.Description>
+		</Alert.Root>
+	{/if}
 		<AlertDialog.Footer class="flex justify-end space-x-2">
 		  <AlertDialog.Cancel class="mt-2">Cancel</AlertDialog.Cancel>
 		  <AlertDialog.Action class="bg-red-500" onclick={() => deleteTask(task.id)}>Delete</AlertDialog.Action>

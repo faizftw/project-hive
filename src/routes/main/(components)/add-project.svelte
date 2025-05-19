@@ -22,16 +22,20 @@
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import { projectsStore } from '$lib/stores/projects';
 	import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 
 	const dispatch = createEventDispatcher<{
 		projectAdded: { data: Project };
 	}>();
 
 	let open = false;
-	let isSubmitting = false;
-	let dateValue: DateValue | null = null;
-	let timeValue = '';
-	let formattedDateTime: string | null = null;
+let isSubmitting = false;
+let dateValue: DateValue | null = null;
+let timeValue = '';
+let formattedDateTime: string | null = null;
+let errorMessage = '';
+let showAlert = false;
 
 	// Tetapkan tanggal minimum sebagai hari ini
 	let minDate = today(getLocalTimeZone());
@@ -71,7 +75,8 @@
 		// Validasi nama project
 		const projectName = formData.get('name') as string;
 		if (!projectName || !projectName.trim()) {
-			toast.error('Nama proyek harus diisi');
+			errorMessage = 'Nama proyek harus diisi';
+			showAlert = true;
 			isSubmitting = false;
 			return;
 		}
@@ -90,14 +95,16 @@
 				selectedDateTime = null;
 			}
 		} else {
-			toast.error('Tanggal dan waktu deadline proyek wajib diisi');
+			errorMessage = 'Tanggal dan waktu deadline proyek wajib diisi';
+			showAlert = true;
 			isSubmitting = false;
 			return;
 		}
 
 		// Validasi apakah deadline tidak di masa lalu
 		if (selectedDateTime && selectedDateTime < new Date()) {
-			toast.error('Deadline tidak boleh di masa lalu');
+			errorMessage = 'Deadline tidak boleh di masa lalu';
+			showAlert = true;
 			isSubmitting = false;
 			return;
 		}
@@ -155,7 +162,8 @@
 		})
 		.catch((err) => {
 			console.error('Error creating project:', err);
-			toast.error(`Gagal membuat proyek: ${err.message}`);
+			errorMessage = `Gagal membuat proyek: ${err.message}`;
+			showAlert = true;
 		})
 		.finally(() => {
 			isSubmitting = false;
@@ -180,6 +188,13 @@
 		<DialogHeader class="space-y-2">
 			<DialogTitle class="text-xl font-semibold">Buat Proyek Baru</DialogTitle>
 		</DialogHeader>
+		{#if showAlert}
+			<Alert.Root variant="destructive">
+				<CrossCircled class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>{errorMessage}</Alert.Description>
+			</Alert.Root>
+		{/if}
 		<form 
 			method="POST"
 			onsubmit={handleSubmit}

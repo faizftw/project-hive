@@ -103,9 +103,9 @@ test('mengisi formulir registrasi dengan valid dan menekan tombol sign up', asyn
   await page.getByPlaceholder('name@example.com').click();
   await page.getByPlaceholder('name@example.com').click();
   await page.getByPlaceholder('name@example.com').click();
-  await page.getByPlaceholder('name@example.com').fill('testdev66@gmail.com');
+  await page.getByPlaceholder('name@example.com').fill('testdev66df88@gmail.com');
   await page.getByPlaceholder('username').click();
-  await page.getByPlaceholder('username').fill('testuser22');
+  await page.getByPlaceholder('username').fill('testuser6fd622');
   await page.getByPlaceholder('password', { exact: true }).click();
   await page.getByPlaceholder('password', { exact: true }).press('ControlOrMeta+a');
   await page.getByPlaceholder('password', { exact: true }).fill('12345678');

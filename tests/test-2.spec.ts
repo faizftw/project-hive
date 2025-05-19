@@ -37,7 +37,6 @@ test('tidak mengisi field Deskripsi pada formulir dan menekan tombol “Buat Pro
   await page.getByPlaceholder('Nama Proyek').fill('testproyek');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
   await page.getByLabel('Next').click();
-  await page.getByLabel('Next').click();
   await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:22');
@@ -60,7 +59,8 @@ test('mengisi field tanggal dan waktu pada masa lampau pada formulir dan menekan
   await page.getByPlaceholder('Nama Proyek').click();
   await page.getByPlaceholder('Nama Proyek').fill('testproyek3');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
-  await page.getByLabel('Thursday, April 24,').click();
+  await page.getByLabel('Next').click();
+  await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
   await page.locator('input[type="time"]').fill('22:22');
   await page.getByLabel('Buat Proyek Baru').getByRole('button', { name: 'Buat Proyek' }).click();
@@ -75,7 +75,6 @@ test('mengisi formulir dengan data valid dan menekan tombol “Buat Proyek”', 
   await page.getByPlaceholder('Deskripsi').click();
   await page.getByPlaceholder('Deskripsi').fill('deskripsi testproyek4');
   await page.getByRole('button', { name: 'Pilih Tanggal' }).click();
-  await page.getByLabel('Next').click();
   await page.getByLabel('Next').click();
   await page.getByLabel('Monday, June 30,').click();
   await page.getByRole('button', { name: 'Pilih Waktu' }).click();
@@ -135,7 +134,7 @@ test('menekan tombol delete pada dialog', async ({ page }) => {
   await page.locator('[aria-label="dots horizontal,"]').first().click();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByRole('button', { name: 'Delete' }).click();
-  await expect(page.getByText('Project berhasil dihapus')).toBeVisible();
+  await expect(page.getByText('Proyek berhasil dihapus')).toBeVisible();
 });
 
 test('menekan tombol “Buka proyek” pada salah satu kartu proyek', async ({ page }) => {
@@ -147,8 +146,8 @@ test('menekan tombol “Buka proyek” pada salah satu kartu proyek', async ({ p
 test('menginput kata kunci yang valid pada search bar', async ({ page }) => {
   await login({ page });
   await page.getByPlaceholder('Search...').click();
-  await page.getByPlaceholder('Search...').fill('project 2');
-  await expect(page.getByRole('heading', { name: 'test project 2' })).toBeVisible();
+  await page.getByPlaceholder('Search...').fill('Blackbox');
+  await expect(page.getByRole('heading', { name: 'blackbox test' })).toBeVisible();
 });
 
 test('menginput kata kunci yang tidak valid pada search bar', async ({ page }) => {

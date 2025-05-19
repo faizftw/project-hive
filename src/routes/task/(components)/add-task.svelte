@@ -7,6 +7,8 @@
 	import { labels } from '../(data)/data';
 	import { tasksStore } from '$lib/stores/tasks';
 	import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 	import { createEventDispatcher } from 'svelte';
 	import type { DateValue } from '@internationalized/date';
 	import { DateFormatter, getLocalTimeZone, today } from '@internationalized/date';
@@ -36,7 +38,9 @@
 		timeValue: '',
 		formattedDateTime: null as string | null,
 		url: '',
-		urlAlias: ''
+		urlAlias: '',
+		errorMessage: '',
+		showAlert: false
 	});
 	
 	const minDate = today(getLocalTimeZone());
@@ -69,14 +73,16 @@
 
 		// Validasi judul task
 		if (!state.title.trim()) {
-			toast.error('Judul tugas harus diisi');
+			state.errorMessage = 'Judul tugas harus diisi';
+			state.showAlert = true;
 			state.isSubmitting = false;
 			return;
 		}
 
 		// Validasi deadline
 		if (!state.dateValue || !state.timeValue) {
-			toast.error('Deadline tugas (tanggal dan waktu) harus diisi');
+			state.errorMessage = 'Deadline tugas (tanggal dan waktu) harus diisi';
+			state.showAlert = true;
 			state.isSubmitting = false;
 			return;
 		}
@@ -94,7 +100,8 @@
 		}
 
 		if (state.formattedDateTime && new Date(state.formattedDateTime) < new Date()) {
-			toast.error('Deadline tugas harus di masa depan');
+			state.errorMessage = 'Deadline tugas harus di masa depan';
+			state.showAlert = true;
 			state.isSubmitting = false;
 			return;
 		}
@@ -105,7 +112,8 @@
 			const projectDeadline = new Date(project.dueDate);
 
 			if (taskDeadline > projectDeadline) {
-				toast.error('Deadline tugas tidak boleh melebihi deadline proyek');
+				state.errorMessage = 'Deadline tugas tidak boleh melebihi deadline proyek';
+				state.showAlert = true;
 				state.isSubmitting = false;
 				return;
 			}
@@ -155,7 +163,8 @@
 				throw new Error(errorMessage);
 			}
 		} catch (error: any) {
-			toast.error(error.message);
+			state.errorMessage = error.message;
+			state.showAlert = true;
 			console.error('Error submitting task:', error);
 		} finally {
 			state.isSubmitting = false;
@@ -175,6 +184,8 @@
 		state.open = false;
 		state.url = '';
 		state.urlAlias = '';
+		state.showAlert = false;
+		state.errorMessage = '';
 	}
 
 	function capitalizeLabel(label: string) {
@@ -197,6 +208,13 @@
 	</Dialog.Trigger>
 	
 	<Dialog.Content class="inline-block" portalProps={{}}>
+		{#if state.showAlert}
+			<Alert.Root variant="destructive">
+				<CrossCircled class="h-4 w-4" />
+				<Alert.Title>Error</Alert.Title>
+				<Alert.Description>{state.errorMessage}</Alert.Description>
+			</Alert.Root>
+		{/if}
 		<Dialog.Header class="space-y-2">
 			<Dialog.Title class="text-xl font-semibold">Buat Tugas Baru</Dialog.Title>
 			<Dialog.Description class="text-sm text-muted-foreground">Isi detail tugas yang ingin Anda tambahkan.</Dialog.Description>

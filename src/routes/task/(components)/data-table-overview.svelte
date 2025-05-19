@@ -25,6 +25,8 @@
 	import * as Table from '$lib/components/ui/table/index.js';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 	import { projectsStore } from '$lib/stores/projects';
 	import { browser } from '$app/environment';
 	import { tasksOverviewStore } from '$lib/stores/tasks-overview';
@@ -32,6 +34,8 @@
 	export let activeTab: string;
 
 	let isLoading = false;
+let errorMessage = '';
+let showAlert = false;
 
 	async function refreshTableData() {
 		if (!browser) return; // Jangan jalankan di server
@@ -50,7 +54,8 @@
 			tasksOverviewStore.set(tasks);
 		} catch (error) {
 			// console.error('Error refreshing data:', error);
-			toast.error('Gagal memperbarui data');
+			errorMessage = 'Gagal memperbarui data';
+showAlert = true;
 		} finally {
 			isLoading = false;
 		}
@@ -293,7 +298,14 @@
 
 <div class="space-y-4">
 	<OverviewToolbar {tableModel} data={$allTasks} />
-	<div class="rounded-md border">
+	{#if showAlert}
+	<Alert.Root variant="destructive">
+		<CrossCircled class="h-4 w-4" />
+		<Alert.Title>Error</Alert.Title>
+		<Alert.Description>{errorMessage}</Alert.Description>
+	</Alert.Root>
+{/if}
+<div class="rounded-md border">
 		<Table.Root {...$tableAttrs} class="w-full">
 			<Table.Header class="bg-muted/50">
 				{#each $headerRows as headerRow}

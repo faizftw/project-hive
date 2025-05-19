@@ -26,6 +26,8 @@
 	import { tasksStore } from '$lib/stores/tasks';
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+import { CrossCircled } from 'svelte-radix';
+import * as Alert from '$lib/components/ui/alert/index.js';
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 	import { refreshTableData as fetchTableData } from '$lib/utils/table-utils';
@@ -36,7 +38,8 @@
 	export let projectId: string;
 
 	let isLoading = true;
-	let errorMessage = '';
+let errorMessage = '';
+let showAlert = false;
 
 	// Fungsi untuk mengambil data dari server
 	async function refreshTableData() {
@@ -58,7 +61,8 @@
 		} catch (error: any) {
 			console.error('Error refreshing data di komponen:', error);
 			errorMessage = error.message || 'Gagal memperbarui data';
-			toast.error(errorMessage);
+			errorMessage = error.message || 'Gagal memperbarui data';
+showAlert = true;
 		} finally {
 			isLoading = false;
 		}
@@ -301,7 +305,14 @@
 		<DataTableToolbar {tableModel} {projectId} data={$filteredTasks} />
 		
 		<!-- Tampilan tabel untuk desktop -->
-		<div class="rounded-md border hidden md:block">
+		{#if showAlert}
+	<Alert.Root variant="destructive">
+		<CrossCircled class="h-4 w-4" />
+		<Alert.Title>Error</Alert.Title>
+		<Alert.Description>{errorMessage}</Alert.Description>
+	</Alert.Root>
+{/if}
+<div class="rounded-md border hidden md:block">
 			<Table.Root {...$tableAttrs}>
 				<Table.Header>
 					{#each $headerRows as headerRow}
