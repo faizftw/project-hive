@@ -21,6 +21,8 @@ import * as Alert from '$lib/components/ui/alert/index.js';
 	let { projectId }: { projectId: string } = $props();
 	import * as Select from "$lib/components/ui/select/index.js";
 	import { projectsStore } from '$lib/stores/projects';
+	import AcademicTemplates from './academic-templates.svelte';
+	import QuickActions from './quick-actions.svelte';
 
 	const dispatch = createEventDispatcher();
 
@@ -188,6 +190,54 @@ import * as Alert from '$lib/components/ui/alert/index.js';
 		state.errorMessage = '';
 	}
 
+	// Handler untuk academic template selection
+	function handleTemplateSelected(event: CustomEvent) {
+		const template = event.detail;
+		state.title = template.title;
+		state.description = template.description;
+		state.priority = template.priority;
+		state.status = template.status;
+		state.label = template.label;
+		
+		// Set deadline jika ada
+		if (template.deadline) {
+			const deadline = new Date(template.deadline);
+			state.dateValue = {
+				year: deadline.getFullYear(),
+				month: deadline.getMonth() + 1,
+				day: deadline.getDate(),
+				toDate: () => deadline
+			};
+			state.timeValue = `${deadline.getHours().toString().padStart(2, '0')}:${deadline.getMinutes().toString().padStart(2, '0')}`;
+		}
+		
+		toast.success('Template berhasil diterapkan!');
+	}
+
+	// Handler untuk quick actions
+	function handleQuickAction(event: CustomEvent) {
+		const { type, data } = event.detail;
+		state.title = data.title;
+		state.description = data.description;
+		state.priority = data.priority;
+		state.status = data.status;
+		state.label = data.label;
+		
+		// Set deadline jika ada
+		if (data.deadline) {
+			const deadline = new Date(data.deadline);
+			state.dateValue = {
+				year: deadline.getFullYear(),
+				month: deadline.getMonth() + 1,
+				day: deadline.getDate(),
+				toDate: () => deadline
+			};
+			state.timeValue = `${deadline.getHours().toString().padStart(2, '0')}:${deadline.getMinutes().toString().padStart(2, '0')}`;
+		}
+		
+		toast.success(`Quick action '${type}' berhasil diterapkan!`);
+	}
+
 	function capitalizeLabel(label: string) {
 		return label.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 	}
@@ -215,9 +265,19 @@ import * as Alert from '$lib/components/ui/alert/index.js';
 				<Alert.Description>{state.errorMessage}</Alert.Description>
 			</Alert.Root>
 		{/if}
-		<Dialog.Header class="space-y-2">
-			<Dialog.Title class="text-xl font-semibold">Buat Tugas Baru</Dialog.Title>
-			<Dialog.Description class="text-sm text-muted-foreground">Isi detail tugas yang ingin Anda tambahkan.</Dialog.Description>
+		<Dialog.Header class="space-y-3">
+			<div class="flex items-center justify-between">
+				<div>
+					<Dialog.Title class="text-xl font-semibold">Buat Tugas Baru</Dialog.Title>
+					<Dialog.Description class="text-sm text-muted-foreground">Isi detail tugas yang ingin Anda tambahkan.</Dialog.Description>
+				</div>
+			</div>
+			
+			<!-- Academic Templates and Quick Actions -->
+			<div class="flex gap-2 pt-2 border-t">
+				<AcademicTemplates on:templateSelected={handleTemplateSelected} />
+				<QuickActions on:quickAction={handleQuickAction} />
+			</div>
 		</Dialog.Header>
 		
 		<form onsubmit={handleSubmit}>

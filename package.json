@@ -26,7 +26,7 @@
 		"@tailwindcss/postcss": "^4.0.14",
 		"@tailwindcss/typography": "^0.5.15",
 		"@types/eslint": "^9.6.0",
-		"bits-ui": "1.0.0-next.98",
+		"bits-ui": "1.8.0",
 		"clsx": "^2.1.1",
 		"eslint": "^9.0.0",
 		"eslint-config-prettier": "^9.1.0",

@@ -61,8 +61,8 @@ importers:
         specifier: ^9.6.0
         version: 9.6.1
       bits-ui:
-        specifier: 1.0.0-next.98
-        version: 1.0.0-next.98(svelte@5.19.9)
+        specifier: 1.8.0
+        version: 1.8.0(svelte@5.19.9)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1143,8 +1143,8 @@ packages:
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
-  bits-ui@1.0.0-next.98:
-    resolution: {integrity: sha512-DYJNoi3pqLiJqmnOeKJp8dSmACu7yONmcoH6YqzrGnIQTgJ4bqL1D1C8gvDoUhWnCAtUWJ8fgyp9d25iOQAkiA==}
+  bits-ui@1.8.0:
+    resolution: {integrity: sha512-CXD6Orp7l8QevNDcRPLXc/b8iMVgxDWT2LyTwsdLzJKh9CxesOmPuNePSPqAxKoT59FIdU4aFPS1k7eBdbaCxg==}
     engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
       svelte: ^5.11.0
@@ -1233,6 +1233,9 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
+
+  css.escape@1.5.1:
+    resolution: {integrity: sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==}
 
   cssesc@3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
@@ -3162,11 +3165,12 @@ snapshots:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  bits-ui@1.0.0-next.98(svelte@5.19.9):
+  bits-ui@1.8.0(svelte@5.19.9):
     dependencies:
       '@floating-ui/core': 1.6.8
       '@floating-ui/dom': 1.6.11
       '@internationalized/date': 3.5.6
+      css.escape: 1.5.1
       esm-env: 1.2.2
       runed: 0.23.4(svelte@5.19.9)
       svelte: 5.19.9
@@ -3257,6 +3261,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  css.escape@1.5.1: {}
 
   cssesc@3.0.0: {}
 
