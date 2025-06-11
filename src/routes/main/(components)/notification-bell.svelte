@@ -203,8 +203,8 @@
 						<div class="p-4 hover:bg-accent/50 transition-colors">
 							<div class="flex items-start gap-3">
 								<div class="flex-shrink-0 mt-0.5">
-									<svelte:component
-										this={notification.icon}
+									
+									<notification.icon
 										class="h-4 w-4 {notification.type === 'overdue' ? 'text-red-500' : notification.type === 'due-today' ? 'text-orange-500' : 'text-blue-500'}"
 									/>
 								</div>
