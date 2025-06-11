@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AddProject, Search, DarkMode, Avatar } from './(components)/index.js';
+	import { AddProject, Search, DarkMode, Avatar, NotificationBell } from './(components)/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { FolderCheck, FolderClock, CalendarClock, Archive, CirclePause, FolderOpen } from 'lucide-svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -115,6 +115,7 @@
 		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-2">
 			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
 			<div class="flex flex-row items-center gap-2">
+				<NotificationBell />
 				<Avatar/>
 				<DarkMode />
 				<AddProject on:projectAdded={handleProjectAdded} />
