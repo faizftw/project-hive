@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { AddProject, Search, DarkMode, Avatar, NotificationBell } from './(components)/index.js';
+	import { AddProject, Search, DarkMode, Avatar, NotificationBell, AnalyticsSidebar } from './(components)/index.js';
+	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { FolderCheck, FolderClock, CalendarClock, Archive, CirclePause, FolderOpen } from 'lucide-svelte';
 	import { Badge } from '$lib/components/ui/badge/index.js';
@@ -111,17 +112,23 @@
 	});
 </script>
 
-	<div class="flex-0 space-y-4 p-8 pt-6">
-		<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-2">
-			<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
-			<div class="flex flex-row items-center gap-2">
-				<NotificationBell />
-				<Avatar/>
-				<DarkMode />
-				<AddProject on:projectAdded={handleProjectAdded} />
-				<Search on:search={handleSearch} />
+<Sidebar.Provider style="--sidebar-width: 20rem;">
+	<AnalyticsSidebar />
+	<Sidebar.Inset>
+		<div class="flex-0 space-y-4 p-8 pt-6">
+			<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-2">
+				<div class="flex items-center gap-2">
+					<Sidebar.Trigger class="-ml-1" />
+					<h2 class="text-3xl font-bold tracking-tight">Dashboard</h2>
+				</div>
+				<div class="flex flex-row items-center gap-2">
+					<NotificationBell />
+					<Avatar/>
+					<DarkMode />
+					<AddProject on:projectAdded={handleProjectAdded} />
+					<Search on:search={handleSearch} />
+				</div>
 			</div>
-		</div>
 		<!-- Desktop view: cards, Mobile view: badges -->
 		<div class="hidden sm:grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
 			<Card.Root>
@@ -249,11 +256,13 @@
 		<Separator class='' />
 		<h2 class="text-2xl font-bold tracking-tight">Projects</h2>
 		
-		<div class="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-			{#each filteredProjects as project (project.id)}
-				<div transition:fade>
-					<ProjectCard project={project as Project} />
-				</div>
-			{/each}
+			<div class="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+				{#each filteredProjects as project (project.id)}
+					<div transition:fade>
+						<ProjectCard project={project as Project} />
+					</div>
+				{/each}
+			</div>
 		</div>
-	</div>
+	</Sidebar.Inset>
+</Sidebar.Provider>

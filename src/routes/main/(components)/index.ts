@@ -4,3 +4,4 @@ export { default as DarkMode } from './darkmode.svelte';
 export { default as Avatar } from './avatar.svelte';
 export { default as EditProject } from './edit-project.svelte';
 export { default as NotificationBell } from './notification-bell.svelte';
+export { default as AnalyticsSidebar } from './analytics-sidebar.svelte';

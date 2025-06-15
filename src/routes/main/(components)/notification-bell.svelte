@@ -11,12 +11,13 @@
 
 	interface Notification {
 		id: string;
-		type: 'overdue' | 'due-today' | 'due-tomorrow' | 'due-week';
+		type: 'overdue' | 'due-today' | 'due-tomorrow' | 'due-week' | 'reminder-3days' | 'reminder-week';
 		title: string;
 		message: string;
 		date: string;
 		icon: any;
 		color: string;
+		priority: number; // 1 = highest, 5 = lowest
 	}
 
 	// Reactive state untuk notifikasi
@@ -30,6 +31,10 @@
 		tomorrow.setDate(tomorrow.getDate() + 1);
 		const nextWeek = new Date(today);
 		nextWeek.setDate(nextWeek.getDate() + 7);
+		const threeDaysLater = new Date(today);
+		threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+		const oneWeekLater = new Date(today);
+		oneWeekLater.setDate(oneWeekLater.getDate() + 7);
 
 		const newNotifications: Notification[] = [];
 
@@ -47,7 +52,8 @@
 						message: `"${task.title}" sudah melewati deadline`,
 						date: task.deadline,
 						icon: AlertTriangle,
-						color: 'destructive'
+						color: 'destructive',
+						priority: 1
 					});
 				}
 				// Task due today
@@ -59,7 +65,8 @@
 						message: `"${task.title}" harus diselesaikan hari ini`,
 						date: task.deadline,
 						icon: Clock,
-						color: 'destructive'
+						color: 'destructive',
+						priority: 2
 					});
 				}
 				// Task due tomorrow
@@ -71,7 +78,21 @@
 						message: `"${task.title}" akan jatuh tempo besok`,
 						date: task.deadline,
 						icon: Clock,
-						color: 'secondary'
+						color: 'secondary',
+						priority: 3
+					});
+				}
+				// Task due in 3 days (reminder)
+				else if (dueDate.toDateString() === threeDaysLater.toDateString()) {
+					newNotifications.push({
+						id: `task-3days-${task.id}`,
+						type: 'reminder-3days',
+						title: 'Reminder: 3 Hari Lagi',
+						message: `"${task.title}" akan jatuh tempo dalam 3 hari`,
+						date: task.deadline,
+						icon: Clock,
+						color: 'outline',
+						priority: 4
 					});
 				}
 				// Task due this week
@@ -83,7 +104,21 @@
 						message: `"${task.title}" akan jatuh tempo dalam minggu ini`,
 						date: task.deadline,
 						icon: Clock,
-						color: 'outline'
+						color: 'outline',
+						priority: 5
+					});
+				}
+				// Task reminder 1 week before (for tasks with longer deadlines)
+				else if (dueDate.toDateString() === oneWeekLater.toDateString()) {
+					newNotifications.push({
+						id: `task-weekreminder-${task.id}`,
+						type: 'reminder-week',
+						title: 'Reminder: 1 Minggu Lagi',
+						message: `"${task.title}" akan jatuh tempo dalam 1 minggu`,
+						date: task.deadline,
+						icon: Clock,
+						color: 'outline',
+						priority: 6
 					});
 				}
 			}
@@ -103,7 +138,8 @@
 						message: `Proyek "${project.name}" sudah melewati deadline`,
 						date: project.dueDate,
 						icon: AlertTriangle,
-						color: 'destructive'
+						color: 'destructive',
+						priority: 1
 					});
 				}
 				// Project due today
@@ -115,20 +151,74 @@
 						message: `Proyek "${project.name}" harus diselesaikan hari ini`,
 						date: project.dueDate,
 						icon: Clock,
-						color: 'destructive'
+						color: 'destructive',
+						priority: 2
+					});
+				}
+				// Project due tomorrow
+				else if (dueDate.toDateString() === tomorrow.toDateString()) {
+					newNotifications.push({
+						id: `project-tomorrow-${project.id}`,
+						type: 'due-tomorrow',
+						title: 'Deadline Proyek Besok',
+						message: `Proyek "${project.name}" akan jatuh tempo besok`,
+						date: project.dueDate,
+						icon: Clock,
+						color: 'secondary',
+						priority: 3
+					});
+				}
+				// Project due in 3 days (reminder)
+				else if (dueDate.toDateString() === threeDaysLater.toDateString()) {
+					newNotifications.push({
+						id: `project-3days-${project.id}`,
+						type: 'reminder-3days',
+						title: 'Reminder Proyek: 3 Hari Lagi',
+						message: `Proyek "${project.name}" akan jatuh tempo dalam 3 hari`,
+						date: project.dueDate,
+						icon: Clock,
+						color: 'outline',
+						priority: 4
+					});
+				}
+				// Project due this week
+				else if (dueDate <= nextWeek) {
+					newNotifications.push({
+						id: `project-week-${project.id}`,
+						type: 'due-week',
+						title: 'Deadline Proyek Minggu Ini',
+						message: `Proyek "${project.name}" akan jatuh tempo dalam minggu ini`,
+						date: project.dueDate,
+						icon: Clock,
+						color: 'outline',
+						priority: 5
+					});
+				}
+				// Project reminder 1 week before
+				else if (dueDate.toDateString() === oneWeekLater.toDateString()) {
+					newNotifications.push({
+						id: `project-weekreminder-${project.id}`,
+						type: 'reminder-week',
+						title: 'Reminder Proyek: 1 Minggu Lagi',
+						message: `Proyek "${project.name}" akan jatuh tempo dalam 1 minggu`,
+						date: project.dueDate,
+						icon: Clock,
+						color: 'outline',
+						priority: 6
 					});
 				}
 			}
 		});
 
-		// Sort notifications by priority (overdue first, then by date)
-		newNotifications.sort((a, b) => {
-			if (a.type === 'overdue' && b.type !== 'overdue') return -1;
-			if (b.type === 'overdue' && a.type !== 'overdue') return 1;
+		// Sort notifikasi berdasarkan priority (1 = highest priority)
+		notifications = newNotifications.sort((a, b) => {
+			// Sort by priority first (lower number = higher priority)
+			if (a.priority !== b.priority) {
+				return a.priority - b.priority;
+			}
+			// If same priority, sort by date (earlier dates first)
 			return new Date(a.date).getTime() - new Date(b.date).getTime();
 		});
-
-		notifications = newNotifications;
 		unreadCount = newNotifications.length;
 	});
 
@@ -205,8 +295,12 @@
 								<div class="flex-shrink-0 mt-0.5">
 									
 									<notification.icon
-										class="h-4 w-4 {notification.type === 'overdue' ? 'text-red-500' : notification.type === 'due-today' ? 'text-orange-500' : 'text-blue-500'}"
-									/>
+									class="h-4 w-4 {notification.type === 'overdue' ? 'text-red-500' : 
+										notification.type === 'due-today' ? 'text-orange-500' : 
+										notification.type === 'due-tomorrow' ? 'text-yellow-500' : 
+										notification.type === 'reminder-3days' ? 'text-blue-500' : 
+										notification.type === 'reminder-week' ? 'text-green-500' : 'text-blue-500'}"
+								/>
 								</div>
 								<div class="flex-1 min-w-0">
 									<div class="flex items-center gap-2 mb-1">
